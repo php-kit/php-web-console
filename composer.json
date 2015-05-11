@@ -1,0 +1,25 @@
+{
+  "name": "impactwave/php-web-console",
+  "description": "In-browser debugging tools for your PHP applications.",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Impactwave",
+      "email": "impactwave@impactwave.com",
+      "homepage": "http://impactwave.com"
+    },
+    {
+      "name": "Claudio Silva",
+      "email": "claudio.silva@impactwave.com"
+    }
+  ],
+  "require": {
+    "psr/http-message": "1.0.*@dev"
+  },
+  "autoload": {
+    "psr-4": {
+      "Impactwave\\WebConsole\\": "src"
+    }
+  },
+  "minimum-stability": "dev"
+}
