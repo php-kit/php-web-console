@@ -112,14 +112,14 @@ class WebConsole
     }
   }
 
-  public function panel ($panelId)
+  public static function panel ($panelId)
   {
     if (isset(self::$panels[$panelId]))
       return self::$panels[$panelId];
     throw new Exception ("Invalid panel id: $panelId");
   }
 
-  public function write ($msg)
+  public static function write ($msg)
   {
     self::panel ('console')->write ($msg);
   }
@@ -129,7 +129,7 @@ class WebConsole
    * Params: list of one or more values to be displayed.
    * @return void
    */
-  public function debug ()
+  public static function debug ()
   {
     call_user_func_array ([self::panel ('console'), 'debug'],  func_get_args ());
   }
@@ -139,17 +139,17 @@ class WebConsole
    * Params: a title followed by a list of one or more values to be displayed.
    * @return void
    */
-  public function debugSection ()
+  public static function debugSection ()
   {
     call_user_func_array ([self::panel ('console'), 'debugSection'], func_get_args ());
   }
 
-  public function logSection ()
+  public static function logSection ()
   {
     call_user_func_array ([self::panel ('console'), 'logSection'], func_get_args ());
   }
 
-  public function log ()
+  public static function log ()
   {
     call_user_func_array ([self::panel ('console'), 'log'], func_get_args ());
   }

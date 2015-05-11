@@ -149,8 +149,9 @@ class ErrorHandler
       $fname   = '<span class="file">' . end ($fitems) . '</span>';
       $line    = isset($v['line']) ? $v['line'] : '';
       $lineStr = $line ? "<span class='line'>$line</span>" : '';
+      $edit    = $file ? self::errorLink ($file, $line, 1, 'edit', '__btn') : '';
       $at      = $file ? self::errorLink ($file, $line, 1) : '&lt;unknown location&gt;';
-      ErrorPopupRenderer::renderStackFrame ($fname, $lineStr, $class, $fn, $args, $at);
+      ErrorPopupRenderer::renderStackFrame ($fname, $lineStr, $class, $fn, $args, $at, $edit);
     }
     return ob_get_clean ();
   }
