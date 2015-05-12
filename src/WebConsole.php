@@ -17,6 +17,8 @@ class WebConsole
   static $TABLE_INDEX_WIDTH    = 50;
   static $TABLE_TYPE_WIDTH     = 100;
 
+  static $class;
+
   private static $debugMode;
 
   /**
@@ -27,6 +29,7 @@ class WebConsole
 
   static function init ($debugMode = true)
   {
+    self::$class     = get_class ();
     self::$debugMode = $debugMode;
     self::registerPanel ('console', new ConsolePanel ('Console', 'fa fa-terminal'));
   }
@@ -50,7 +53,7 @@ class WebConsole
       if (!$count)
         echo $myContent;
     }
-    else error_log (self::panel('console')->render());
+    else error_log (self::panel ('console')->render ());
   }
 
   /**
@@ -89,7 +92,7 @@ class WebConsole
         echo $myContent;
       return null;
     }
-    else error_log (self::panel('console')->render());
+    else error_log (self::panel ('console')->render ());
     return $response;
   }
 
@@ -101,6 +104,96 @@ class WebConsole
     throw new $class($e->getMessage () . $openLogPaneMessage, $e->getCode (), $e);
   }
 
+  public static function panel ($panelId)
+  {
+    if (isset(self::$panels[$panelId]))
+      return self::$panels[$panelId];
+    throw new Exception ("Invalid panel id: <b>" . htmlentities ($panelId) . '</b>');
+  }
+
+  public static function write ($panelId, $msg)
+  {
+    self::panel ($panelId)->write ($msg);
+  }
+
+  /**
+   * Logs detailed information about the specified values or variables to the PHP console.
+   *
+   * Extra params: list of one or more values to be displayed.
+   * @param string $panelId Which panel to write to.
+   * @return void
+   */
+  public static function debug ($panelId)
+  {
+    $args = array_slice (func_get_args (), 1);
+    call_user_func_array ([self::panel ($panelId), 'debug'], $args);
+  }
+
+  /**
+   * Logs detailed information about the specified values or variables to the PHP console.
+   *
+   * > The filter function may remove some keys from the tabular output of objects or arrays.
+   *
+   * Extra params: list of one or more values to be displayed.
+   * @param string   $panelId Which panel to write to.
+   * @param callable $fn Filter callback. Receives the key name, the value and the target object/array.
+   *                     Returns <code>true</code> if the value should be displayed.
+   * @throws Exception
+   */
+  public static function debugWithFilter ($panelId, callable $fn)
+  {
+    $args = array_slice (func_get_args (), 1);
+    call_user_func_array ([self::panel ($panelId), 'debugWithFilter'], $args);
+  }
+
+  /**
+   * Logs detailed information about the specified values or variables to the PHP console.
+   *
+   * Extra params: a title followed by a list of one or more values to be displayed.
+   * @param string $panelId Which panel to write to.
+   */
+  public static function debugSection ($panelId)
+  {
+    $args = array_slice (func_get_args (), 1);
+    call_user_func_array ([self::panel ($panelId), 'debugSection'], $args);
+  }
+
+  /**
+   * Writes to a section on the specified panel.
+   *
+   * Extra params: a title followed by a list of one or more values to be displayed.
+   * @param string $panelId Which panel to write to.
+   */
+  public static function logSection ($panelId)
+  {
+    $args = array_slice (func_get_args (), 1);
+    call_user_func_array ([self::panel ($panelId), 'logSection'], $args);
+  }
+
+  /**
+   * Writes to the specified panel.
+   *
+   * @param string $panelId Which panel to write to.
+   */
+  public static function log ($panelId)
+  {
+    $args = array_slice (func_get_args (), 1);
+    call_user_func_array ([self::panel ($panelId), 'log'], $args);
+  }
+
+  public static function highlight ($msg, array $keywords, $baseStyle)
+  {
+    $k = implode ('|', $keywords);
+    return "<span class=$baseStyle>" . preg_replace ("#\\b($k)\\b#", '<span class=keyword>$1</span>', $msg) . '</span>';
+  }
+
+  public static function getLibraryNamespace ()
+  {
+    $c = explode ('\\', get_class ());
+    array_pop ($c);
+    return implode ('\\', $c);
+  }
+
   private static function render ()
   {
     global $application;
@@ -110,48 +203,6 @@ class WebConsole
       WebConsoleRenderer::renderScripts ();
       WebConsoleRenderer::renderConsole (self::$panels);
     }
-  }
-
-  public static function panel ($panelId)
-  {
-    if (isset(self::$panels[$panelId]))
-      return self::$panels[$panelId];
-    throw new Exception ("Invalid panel id: $panelId");
-  }
-
-  public static function write ($msg)
-  {
-    self::panel ('console')->write ($msg);
-  }
-
-  /**
-   * Logs detailed information about the specified values or variables to the PHP console.
-   * Params: list of one or more values to be displayed.
-   * @return void
-   */
-  public static function debug ()
-  {
-    call_user_func_array ([self::panel ('console'), 'debug'],  func_get_args ());
-  }
-
-  /**
-   * Logs detailed information about the specified values or variables to the PHP console.
-   * Params: a title followed by a list of one or more values to be displayed.
-   * @return void
-   */
-  public static function debugSection ()
-  {
-    call_user_func_array ([self::panel ('console'), 'debugSection'], func_get_args ());
-  }
-
-  public static function logSection ()
-  {
-    call_user_func_array ([self::panel ('console'), 'logSection'], func_get_args ());
-  }
-
-  public static function log ()
-  {
-    call_user_func_array ([self::panel ('console'), 'log'], func_get_args ());
   }
 
 }

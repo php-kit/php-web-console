@@ -60,8 +60,28 @@ class ErrorHandler
     exit;
   }
 
+  public static function processMessage ($msg)
+  {
+    $msg = preg_replace_callback ('|<path>([^<]*)</path>|', function ($m) {
+      return '<b>' . ErrorHandler::shortFileName ($m[1]) . '</b>';
+    }, $msg);
+    return $msg;
+  }
+
+  public static function normalizePath ($path)
+  {
+    do {
+      $path = preg_replace (
+        ['#//|/\./#', '#/([^/]*)/\.\./#'],
+        '/', $path, -1, $count
+      );
+    } while ($count > 0);
+    return $path;
+  }
+
   public static function shortFileName ($fileName)
   {
+    $fileName = self::normalizePath ($fileName);
     if (self::$baseDir) {
       if (strpos ($fileName, self::$baseDir) === 0)
         return substr ($fileName, strlen (self::$baseDir) + 1);
@@ -94,9 +114,9 @@ class ErrorHandler
 
   private static function filterStackTrace (array $trace)
   {
-    $me = get_class ();
-    return array_values (array_filter ($trace, function ($frame) use ($me) {
-      return !isset($frame['class']) || $frame['class'] != $me;
+    $namespace = WebConsole::getLibraryNamespace ();
+    return array_values (array_filter ($trace, function ($frame) use ($namespace) {
+      return !isset($frame['class']) || substr ($frame['class'], 0, strlen ($namespace)) != $namespace;
     }));
   }
 

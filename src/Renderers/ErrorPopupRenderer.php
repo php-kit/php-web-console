@@ -31,7 +31,7 @@ class ErrorPopupRenderer
             $title = isset($exception->title) ? $exception->title : get_class ($exception);
             if ($title)
               echo "<div class='__title'>$title</div>";
-            echo ucfirst ($exception->getMessage ());
+            echo ucfirst (ErrorHandler::processMessage($exception->getMessage ()));
             ?>
           </div>
           <div class="error-location">
@@ -107,7 +107,7 @@ class ErrorPopupRenderer
   left: 0;
   width: 100%;
   height: 100%;
-  background: #DDD;
+  background: rgba(208,208,208,0.9);
 }
 
 #__error a {

@@ -6,7 +6,19 @@ class ConsolePanel
   public $title;
   public $icon;
 
+  /**
+   * @var string The panel's HTML content.
+   */
   protected $content = '';
+  /**
+   * Filter callback for tables.
+   *
+   * <p>When set, for each object/array being debugged, the callbak receives the key name, the value and the target
+   * object/array.
+   * <p>It should return `true` if the value should be displayed.
+   * @var callable
+   */
+  protected $filter;
 
   function __construct ($title = 'Panel', $icon = '')
   {
@@ -40,6 +52,24 @@ class ConsolePanel
     $this->write ('</div>');
   }
 
+  /**
+   * Logs detailed information about the specified values or variables to the PHP console.
+   *
+   * > The filter function may remove some keys from the tabular output of objects or arrays.
+   *
+   * Extra params: list of one or more values to be displayed.
+   * @param callable $fn Filter callback. Receives the key name, the value and the target object/array.
+   *                     Returns <code>true</code> if the value should be displayed.
+   * @return void
+   */
+  public function debugWithFilter (callable $fn)
+  {
+    $args         = array_slice (func_get_args (), 1);
+    $this->filter = $fn;
+    call_user_func_array ([get_class (), 'debug'], $args);
+    $this->filter = null;
+  }
+
   public function logSection ($title)
   {
     $this->write ("<div class='__log-section'><div class='__log-title'>$title</div>");
@@ -53,8 +83,11 @@ class ConsolePanel
   public function log ()
   {
     $this->write ('<div class="__log-stripe">');
-    foreach (func_get_args () as $text)
+    foreach (func_get_args () as $text) {
+      if (!is_string ($text))
+        $text = $this->table ($text);
       $this->write ($text);
+    }
     $this->write ('</div>');
   }
 
@@ -81,13 +114,15 @@ class ConsolePanel
 
   protected function showCallLocation ()
   {
-    $stack = debug_backtrace (0, 4);
-    // Discard frames of both this function and the previous one.
-    array_shift ($stack);
-    array_shift ($stack);
-    // Detect call via global debug() and discard it, if present.
-    if (isset($stack[0]['args']) && count ($stack[0]['args']) && $stack[0]['args'][0] == get_class () . '::debug')
-      array_shift ($stack);
+    $namespace = WebConsole::getLibraryNamespace ();
+    $base      = __DIR__;
+    $stack     = debug_backtrace (0);
+    // Discard frames of all functions that belong to this library.
+    while (!empty($stack) && (
+        (isset($stack[0]['file']) && stripos ($stack[0]['file'], $base) === 0) ||
+        (isset($stack[0]['class']) && stripos ($stack[0]['class'], $namespace) === 0)
+      )
+    ) array_shift ($stack);
     $trace = $stack[0];
     $path  = isset($trace['file']) ? $trace['file'] : '';
     $path  = ErrorHandler::shortFileName ($path);
@@ -140,6 +175,7 @@ HTML;
     else {
       return htmlspecialchars (str_replace ('    ', '  ', trim (print_r ($data, true))));
     }
+    $filter = isset($this->filter) ? $this->filter : function ($k) { return true; };
     ob_start ();
     if ($depth >= WebConsole::$TABLE_COLLAPSE_DEPTH)
       echo '<div class="__expand"><a class="fa fa-plus-square" href="javascript:void(0)" onclick="this.parentNode.className+=\' show\'"></a>';
@@ -162,7 +198,7 @@ HTML;
       <tr>
         <th<?= $c1 ?>><?= $k ?></th>
         <td><?= $this->getType ($v) ?></td>
-        <td><?= $this->table ($v) ?></td>
+        <td><?= $filter($k, $v, $data) ? $this->table ($v) : '<i>ommited</i>' ?></td>
         <?php endforeach; ?>
     </tbody>
     </table><?php

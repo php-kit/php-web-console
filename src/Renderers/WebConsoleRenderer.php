@@ -6,17 +6,21 @@ class WebConsoleRenderer
 
   static function renderConsole (array $panels)
   {
+    $time = round(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 3);
+    $memory = round (memory_get_peak_usage (true) / 1024 / 1024, 1);
     $nop = 'href="javascript:void(0)"';
     ?>
     <div id="__console-container">
       <div id="__debug-bar">
+        <span><i class="fa fa-clock-o"></i>&nbsp; <?=$time ?> seconds</span>
+        <span><i class="fa fa-cogs"></i>&nbsp; <?=$memory ?> Mb</span>
         <?php foreach ($panels as $id => $panel):
           $content = $panel->render ();
           ?>
           <a class="__tab<?= strlen ($content) ? '' : ' disabled' ?>" <?= $nop ?>
              onclick="clearSel();openConsole();find('__console').className='show-console';find('__<?= $id ?>-tab').style.display='block';this.className='__tab active'">
           <?php if ($panel->icon): ?>
-            <i class="<?= $panel->title ?>"></i>
+            <i class="<?= $panel->icon ?>"></i>
           <?php endif ?>
             <?= $panel->title ?>
         </a>
@@ -108,6 +112,32 @@ class WebConsoleRenderer
   text-align: right;
 }
 
+#__debug-bar > span {
+  display: inline-block;
+  float: left;
+  color: #FFF;
+  line-height: 28px;
+  padding: 4px 10px 0;
+  margin-top: -4px;
+  border-left: 1px solid #686d73;
+  border-right: 1px solid #000;
+  position: relative;
+}
+#__debug-bar > span:first-of-type {
+  border-left: none;
+  padding-left: 0;
+}
+
+#__debug-bar > span:last-of-type::after {
+  content: '';
+  display: inline-block;
+  position: absolute;
+  height: 32px;
+  right: -2px;
+  top: 0;
+  border-left: 1px solid #686d73;
+}
+
 #__debug-bar .__tab {
   display: inline-block;
   color: #FFF;
@@ -136,7 +166,9 @@ class WebConsoleRenderer
 }
 
 #__debug-bar .__tab.disabled {
+  cursor: default;
   color: #737373;
+  pointer-events: none;
 }
 
 #__console {
@@ -224,16 +256,23 @@ class WebConsoleRenderer
   position: absolute;
 }
 
-#__console.show-console #__console-tab {
-  display: block;
+#__console header {
+  color: #666;
+  font-weight: bold;
+  margin: 0 0 20px;
 }
 
-#__console.show-request #__request-tab {
-  display: block;
+#__console .keyword {
+  color: #B00;
+  margin: 0 0 20px;
 }
 
-#__console.show-routes #__routes-tab {
-  display: block;
+#__console .identifier {
+  color: #55A;
+}
+
+#__console .dbcolumn {
+  color: #5A5;
 }
 
 .__console-table {
@@ -344,13 +383,12 @@ class WebConsoleRenderer
 }
 
 .__expand.show > table {
-  display: block;
+  display: table;
 }
 
 .__expand.show > a {
   display: none;
 }
-
     </style>
     <?php
   }
