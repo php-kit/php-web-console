@@ -13,7 +13,7 @@ class WebConsoleRenderer
     <div id="__console-container">
       <div id="__debug-bar">
         <span><i class="fa fa-clock-o"></i>&nbsp; <?=$time ?> seconds</span>
-        <span><i class="fa fa-cogs"></i>&nbsp; <?=$memory ?> Mb</span>
+        <span><i class="fa fa-cogs"></i>&nbsp; <?=$memory ?> MB</span>
         <?php foreach ($panels as $id => $panel):
           $content = $panel->render ();
           ?>
@@ -216,9 +216,9 @@ class WebConsoleRenderer
 }
 
 .__log-section {
-  margin: 5px 5px 20px;
+  margin: 0 0 20px;
   padding: 0 10px 10px;
-  outline: 1px solid #CCC;
+  border: 1px solid #DDD;
   position: relative;
 }
 
@@ -227,16 +227,23 @@ class WebConsoleRenderer
 }
 
 .__log-title {
+  font-weight: bold;
+  text-align: left;
+  font-family: sans-serif;
   margin: 0 -10px 10px;
   padding: 10px;
-  border-bottom: 1px solid #CCC;
-  font-weight: bold;
-  background: #f8f8f8;
-  font-family: sans-serif;
+  background: #eeeef0;
+  border-bottom: 1px solid #DDD;
+  color: #888;
 }
 
 .__log-stripe {
   padding: 10px 0;
+  position: relative;
+}
+
+.__log-stripe:first-child {
+  padding-top: 0;
 }
 
 .__log-data {
@@ -244,14 +251,23 @@ class WebConsoleRenderer
   padding-top: 5px;
 }
 
-.__log-data > .__console-table {
-  margin-bottom: 10px;
+.__log-data > .__console-table:first-of-type {
+  margin-top: -16px;
 }
 
+.__log-data > .__console-table:not(.with-caption):first-of-type {
+  margin-top: -15px;
+}
+
+.__log-data > .__console-table:last-of-type {
+  margin-bottom: -10px;
+}
+
+/* must lie inside a __log-stripe */
 .__debug-location {
   color: #999;
   right: 10px;
-  margin-top: 5px;
+  top: 5px;
   z-index: 1;
   position: absolute;
 }
@@ -288,7 +304,7 @@ class WebConsoleRenderer
   min-width: 320px; /* Prevent overflow of value column label */
   table-layout: fixed;
   border-spacing: 0;
-  margin: -10px -10px;
+  margin: -11px -10px;
   border-collapse: collapse;
 }
 

@@ -156,11 +156,6 @@ class WebConsole
     throw new Exception ("Invalid panel id: <b>" . htmlentities ($panelId) . '</b>');
   }
 
-  public static function write ($panelId, $msg)
-  {
-    self::panel ($panelId)->write ($msg);
-  }
-
   public static function highlight ($msg, array $keywords, $baseStyle)
   {
     $k = implode ('|', $keywords);

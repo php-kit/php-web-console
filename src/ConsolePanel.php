@@ -19,6 +19,11 @@ class ConsolePanel
    * @var callable
    */
   protected $filter;
+  /**
+   * The caption to be used on the next table.
+   * @var string
+   */
+  protected $caption;
 
   function __construct ($title = 'Panel', $icon = '')
   {
@@ -41,6 +46,12 @@ class ConsolePanel
   {
     foreach (func_get_args () as $arg) {
       if (!is_string ($arg))
+        $arg = $this->inspect ($arg);
+      elseif (substr ($arg, 0, 2) == '<#') {
+        if (substr ($arg, 2, 2) == 't>') $arg = substr ($arg, 4, -5);
+        // else passthrough
+      }
+      elseif (substr ($arg, 0, 3) != '</#')
         $arg = $this->inspect ($arg);
       $this->write ($arg);
     }
@@ -65,6 +76,15 @@ class ConsolePanel
     $this->filter = $fn;
     call_user_func_array ([$this, 'log'], $args);
     $this->filter = null;
+    return $this;
+  }
+
+  public function withCaption ($caption)
+  {
+    $args         = array_slice (func_get_args (), 1);
+    $this->caption = $caption;
+    call_user_func_array ([$this, 'log'], $args);
+    return $this;
   }
 
   protected function inspect ($val)
@@ -91,6 +111,8 @@ class ConsolePanel
    * - `<#section|title>text</#section>` - A section box with an optional title.
    * - `<#log>content</#log>` - Output content wrapped by a log stripe.
    * - `<#data>data</#data>` - Format a data structure's textual representation.
+   * - `<#header>text</#header>` - A subsection title.
+   * - `<#footer>text</#footer>` - Extra information, right aligned.
    *
    * @param $msg
    * @return mixed
@@ -104,8 +126,6 @@ class ConsolePanel
           if ($args)
             $args = explode ('|', $args);
           switch ($tag) {
-            case 't':
-              return $str;
             case 'section':
               return "<div class='__log-section'>" . ($args ? "<div class='__log-title'>$args[0]</div>" : '') .
                      "$str</div>";
@@ -118,7 +138,7 @@ class ConsolePanel
             case 'footer':
               return "<div class='__footer'>$str</div>";
             default:
-              ob_clean();
+              ob_clean ();
               throw new \RuntimeException("Invalid log tag <#$tag>");
           }
         }, $msg, -1, $count);
@@ -127,7 +147,7 @@ class ConsolePanel
     return $msg;
   }
 
-  protected function showCallLocation ()
+  public function showCallLocation ()
   {
     $namespace = WebConsole::getLibraryNamespace ();
     $base      = __DIR__;
@@ -147,11 +167,16 @@ class ConsolePanel
 <div class="__debug-location"><b>At</b> $path$line</div>
 HTML;
     $this->write ($path);
+    return $this;
   }
 
   protected function table ($data, $title = '')
   {
     static $depth = 0;
+    if ($this->caption) {
+      $title = $this->caption;
+      $this->caption = '';
+    }
 
     $nest = false;
     $w1   = WebConsole::$TABLE_PROP_WIDTH;
@@ -195,7 +220,7 @@ HTML;
     if ($depth >= WebConsole::$TABLE_COLLAPSE_DEPTH)
       echo '<div class="__expand"><a class="fa fa-plus-square" href="javascript:void(0)" onclick="this.parentNode.className+=\' show\'"></a>';
     ?>
-    <table class="__console-table">
+    <table class="__console-table<?=$title ? ' with-caption' : '' ?>">
     <?= $title ? "<caption>$title</caption>" : '' ?>
     <colgroup>
         <col width="<?= $w1 ?>">
@@ -210,8 +235,8 @@ HTML;
       </thead>
     <tbody>
       <?php foreach ($data as $k => $v):
-        $x = $filter($k, $v, $data);
-        if (!$x) continue;
+      $x = $filter($k, $v, $data);
+      if (!$x) continue;
       ?>
       <tr>
         <th<?= $c1 ?>><?= $k ?></th>

@@ -12,7 +12,7 @@ class HttpRequestPanel extends ConsolePanel
 
   public function render ()
   {
-    return $this->table ($_GET, 'Request') . $this->table ($_SERVER, 'Server variables');
+    return $this->table ($_GET, 'Request') . $this->table ($_SERVER, 'Server Variables');
   }
 
 }
