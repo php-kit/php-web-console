@@ -28,28 +28,23 @@ class ConsolePanel
 
   public function render ()
   {
-    return $this->content;
+    return $this->format ($this->content);
   }
 
   public function write ($msg)
   {
     $this->content .= $msg;
+    return $this;
   }
 
-  /**
-   * Logs detailed information about the specified values or variables to the PHP console.
-   * Params: list of one or more values to be displayed.
-   * @param string $title The logging section title.
-   * @return void
-   */
-  public function debugSection ($title)
+  public function log ()
   {
-    $this->write ("<div class='__log-section'><div class='__log-title'>$title</div>");
-    $args = func_get_args ();
-    array_shift ($args);
-    $me = get_class ();
-    call_user_func_array ("$me::debug", $args);
-    $this->write ('</div>');
+    foreach (func_get_args () as $arg) {
+      if (!is_string ($arg))
+        $arg = $this->inspect ($arg);
+      $this->write ($arg);
+    }
+    return $this;
   }
 
   /**
@@ -58,58 +53,78 @@ class ConsolePanel
    * > The filter function may remove some keys from the tabular output of objects or arrays.
    *
    * Extra params: list of one or more values to be displayed.
-   * @param callable $fn Filter callback. Receives the key name, the value and the target object/array.
-   *                     Returns <code>true</code> if the value should be displayed.
-   * @return void
+   * @param callable $fn Filter callback. Receives the key name, the value and the target object/array.<br>
+   *                     Returns <kbd>true</kbd> if the value should be displayed, <kbd>false</kbd> if the whole
+   *                     key + value should be hidden, or <kbd>'...'</kbd> if the key should appear, but the value
+   *                     be omitted.
+   * @return $this
    */
-  public function debugWithFilter (callable $fn)
+  public function withFilter (callable $fn)
   {
     $args         = array_slice (func_get_args (), 1);
     $this->filter = $fn;
-    call_user_func_array ([get_class (), 'debug'], $args);
+    call_user_func_array ([$this, 'log'], $args);
     $this->filter = null;
   }
 
-  public function logSection ($title)
+  protected function inspect ($val)
   {
-    $this->write ("<div class='__log-section'><div class='__log-title'>$title</div>");
-    $args = func_get_args ();
-    array_shift ($args);
-    $me = get_class ();
-    call_user_func_array ("$me::log", $args);
-    $this->write ('</div>');
-  }
-
-  public function log ()
-  {
-    $this->write ('<div class="__log-stripe">');
-    foreach (func_get_args () as $text) {
-      if (!is_string ($text))
-        $text = $this->table ($text);
-      $this->write ($text);
+    $arg = $this->table ($val);
+    if (is_scalar ($val) || is_null ($val)) {
+      if (!strlen ($arg))
+        $arg = is_null ($val) ? 'NULL' : "''";
+      $arg .= ' <i>(' . $this->getType ($val) . ')</i>';
     }
-    $this->write ('</div>');
+    return "<#data>$arg</#data>";
   }
 
   /**
-   * Logs detailed information about the specified values or variables to the PHP console.
-   * Params: list of one or more values to be displayed.
-   * @return void
+   * Renders log markup to HTML.
+   *
+   * ##### Syntax:
+   * ```
+   *    <#tag>text</#tag>
+   *    <#tag|arg1|...argN>text</#tag>
+   * ```
+   * ##### Supported tags:
+   * - `<#t>text</#t>` - non-evaluated raw HTML text.
+   * - `<#section|title>text</#section>` - A section box with an optional title.
+   * - `<#log>content</#log>` - Output content wrapped by a log stripe.
+   * - `<#data>data</#data>` - Format a data structure's textual representation.
+   *
+   * @param $msg
+   * @return mixed
    */
-  public function debug ()
+  protected function format ($msg)
   {
-    $this->write ('<div class="__debug-stripe">');
-    $this->showCallLocation ();
-    foreach (func_get_args () as $val) {
-      $text = $this->table ($val);
-      if (is_scalar ($val) || is_null ($val)) {
-        if (!strlen ($text))
-          $text = is_null ($val) ? 'NULL' : "''";
-        $text .= ' <i>(' . $this->getType ($val) . ')</i>';
-      }
-      $this->write (strlen ($text) && $text[0] == '<' ? $text : "<div class='__debug-item'>$text</div>");
+    if (is_string ($msg)) {
+      do {
+        $msg = preg_replace_callback ('~<#(.+?)(?:\|([^>]+))?>(.*?)</#\1>~s', function ($m) {
+          list ($all, $tag, $args, $str) = $m;
+          if ($args)
+            $args = explode ('|', $args);
+          switch ($tag) {
+            case 't':
+              return $str;
+            case 'section':
+              return "<div class='__log-section'>" . ($args ? "<div class='__log-title'>$args[0]</div>" : '') .
+                     "$str</div>";
+            case 'log':
+              return "<div class='__log-stripe'>$str</div>";
+            case 'data':
+              return "<div class='__log-data'>$str</div>";
+            case 'header':
+              return "<div class='__header'>$str</div>";
+            case 'footer':
+              return "<div class='__footer'>$str</div>";
+            default:
+              ob_clean();
+              throw new \RuntimeException("Invalid log tag <#$tag>");
+          }
+        }, $msg, -1, $count);
+      } while ($count);
     }
-    $this->write ('</div>');
+    return $msg;
   }
 
   protected function showCallLocation ()
@@ -194,11 +209,14 @@ HTML;
         <th>Value</th>
       </thead>
     <tbody>
-      <?php foreach ($data as $k => $v): ?>
+      <?php foreach ($data as $k => $v):
+        $x = $filter($k, $v, $data);
+        if (!$x) continue;
+      ?>
       <tr>
         <th<?= $c1 ?>><?= $k ?></th>
         <td><?= $this->getType ($v) ?></td>
-        <td><?= $filter($k, $v, $data) ? $this->table ($v) : '<i>ommited</i>' ?></td>
+        <td><?= $x === '...' ? '<i>ommited</i>' : $this->table ($v) ?></td>
         <?php endforeach; ?>
     </tbody>
     </table><?php

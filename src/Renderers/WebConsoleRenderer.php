@@ -239,13 +239,13 @@ class WebConsoleRenderer
   padding: 10px 0;
 }
 
-.__debug-stripe:not(:last-child) {
-  margin-bottom: 20px;
-}
-
-.__debug-item {
+.__log-data {
   white-space: pre;
   padding-top: 5px;
+}
+
+.__log-data > .__console-table {
+  margin-bottom: 10px;
 }
 
 .__debug-location {
@@ -256,10 +256,16 @@ class WebConsoleRenderer
   position: absolute;
 }
 
-#__console header {
+#__console .__header {
   color: #666;
   font-weight: bold;
-  margin: 0 0 20px;
+  margin: 10px 0;
+}
+
+#__console .__footer {
+  color: #777;
+  text-align: right;
+  font-size: 10px;
 }
 
 #__console .keyword {

@@ -9,6 +9,11 @@ use Exception;
 use Impactwave\WebConsole\Renderers\WebConsoleRenderer;
 use Psr\Http\Message\ResponseInterface;
 
+/**
+ * @method static log(...$args) Alias of WebConsole::panel('log', ...$args).
+ * @param mixed ...$args
+ * @returns ConsolePanel
+ */
 class WebConsole
 {
   static $TABLE_MAX_DEPTH      = 7;
@@ -20,18 +25,50 @@ class WebConsole
   static $class;
 
   private static $debugMode;
-
   /**
    * Map of panel names (identifiers) to Console subclass instances.
    * @var ConsolePanel[]
    */
   private static $panels = [];
 
+  /**
+   * Allows writing to a specific panel using an abbreviated syntax.
+   *
+   * ##### Ex:
+   *
+   *     WebConsole::log ("some text");
+   *     WebConsole::log ()->write ("some text");
+   *
+   * Both will log to the 'log' panel.
+   *
+   * ##### Ex:
+   *
+   *     WebConsole::request ("text");
+   *     WebConsole::request ()->write ("text");
+   *
+   * Both will write text to the 'request' panel.
+   *
+   * ##### Note:
+   *
+   * The calls are chainable, so you may invoke more methods os the same panel.
+   *
+   * @param string $name
+   * @param array $args
+   * @return ConsolePanel
+   * @throws Exception
+   */
+  public static function __callStatic ($name, $args)
+  {
+    $panel = self::panel ($name);
+    call_user_func_array ([$panel, 'log'], $args);
+    return $panel;
+  }
+
   static function init ($debugMode = true)
   {
     self::$class     = get_class ();
     self::$debugMode = $debugMode;
-    self::registerPanel ('console', new ConsolePanel ('Console', 'fa fa-terminal'));
+    self::registerPanel ('log', new ConsolePanel ('Inspector', 'fa fa-search'));
   }
 
   public static function registerPanel ($panelId, ConsolePanel $panel)
@@ -57,6 +94,8 @@ class WebConsole
   }
 
   /**
+   * PSR-7-compatible version of {@see outputContent()}.
+   *
    * Renders the console and inserts its content into the server response, if applicable.
    * @param ResponseInterface $response Optional HTTP response object if the host application is PSR-7 compliant.
    * @return ResponseInterface|null The modified response, or NULL if the $response argument was not given.
@@ -104,6 +143,12 @@ class WebConsole
     throw new $class($e->getMessage () . $openLogPaneMessage, $e->getCode (), $e);
   }
 
+  /**
+   * Returns a ConsolePanel instance by name.
+   * @param string $panelId
+   * @return ConsolePanel
+   * @throws Exception When the id is invalid.
+   */
   public static function panel ($panelId)
   {
     if (isset(self::$panels[$panelId]))
@@ -114,71 +159,6 @@ class WebConsole
   public static function write ($panelId, $msg)
   {
     self::panel ($panelId)->write ($msg);
-  }
-
-  /**
-   * Logs detailed information about the specified values or variables to the PHP console.
-   *
-   * Extra params: list of one or more values to be displayed.
-   * @param string $panelId Which panel to write to.
-   * @return void
-   */
-  public static function debug ($panelId)
-  {
-    $args = array_slice (func_get_args (), 1);
-    call_user_func_array ([self::panel ($panelId), 'debug'], $args);
-  }
-
-  /**
-   * Logs detailed information about the specified values or variables to the PHP console.
-   *
-   * > The filter function may remove some keys from the tabular output of objects or arrays.
-   *
-   * Extra params: list of one or more values to be displayed.
-   * @param string   $panelId Which panel to write to.
-   * @param callable $fn Filter callback. Receives the key name, the value and the target object/array.
-   *                     Returns <code>true</code> if the value should be displayed.
-   * @throws Exception
-   */
-  public static function debugWithFilter ($panelId, callable $fn)
-  {
-    $args = array_slice (func_get_args (), 1);
-    call_user_func_array ([self::panel ($panelId), 'debugWithFilter'], $args);
-  }
-
-  /**
-   * Logs detailed information about the specified values or variables to the PHP console.
-   *
-   * Extra params: a title followed by a list of one or more values to be displayed.
-   * @param string $panelId Which panel to write to.
-   */
-  public static function debugSection ($panelId)
-  {
-    $args = array_slice (func_get_args (), 1);
-    call_user_func_array ([self::panel ($panelId), 'debugSection'], $args);
-  }
-
-  /**
-   * Writes to a section on the specified panel.
-   *
-   * Extra params: a title followed by a list of one or more values to be displayed.
-   * @param string $panelId Which panel to write to.
-   */
-  public static function logSection ($panelId)
-  {
-    $args = array_slice (func_get_args (), 1);
-    call_user_func_array ([self::panel ($panelId), 'logSection'], $args);
-  }
-
-  /**
-   * Writes to the specified panel.
-   *
-   * @param string $panelId Which panel to write to.
-   */
-  public static function log ($panelId)
-  {
-    $args = array_slice (func_get_args (), 1);
-    call_user_func_array ([self::panel ($panelId), 'log'], $args);
   }
 
   public static function highlight ($msg, array $keywords, $baseStyle)
