@@ -94,8 +94,9 @@ class ConsolePanel
       if (!strlen ($arg))
         $arg = is_null ($val) ? 'NULL' : "''";
       $arg .= ' <i>(' . $this->getType ($val) . ')</i>';
+      return "<#data>$arg</#data>";
     }
-    return "<#data>$arg</#data>";
+    return $arg;
   }
 
   /**
@@ -108,11 +109,13 @@ class ConsolePanel
    * ```
    * ##### Supported tags:
    * - `<#t>text</#t>` - non-evaluated raw HTML text.
+   * - `<#i>text</#i>` - Log item. It adds spacing.
    * - `<#section|title>text</#section>` - A section box with an optional title.
    * - `<#log>content</#log>` - Output content wrapped by a log stripe.
    * - `<#data>data</#data>` - Format a data structure's textual representation.
    * - `<#header>text</#header>` - A subsection title.
    * - `<#footer>text</#footer>` - Extra information, right aligned.
+   * - `<#alert>text</#alert>` - Warning message.
    *
    * @param $msg
    * @return mixed
@@ -126,6 +129,8 @@ class ConsolePanel
           if ($args)
             $args = explode ('|', $args);
           switch ($tag) {
+            case 'i':
+              return "<div class='__log-item'>$str</div>";
             case 'section':
               return "<div class='__log-section'>" . ($args ? "<div class='__log-title'>$args[0]</div>" : '') .
                      "$str</div>";
@@ -136,7 +141,9 @@ class ConsolePanel
             case 'header':
               return "<div class='__header'>$str</div>";
             case 'footer':
-              return "<div class='__footer'>$str</div>";
+              return "<div class='__footer'>$str</div><div></div>";
+            case 'alert':
+              return "<div class='__alert'>$str</div>";
             default:
               ob_clean ();
               throw new \RuntimeException("Invalid log tag <#$tag>");

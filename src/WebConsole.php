@@ -139,8 +139,8 @@ class WebConsole
   {
     $class              = get_class ($e);
     $openLogPaneMessage =
-      "<p><a href='javascript:void(0)' onclick='document.getElementById(&quot;__console&quot;).style.height=&quot;auto&quot;'>Open the log pane</a> to see more details.";
-    throw new $class($e->getMessage () . $openLogPaneMessage, $e->getCode (), $e);
+      "<p><a href='javascript:void(0)' onclick='openConsoleTab(\"database\")'>Open the log pane</a> to see more details.";
+    throw new $class($e->getMessage () . $openLogPaneMessage, 0, $e);
   }
 
   /**

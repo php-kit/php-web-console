@@ -17,8 +17,8 @@ class WebConsoleRenderer
         <?php foreach ($panels as $id => $panel):
           $content = $panel->render ();
           ?>
-          <a class="__tab<?= strlen ($content) ? '' : ' disabled' ?>" <?= $nop ?>
-             onclick="clearSel();openConsole();find('__console').className='show-console';find('__<?= $id ?>-tab').style.display='block';this.className='__tab active'">
+          <a id="__tab-<?= $id ?>" class="__tab<?= strlen ($content) ? '' : ' disabled' ?>" <?= $nop ?>
+             onclick="openConsoleTab('<?= $id ?>')">
           <?php if ($panel->icon): ?>
             <i class="<?= $panel->icon ?>"></i>
           <?php endif ?>
@@ -48,6 +48,13 @@ class WebConsoleRenderer
         select ('.__tab').forEach (function (e) {e.className = e.className.replace (' active', '')});
         select ('.__panel').forEach (function (e) {e.style.display = 'none'});
       };
+    window.openConsoleTab = function (tab) {
+      clearSel();
+      openConsole();
+      find('__console').className='show-console';
+      find('__' + tab + '-tab').style.display='block';
+      find('__tab-' + tab).className='__tab active';
+    }
     window.openConsole = function (s) { find ('__console-container').className = 'Console-show' };
   </script>
     <?php
@@ -177,7 +184,7 @@ class WebConsoleRenderer
   background: #EEE;
   font-family: Menlo, monospace;
   font-size: 12px;
-  line-height: 1.2;
+  line-height: 1.5;
   box-sizing: border-box;
   position: relative;
 }
@@ -190,7 +197,6 @@ class WebConsoleRenderer
   right: 5px;
   border: 1px solid #CCC;
   white-space: pre-line;
-  padding: 10px;
   background: #FFF;
   overflow: scroll;
   display: none;
@@ -216,21 +222,15 @@ class WebConsoleRenderer
 }
 
 .__log-section {
-  margin: 0 0 20px;
-  padding: 0 10px 10px;
+  margin-top: -1px;
   border: 1px solid #DDD;
   position: relative;
-}
-
-.__log-section:last-child {
-  margin-bottom: 0;
 }
 
 .__log-title {
   font-weight: bold;
   text-align: left;
   font-family: sans-serif;
-  margin: 0 -10px 10px;
   padding: 10px;
   background: #eeeef0;
   border-bottom: 1px solid #DDD;
@@ -238,50 +238,61 @@ class WebConsoleRenderer
 }
 
 .__log-stripe {
-  padding: 10px 0;
   position: relative;
-}
-
-.__log-stripe:first-child {
-  padding-top: 0;
 }
 
 .__log-data {
   white-space: pre;
-  padding-top: 5px;
+  padding: 5px 10px 0;
 }
 
-.__log-data > .__console-table:first-of-type {
-  margin-top: -16px;
+.__log-data:first-child {
+  padding-top: 10px;
 }
 
-.__log-data > .__console-table:not(.with-caption):first-of-type {
-  margin-top: -15px;
-}
-
-.__log-data > .__console-table:last-of-type {
-  margin-bottom: -10px;
+.__log-data:last-child {
+  padding-bottom: 10px;
 }
 
 /* must lie inside a __log-stripe */
 .__debug-location {
   color: #999;
   right: 10px;
-  top: 5px;
+  top: 10px;
   z-index: 1;
   position: absolute;
+}
+
+#__console .__log-item {
+  margin: 10px 10px 0;
+}
+
+#__console .__log-item:last-child {
+  margin-bottom: 10px;
 }
 
 #__console .__header {
   color: #666;
   font-weight: bold;
-  margin: 10px 0;
+  margin: 10px 10px;
 }
 
 #__console .__footer {
   color: #777;
-  text-align: right;
+  float: right;
   font-size: 10px;
+  padding: 10px;
+  display: inline-block;
+}
+#__console .__footer + div {
+  clear: right;
+}
+
+#__console .__alert {
+  color: #C00;
+  font-weight: bold;
+  background: #FFA;
+  padding: 5px 10px;
 }
 
 #__console .keyword {
@@ -300,11 +311,10 @@ class WebConsoleRenderer
 .__console-table {
   font-size: 12px;
   width: 100%;
-  width: calc(100% + 20px);
   min-width: 320px; /* Prevent overflow of value column label */
   table-layout: fixed;
   border-spacing: 0;
-  margin: -11px -10px;
+  margin: -1px 0;
   border-collapse: collapse;
 }
 
@@ -312,7 +322,7 @@ class WebConsoleRenderer
   margin-top: -10px;
 }
 
-.__debug-item + .__console-table {
+.__console-table + .__console-table {
   margin-top: 10px;
 }
 
@@ -321,10 +331,6 @@ class WebConsoleRenderer
   margin: 0 0 -1px -11px;
   width: 100%;
   width: calc(100% + 11px);
-}
-
-.__console-table + .__console-table {
-  margin-top: 10px;
 }
 
 .__console-table caption {
