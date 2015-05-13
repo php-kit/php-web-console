@@ -25,8 +25,10 @@ class WebConsoleRenderer
             <?= $panel->title ?>
         </a>
         <?php endforeach; ?>
-        <a class="__close fa fa-close" <?= $nop ?>
+        <a class="__minimize fa fa-chevron-down" <?= $nop ?>
            onclick="find('__console-container').className='';clearSel()"></a>
+        <a class="__close fa fa-close" <?= $nop ?>
+           onclick="find('__console-container').remove()"></a>
       </div>
       <div id="__console">
         <?php foreach ($panels as $id => $panel): ?>
@@ -210,12 +212,29 @@ class WebConsoleRenderer
 .__close {
   line-height: 26px;
   padding: 0 10px;
+  color: #FFF;
+  text-decoration: none;
+}
+
+.__close:hover, .__close:focus {
+  text-decoration: none;
+  color: #FFF;
+}
+
+.__minimize {
+  line-height: 26px;
+  padding: 0 10px;
   color: #777;
   text-decoration: none;
   cursor: default;
 }
 
-.Console-show .__close {
+.__minimize:hover, .__minimize:focus {
+  text-decoration: none;
+  color: #777;
+}
+
+.Console-show .__minimize {
   cursor: pointer;
   color: #FFF;
   text-shadow: 0 1px #000;
