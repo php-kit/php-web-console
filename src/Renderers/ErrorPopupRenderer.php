@@ -31,7 +31,7 @@ class ErrorPopupRenderer
             $title = isset($exception->title) ? $exception->title : get_class ($exception);
             if ($title)
               echo "<div class='__title'>$title</div>";
-            echo ucfirst (ErrorHandler::processMessage($exception->getMessage ()));
+            echo ucfirst (ErrorHandler::processMessage ($exception->getMessage ()));
             ?>
           </div>
           <div class="error-location">
@@ -53,7 +53,7 @@ class ErrorPopupRenderer
       </div>
       <div id="__trace">
         <div style="__list">
-          <?=$stackTrace ?>
+          <?= $stackTrace ?>
         </div>
       </div>
     </td>
@@ -82,7 +82,7 @@ class ErrorPopupRenderer
           <?= $lineStr ?>
           <div class="__call">
             <?= "$class$fn $args" ?>
-            <?=$edit ?>
+            <?= $edit ?>
             <a class="__btn" href="javascript:void(0)" onclick="this.nextSibling.nextSibling.style.display='block'">more...</a>
             <div class='__location'>At <?= $at ?></div>
           </div>
@@ -107,7 +107,7 @@ class ErrorPopupRenderer
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(208,208,208,0.9);
+  background: rgba(208, 208, 208, 0.9);
 }
 
 #__error a {
@@ -329,6 +329,17 @@ class ErrorPopupRenderer
   font-size: 10px;
   padding: 5px 10px;
   margin: 5px -10px -5px -10px;
+}
+
+.__message table {
+  font-size: 12px;
+}
+
+.__message table th {
+  font-weight: normal;
+  color: #08A;
+  text-align: left;
+  padding-right: 10px;
 }
 
 </style>
