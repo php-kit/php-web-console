@@ -107,6 +107,7 @@ class WebConsoleRenderer
 }
 
 #__debug-bar {
+  font-family: sans-serif;
   box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
   box-sizing: border-box;
   margin: -32px 0 0 0;
@@ -150,7 +151,6 @@ class WebConsoleRenderer
 #__debug-bar .__tab {
   display: inline-block;
   color: #FFF;
-  font-family: sans-serif;
   text-decoration: none;
   padding: 0 15px;
   margin-right: -3px;
