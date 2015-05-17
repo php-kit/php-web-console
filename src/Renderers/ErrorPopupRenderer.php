@@ -60,7 +60,7 @@ class ErrorPopupRenderer
     </tr>
     </table>
     <script>document.getElementById ('__more').focus ()</script>
-    <iframe name="hidden" style="display:none;height: 400px;width: 800px"></iframe>
+    <iframe name="hidden" style="display:none"></iframe>
     <?php
   }
 

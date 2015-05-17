@@ -167,11 +167,11 @@ class ConsolePanel
     ) array_shift ($stack);
     $trace = $stack[0];
     $path  = isset($trace['file']) ? $trace['file'] : '';
-    $path  = ErrorHandler::shortFileName ($path);
-    $line  = isset($trace['line']) ? " (<b>{$trace['line']}</b>)" : '';
+    $line  = isset($trace['line']) ? $trace['line'] : '';
+    $location = empty($line) ? ErrorHandler::shortFileName ($path) : ErrorHandler::errorLink($path, $line, 1, "$path($line)");
     if ($path != '')
       $path = <<<HTML
-<div class="__debug-location"><b>At</b> $path$line</div>
+<div class="__debug-location"><b>At</b> $location</div>
 HTML;
     $this->write ($path);
     return $this;

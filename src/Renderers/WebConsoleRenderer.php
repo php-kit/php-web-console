@@ -36,6 +36,7 @@ class WebConsoleRenderer
         <?php endforeach; ?>
       </div>
     </div>
+    <iframe name="hidden" style="display:none"></iframe>
     <?php
   }
 
@@ -280,6 +281,22 @@ class WebConsoleRenderer
   top: 10px;
   z-index: 1;
   position: absolute;
+}
+
+.__debug-location a {
+  text-decoration: none;
+}
+
+.__debug-location a:link {
+  color: #99C;
+}
+
+.__debug-location a {
+  color: #AAA;
+}
+
+.__console-table + .__debug-location {
+  margin-top: -7px;
 }
 
 #__console .__log-item {
