@@ -120,6 +120,24 @@ class ErrorHandler
     }));
   }
 
+  private static function debugVal ($arg)
+  {
+    switch (gettype ($arg)) {
+      case 'boolean':
+        $arg = $arg ? 'true' : 'false';
+        break;
+      case 'string':
+        $arg = "'$arg'";
+        break;
+      case 'integer':
+      case 'double':
+        break;
+      default:
+        $arg = ucfirst (gettype ($arg));
+    }
+    return $arg;
+  }
+
   private static function getStackTrace (Exception $exception)
   {
     ob_start ();
@@ -151,7 +169,9 @@ class ErrorHandler
               case 'double':
                 break;
               case 'array':
-                $arg = '[' . substr (var_export ($arg, true), 10, -3) . ']';
+                $arg = implode (', ',
+                  array_map (function ($k, $v) use ($arg) { return "$k=>" . self::debugVal ($v); }, array_keys ($arg),
+                    $arg));
                 break;
               default:
                 $arg = ucfirst (gettype ($arg));
