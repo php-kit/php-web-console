@@ -90,7 +90,7 @@ class WebConsole
       if (!$count)
         echo $myContent;
     }
-    else error_log (self::panel ('console')->render ());
+    else error_log (self::panel ('log')->render ());
   }
 
   /**
