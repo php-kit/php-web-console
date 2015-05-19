@@ -84,7 +84,7 @@ class WebConsole
     if (self::$debugMode) {
       $content = ob_get_clean ();
       ob_start ();
-      self::render ();
+      self::render ();;
       $myContent = ob_get_clean ();
       echo preg_replace ('#(</body>\s*</html>\s*)$#i', "$myContent\$1", $content, -1, $count);
       if (!$count)
@@ -171,9 +171,7 @@ class WebConsole
 
   private static function render ()
   {
-    global $application;
-
-    if ($application->debugMode && strpos ($_SERVER['HTTP_ACCEPT'], 'text/html') !== false) {
+    if (self::$debugMode && strpos ($_SERVER['HTTP_ACCEPT'], 'text/html') !== false) {
       WebConsoleRenderer::renderStyles ();
       WebConsoleRenderer::renderScripts ();
       WebConsoleRenderer::renderConsole (self::$panels);
