@@ -22,7 +22,12 @@ class WebConsole
   static $TABLE_INDEX_WIDTH    = 50;
   static $TABLE_TYPE_WIDTH     = 100;
 
-  static $class;
+  static $class = __CLASS__;
+  /**
+   * Is WebConsole available?
+   * @var bool
+   */
+  static $initialized = false;
 
   private static $debugMode;
   /**
@@ -59,6 +64,8 @@ class WebConsole
    */
   public static function __callStatic ($name, $args)
   {
+    if (!self::$initialized)
+      throw new \Exception ("You can't use the Web Console before it is initialized.");
     $panel = self::panel ($name);
     call_user_func_array ([$panel, 'log'], $args);
     return $panel;
@@ -66,7 +73,7 @@ class WebConsole
 
   static function init ($debugMode = true)
   {
-    self::$class     = get_class ();
+    self::$initialized = true;
     self::$debugMode = $debugMode;
     self::registerPanel ('log', new ConsolePanel ('Inspector', 'fa fa-search'));
   }

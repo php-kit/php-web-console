@@ -52,11 +52,18 @@ class ErrorHandler
 
   public static function globalExceptionHandler (Exception $exception)
   {
-    global $application;
-    if ($_SERVER['HTTP_HOST'] == 'localhost' || (isset($application) && $application->debugMode))
+    $handled = false;
+    if (self::$debugMode && WebConsole::$initialized) {
       self::showErrorPopup ($exception);
+      $handled = true;
+    }
     if (self::$nextExceptionHandler)
       call_user_func (self::$nextExceptionHandler, $exception);
+    if (!$handled) {
+      @ob_end_clean();
+      echo "<style>body{background:silver}table {font-family:Menlo,sans-serif;font-size:12px}</style>";
+      throw $exception;
+    }
     exit;
   }
 
