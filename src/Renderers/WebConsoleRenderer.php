@@ -310,7 +310,7 @@ class WebConsoleRenderer
 #__console .__header {
   color: #666;
   font-weight: bold;
-  margin: 10px 10px;
+  padding: 10px;
 }
 
 #__console .__footer {
@@ -421,8 +421,9 @@ class WebConsoleRenderer
   color: #55A;
 }
 
-.__console-table span[title] {
+.__console-table span[title], .__type {
   color: #5A5;
+  font-weight: normal;
   cursor: help;
 }
 

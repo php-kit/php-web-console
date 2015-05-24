@@ -96,7 +96,7 @@ class ConsolePanel
       $arg .= ' <i>(' . $this->getType ($val) . ')</i>';
       return "<#data>$arg</#data>";
     }
-    return $arg;
+    return "<#header>Type: <span class='__type'>".$this->getType ($val)."</span></#header>$arg";
   }
 
   /**
@@ -207,12 +207,12 @@ HTML;
       uksort ($data, 'strnatcasecmp');
     }
     elseif (is_object ($data)) {
-      $data = (array)$data;
-      if (empty($data))
-        return '';
       if ($depth == WebConsole::$TABLE_MAX_DEPTH)
         return '<i>(...)</i>';
       ++$depth;
+      $data = get_object_vars($data);
+      if (empty($data))
+        return '';
       $nest  = true;
       $label = 'Property';
       uksort ($data, 'strnatcasecmp');
@@ -223,7 +223,7 @@ HTML;
       return htmlspecialchars (str_replace ('    ', '  ', trim (print_r ($data, true))));
     }
     $filter = isset($this->filter) ? $this->filter : function ($k) { return true; };
-    ob_start ();
+    ob_start (null,0);
     if ($depth >= WebConsole::$TABLE_COLLAPSE_DEPTH)
       echo '<div class="__expand"><a class="fa fa-plus-square" href="javascript:void(0)" onclick="this.parentNode.className+=\' show\'"></a>';
     ?>

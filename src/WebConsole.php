@@ -16,7 +16,7 @@ use Psr\Http\Message\ResponseInterface;
  */
 class WebConsole
 {
-  static $TABLE_MAX_DEPTH      = 7;
+  static $TABLE_MAX_DEPTH      = 5;
   static $TABLE_COLLAPSE_DEPTH = 4;
   static $TABLE_PROP_WIDTH     = 170;
   static $TABLE_INDEX_WIDTH    = 50;
