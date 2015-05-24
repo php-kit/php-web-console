@@ -10,6 +10,8 @@ use Impactwave\WebConsole\Renderers\ErrorPopupRenderer;
  */
 class ErrorHandler
 {
+  const TRIM_WIDTH = 50;
+
   public static $appName   = 'PHP Web Console';
   public static $debugMode = true;
 
@@ -134,7 +136,7 @@ class ErrorHandler
         $arg = $arg ? 'true' : 'false';
         break;
       case 'string':
-        $arg = "'$arg'";
+        $arg = "'" . mb_strimwidth (htmlspecialchars ($arg), 0, self::TRIM_WIDTH, "...") . "'";
         break;
       case 'integer':
       case 'double':
@@ -170,7 +172,7 @@ class ErrorHandler
                 $arg = $arg ? 'true' : 'false';
                 break;
               case 'string':
-                $arg = "'$arg'";
+                $arg = "'" . mb_strimwidth (htmlspecialchars ($arg), 0, self::TRIM_WIDTH, "...") . "'";
                 break;
               case 'integer':
               case 'double':
