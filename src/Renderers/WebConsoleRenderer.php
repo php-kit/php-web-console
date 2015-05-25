@@ -37,6 +37,7 @@ class WebConsoleRenderer
       </div>
     </div>
     <iframe name="hidden" style="display:none"></iframe>
+    <form id="__post" style="display:none" method="post"><input id="__action" type="hidden" name="_action"></form>
     <?php
   }
 
@@ -59,6 +60,7 @@ class WebConsoleRenderer
       find('__tab-' + tab).className='__tab active';
     }
     window.openConsole = function (s) { find ('__console-container').className = 'Console-show' };
+    window.__doAction = function (a) { find('__action').setAttribute('value',a);find ('__post').submit() };
   </script>
     <?php
   }
@@ -87,6 +89,10 @@ class WebConsoleRenderer
   background: #f8f8f8;
   outline: none;
   box-shadow: none;
+}
+
+.__btn-default {
+  padding: 5px 10px;
 }
 
 #__console-container {
