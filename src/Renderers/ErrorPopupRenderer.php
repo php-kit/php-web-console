@@ -30,7 +30,7 @@ class ErrorPopupRenderer
             <?php
             $title = isset($exception->title) ? $exception->title : get_class ($exception);
             if ($title)
-              echo "<div class='__title'>$title</div>";
+              echo "<h3>$title</h3>";
             echo ucfirst (ErrorHandler::processMessage ($exception->getMessage ()));
             ?>
           </div>
@@ -52,9 +52,7 @@ class ErrorPopupRenderer
         </div>
       </div>
       <div id="__trace">
-        <div style="__list">
-          <?= $stackTrace ?>
-        </div>
+        <?= $stackTrace ?>
       </div>
     </td>
     </tr>
@@ -67,27 +65,26 @@ class ErrorPopupRenderer
   /**
    * @param string $fname   File name.
    * @param string $lineStr Line number.
-   * @param string $class   Class name.
    * @param string $fn      Method name.
    * @param string $args    Call arguments.
    * @param string $at      Full error location.
    * @param string $edit    Edit button.
    */
-  static function renderStackFrame ($fname, $lineStr, $class, $fn, $args, $at, $edit = '')
+  static function renderStackFrame ($fname, $lineStr, $fn, $args, $at, $edit = '')
   { ?>
     <div class="stack-frame">
-      <code>
+      <div class="code">
         <div>
           <?= $fname ?>
           <?= $lineStr ?>
           <div class="__call">
-            <?= "$class$fn $args" ?>
+            <?= "$fn $args" ?>
             <?= $edit ?>
             <a class="__btn" href="javascript:void(0)" onclick="this.nextSibling.nextSibling.style.display='block'">more...</a>
             <div class='__location'>At <?= $at ?></div>
           </div>
         </div>
-      </code>
+      </div>
     </div>
     <?php
   }
@@ -168,13 +165,6 @@ class ErrorPopupRenderer
   top: 2px;
 }
 
-#__error .__title {
-  font-weight: bold;
-  font-size: 14px;
-  color: #800;
-  margin: -2px 0 20px;
-}
-
 #__feedback {
   display: none;
   color: #666;
@@ -219,22 +209,11 @@ class ErrorPopupRenderer
   box-sizing: border-box;
 }
 
-#__error .error-location {
-  padding: 20px;
-  border-top: 1px solid #BF3D27;
-  font-family: menlo, monospace;
-  font-size: 12px;
-  background: #FFF;
+#__error .stack-frame:first-child {
+  border-top: 1px solid;
 }
 
-#__error .__list {
-  color: #555;
-  overflow: auto;
-  max-height: 350px;
-  white-space: nowrap;
-}
-
-#__error code {
+#__error .code {
   display: table;
   table-layout: fixed;
   border: 1px #DDD;
@@ -244,11 +223,11 @@ class ErrorPopupRenderer
   margin-top: -1px;
 }
 
-#__error code:last-child {
+#__error .code:last-child {
   border-bottom: none;
 }
 
-#__error code > div {
+#__error .code > div {
   display: table-row;
 }
 
@@ -309,6 +288,10 @@ class ErrorPopupRenderer
   font-family: menlo, monospace;
   font-size: 12px;
   display: none;
+  color: #555;
+  overflow: auto;
+  max-height: 220px;
+  white-space: nowrap;
 }
 
 .__show #__trace {
@@ -323,12 +306,57 @@ class ErrorPopupRenderer
   color: #08A;
 }
 
+#__error .string {
+  color: #C90;
+}
+
+#__error .type {
+  color: #5A5;
+}
+
+#__error .info {
+  cursor: help;
+  color: #5A5;
+}
+
+#__error .error-location {
+  padding: 20px;
+  border-top: 1px solid #BF3D27;
+  font-family: menlo, monospace;
+  font-size: 12px;
+  background: #FFF;
+}
+
 #__error .__location {
   display: none;
   color: #999;
   font-size: 10px;
   padding: 5px 10px;
   margin: 5px -10px -5px -10px;
+}
+
+.__message h3 {
+  font-size: 14px;
+  margin: -2px 0 20px;
+}
+
+.__message h3 b {
+  color: #A00;
+}
+
+.__message code {
+  overflow: auto;
+  max-height: 100px;
+  background: #3C3F41;
+  color: #EEE;
+  display: block;
+  padding: 10px;
+  font-family: Menlo, monospace;
+  line-height: 1.3;
+}
+.__message code b {
+  color: #F66;
+  font-weight: normal;
 }
 
 .__message table {

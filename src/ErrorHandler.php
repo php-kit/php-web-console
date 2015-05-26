@@ -62,7 +62,7 @@ class ErrorHandler
     if (self::$nextExceptionHandler)
       call_user_func (self::$nextExceptionHandler, $exception);
     if (!$handled) {
-      @ob_end_clean();
+      @ob_end_clean ();
       echo "<style>body{background:silver}table {font-family:Menlo,sans-serif;font-size:12px}</style>";
       throw $exception;
     }
@@ -151,18 +151,22 @@ class ErrorHandler
   {
     ob_start ();
     $trace = self::filterStackTrace ($exception instanceof PHPError ? debug_backtrace () : $exception->getTrace ());
-    if (function_exists ('xdebug_get_function_stack')) {
-      $trace2 = self::filterStackTrace (array_reverse (xdebug_get_function_stack ()));
-      if (count ($trace2) > count ($trace))
-        $trace = $trace2;
-    }
     if (count ($trace) && $trace[count ($trace) - 1]['function'] == '{main}')
       array_pop ($trace);
     foreach ($trace as $k => $v) {
-      $fn    = isset($v['function']) ? "<span class='fn'>{$v['function']}</span>" : 'global scope';
       $class = isset($v['class']) ? $v['class'] : '';
       if ($class == 'ErrorHandler')
         continue;
+      //$class   = $class ? "<span class='class'>$class</span>" : '';
+      if (isset($v['function'])) {
+        $f = $v['function'];
+        if (strpos($f,'{closure}') !== false) {
+          if ($class) $fn = "<span class='info' title='On class $class'>Closure</span>";
+          else $fn = "<span class='type'>Closure</span>";
+        }
+        else $fn = $class ? "<span class='class'>$class</span>-><span class='fn'>$f</span>" : "<span class='fn'>$f</span>";
+      }
+      else $fn = 'global scope';
       if (isset($v['function'])) {
         $args = [];
         if (isset($v['args'])) {
@@ -172,15 +176,16 @@ class ErrorHandler
                 $arg = $arg ? 'true' : 'false';
                 break;
               case 'string':
-                $arg = "'" . mb_strimwidth (htmlspecialchars ($arg), 0, self::TRIM_WIDTH, "...") . "'";
+                $arg = "'<span class='string'>" . mb_strimwidth (htmlspecialchars ($arg), 0, self::TRIM_WIDTH, "...") .
+                       "</span>'";
                 break;
               case 'integer':
               case 'double':
                 break;
               case 'array':
-                $arg = implode (', ',
-                  array_map (function ($k, $v) use ($arg) { return "$k=>" . self::debugVal ($v); }, array_keys ($arg),
-                    $arg));
+                $arg = '<span class="info" title="' . (($arg) ? "[\n  " . htmlspecialchars (implode (",\n  ",
+                    array_map (function ($k, $v) use ($arg) { return "$k => " . self::debugVal ($v); }, array_keys ($arg),
+                      $arg))) . "\n]" : 'Empty array') . '">array</span>';
                 break;
               default:
                 $arg = ucfirst (gettype ($arg));
@@ -192,15 +197,14 @@ class ErrorHandler
         $args = "($args)";
       }
       else $args = '';
-      $class   = $class ? "<span class='class'>$class</span>->" : '';
       $file    = isset($v['file']) ? $v['file'] : '';
       $fitems  = explode (DIRECTORY_SEPARATOR, $file);
       $fname   = '<span class="file">' . end ($fitems) . '</span>';
-      $line    = isset($v['line']) ? $v['line'] : '';
+      $line    = isset($v['line']) ? $v['line'] : '&nbsp;';
       $lineStr = $line ? "<span class='line'>$line</span>" : '';
       $edit    = $file ? self::errorLink ($file, $line, 1, 'edit', '__btn') : '';
       $at      = $file ? self::errorLink ($file, $line, 1) : '&lt;unknown location&gt;';
-      ErrorPopupRenderer::renderStackFrame ($fname, $lineStr, $class, $fn, $args, $at, $edit);
+      ErrorPopupRenderer::renderStackFrame ($fname, $lineStr, $fn, $args, $at, $edit);
     }
     return ob_get_clean ();
   }

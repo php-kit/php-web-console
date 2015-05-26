@@ -168,7 +168,8 @@ class ConsolePanel
     $trace = $stack[0];
     $path  = isset($trace['file']) ? $trace['file'] : '';
     $line  = isset($trace['line']) ? $trace['line'] : '';
-    $location = empty($line) ? ErrorHandler::shortFileName ($path) : ErrorHandler::errorLink($path, $line, 1, "$path($line)");
+    $shortPath = ErrorHandler::shortFileName ($path);
+    $location = empty($line) ? $shortPath : ErrorHandler::errorLink($path, $line, 1, "$shortPath($line)");
     if ($path != '')
       $path = <<<HTML
 <div class="__debug-location"><b>At</b> $location</div>
