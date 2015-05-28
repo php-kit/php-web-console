@@ -133,8 +133,8 @@ class ErrorPopupRenderer
   text-align: left;
   border: 1px solid #73787E;
   background: #F5F5F5;
-  font-family: sans-serif;
-  font-size: 12px;
+  font-family: "Helvetica Neue", Arial, Verdana, sans-serif;
+  font-size: 14px;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
 }
 
@@ -180,7 +180,6 @@ class ErrorPopupRenderer
 
 #__error .__message {
   padding: 26px 20px 20px 88px;
-  font-family: menlo, monospace;
 }
 
 #__error .__more {
@@ -346,7 +345,7 @@ class ErrorPopupRenderer
 
 .__message code {
   overflow: auto;
-  max-height: 100px;
+  max-height: 160px;
   background: #3C3F41;
   color: #EEE;
   display: block;
@@ -360,10 +359,17 @@ class ErrorPopupRenderer
 }
 
 .__message table {
-  font-size: 12px;
+  font-size: inherit;
+  border-spacing: 0;
+  line-height: 1.3;
+  margin: 15px 0;
 }
 
-.__message table th {
+.__message table td {
+  padding-right: 15px;
+}
+
+.__message table th, dt {
   font-weight: normal;
   color: #08A;
   text-align: left;
