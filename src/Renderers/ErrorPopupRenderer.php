@@ -318,6 +318,14 @@ class ErrorPopupRenderer
   color: #5A5;
 }
 
+#__error .tag {
+  color: #ffd064;
+}
+
+#__error .tag-hilight {
+  color: #5ed4e4;
+}
+
 #__error .error-location {
   padding: 20px;
   border-top: 1px solid #BF3D27;
