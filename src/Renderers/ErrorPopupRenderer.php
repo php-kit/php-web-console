@@ -335,8 +335,8 @@ class ErrorPopupRenderer
 }
 
 .__message h3 {
-  font-size: 14px;
-  margin: -2px 0 20px;
+  font-size: 16px;
+  margin: -4px 0 20px;
 }
 
 .__message h3 b {
@@ -351,7 +351,9 @@ class ErrorPopupRenderer
   display: block;
   padding: 10px;
   font-family: Menlo, monospace;
-  line-height: 1.3;
+  font-size: 13px;
+  line-height: 1.2;
+  white-space: pre;
 }
 .__message code b {
   color: #F66;
@@ -361,12 +363,12 @@ class ErrorPopupRenderer
 .__message table {
   font-size: inherit;
   border-spacing: 0;
-  line-height: 1.3;
+  line-height: 1.2;
   margin: 15px 0;
 }
 
 .__message table td {
-  padding-right: 15px;
+  padding: 0 15px 0 0;
 }
 
 .__message table th, dt {
