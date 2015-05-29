@@ -93,7 +93,7 @@ class ConsolePanel
     if (is_scalar ($val) || is_null ($val)) {
       if (!strlen ($arg))
         $arg = is_null ($val) ? 'NULL' : "''";
-      $arg .= ' <i>(' . $this->getType ($val) . ')</i>';
+      $arg = '<i>(' . $this->getType ($val) . ")</i> $arg";
       return "<#data>$arg</#data>";
     }
     return "<#header>Type: <span class='__type'>".$this->getType ($val)."</span></#header>$arg";

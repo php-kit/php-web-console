@@ -269,9 +269,10 @@ class WebConsoleRenderer
 
 .__log-data {
   white-space: pre;
-  padding: 5px 10px 0;
+  padding: 10px 5px 0;
+  display: inline-block;
 }
-
+/*
 .__log-data:first-child {
   padding-top: 10px;
 }
@@ -279,7 +280,7 @@ class WebConsoleRenderer
 .__log-data:last-child {
   padding-bottom: 10px;
 }
-
+*/
 /* must lie inside a __log-stripe */
 .__debug-location {
   color: #999;

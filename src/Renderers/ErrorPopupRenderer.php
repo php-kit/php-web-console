@@ -298,6 +298,7 @@ class ErrorPopupRenderer
 }
 
 #__error .class {
+  cursor: help;
   color: #A00;
 }
 

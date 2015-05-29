@@ -160,11 +160,21 @@ class ErrorHandler
       //$class   = $class ? "<span class='class'>$class</span>" : '';
       if (isset($v['function'])) {
         $f = $v['function'];
+        $type = isset($v['type']) ? $v['type'] : '->';
         if (strpos($f,'{closure}') !== false) {
           if ($class) $fn = "<span class='info' title='On class $class'>Closure</span>";
           else $fn = "<span class='type'>Closure</span>";
         }
-        else $fn = $class ? "<span class='class'>$class</span>-><span class='fn'>$f</span>" : "<span class='fn'>$f</span>";
+        else {
+          if ($class) {
+            $z         = explode ('\\', $class);
+            $className = array_pop ($z);
+            $namespace = implode ('\\', $z);
+            $fn        = "<span class='class' title='$namespace'>$className</span>$type<span class='fn'>$f</span>";
+          }
+          else $fn = "<span class='fn'>$f</span>";
+        }
+        $fn = "Call $fn";
       }
       else $fn = 'global scope';
       if (isset($v['function'])) {
