@@ -352,6 +352,10 @@ class ErrorPopupRenderer
   color: #A00;
 }
 
+.__message .fixed {
+  font-family: menlo, monospace;
+}
+
 .__message code {
   overflow: auto;
   max-height: 160px;
@@ -378,9 +382,11 @@ class ErrorPopupRenderer
 
 .__message table td {
   padding: 0 15px 0 0;
+  vertical-align: top;
 }
 
-.__message table th, dt {
+.__message table th {
+  vertical-align: top;
   font-weight: normal;
   color: #08A;
   text-align: left;

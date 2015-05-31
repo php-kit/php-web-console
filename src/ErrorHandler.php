@@ -170,7 +170,9 @@ class ErrorHandler
             $z         = explode ('\\', $class);
             $className = array_pop ($z);
             $namespace = implode ('\\', $z);
-            $fn        = "<span class='class' title='$namespace'>$className</span>$type<span class='fn'>$f</span>";
+            $fn        = $f == '__construct'
+              ? "new <span class='class' title='$namespace'>$className</span>"
+              : "<span class='class' title='$namespace'>$className</span>$type<span class='fn'>$f</span>";
           }
           else $fn = "<span class='fn'>$f</span>";
         }
