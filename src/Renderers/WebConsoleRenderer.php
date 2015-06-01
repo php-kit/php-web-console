@@ -461,6 +461,48 @@ class WebConsoleRenderer
 .__expand.show > a {
   display: none;
 }
+
+.__panel > code {
+  height: 100%;
+  overflow: auto;
+}
+
+.__panel code {
+  background: #3C3F41;
+  color: #EEE;
+  display: block;
+  padding: 10px;
+  font-family: Menlo, monospace;
+  font-size: 13px;
+  line-height: 1.2;
+  white-space: pre;
+  border-radius: 0;
+}
+.__panel code b {
+  color: #F66;
+  font-weight: normal;
+}
+
+.__panel code table {
+  font-size: inherit;
+  border-spacing: 0;
+  line-height: 1.2;
+  margin: 15px 0;
+}
+
+.__panel code table td {
+  padding: 0 15px 0 0;
+  vertical-align: top;
+}
+
+.__panel code table th {
+  vertical-align: top;
+  font-weight: normal;
+  color: #08A;
+  text-align: left;
+  padding-right: 10px;
+}
+
     </style>
     <?php
   }
