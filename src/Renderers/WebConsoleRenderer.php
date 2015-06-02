@@ -26,7 +26,7 @@ class WebConsoleRenderer
         </a>
         <?php endforeach; ?>
         <a class="__minimize fa fa-chevron-down" <?= $nop ?>
-           onclick="find('__console-container').className='';clearSel()"></a>
+           onclick="closeConsole()"></a>
         <a class="__close fa fa-close" <?= $nop ?>
            onclick="find('__console-container').remove()"></a>
       </div>
@@ -46,10 +46,15 @@ class WebConsoleRenderer
     <script>
     window.find = function (s) { return document.getElementById (s) };
     window.select = function (s) { return [].concat.apply ([], document.querySelectorAll (s)) };
-    window.clearSel =
+    window.clearTabSel =
       function ()
       {
         select ('.__tab').forEach (function (e) {e.className = e.className.replace (' active', '')});
+      };
+    window.clearSel =
+      function ()
+      {
+        clearTabSel ();
         select ('.__panel').forEach (function (e) {e.style.display = 'none'});
       };
     window.openConsoleTab = function (tab) {
@@ -60,6 +65,7 @@ class WebConsoleRenderer
       find('__tab-' + tab).className='__tab active';
     }
     window.openConsole = function (s) { find ('__console-container').className = 'Console-show' };
+    window.closeConsole = function (s) { find('__console-container').className='';clearTabSel() };
     window.__doAction = function (a) { find('__action').setAttribute('value',a);find ('__post').submit() };
   </script>
     <?php
