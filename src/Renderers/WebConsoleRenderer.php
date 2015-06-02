@@ -462,7 +462,8 @@ class WebConsoleRenderer
   display: none;
 }
 
-.__panel > code {
+.__panel > code:first-child {
+  box-sizing: border-box;
   height: 100%;
   overflow: auto;
 }
