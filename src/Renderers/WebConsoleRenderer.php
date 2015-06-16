@@ -475,12 +475,12 @@ class WebConsoleRenderer
 }
 
 .__panel code {
-  background: #3C3F41;
+  background: #222;
   color: #EEE;
   display: block;
   padding: 10px;
   font-family: Menlo, monospace;
-  font-size: 13px;
+  font-size: 10px;
   line-height: 1.2;
   white-space: pre;
   border-radius: 0;
