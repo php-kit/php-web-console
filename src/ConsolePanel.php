@@ -178,15 +178,13 @@ HTML;
     return $this;
   }
 
-  protected function table ($data, $title = '')
+  protected function table ($data, $title = '', $depth = 0)
   {
-    static $depth = 0;
     if ($this->caption) {
       $title = $this->caption;
       $this->caption = '';
     }
 
-    $nest = false;
     $w1   = WebConsole::$TABLE_PROP_WIDTH;
     $c1   = '';
     if ($data instanceof \Closure) {
@@ -198,7 +196,6 @@ HTML;
       if ($depth == WebConsole::$TABLE_MAX_DEPTH)
         return '<i>(...)</i>';
       ++$depth;
-      $nest  = true;
       $label = 'Key';
       if (isset($data[0])) {
         $label = 'Index';
@@ -214,7 +211,6 @@ HTML;
       $data = get_object_vars($data);
       if (empty($data))
         return '';
-      $nest  = true;
       $label = 'Property';
       uksort ($data, 'strnatcasecmp');
     }
@@ -249,13 +245,12 @@ HTML;
       <tr>
         <th<?= $c1 ?>><?= $k ?></th>
         <td><?= $this->getType ($v) ?></td>
-        <td><?= $x === '...' ? '<i>ommited</i>' : $this->table ($v) ?></td>
+        <td><?= $x === '...' ? '<i>ommited</i>' : $this->table ($v, '', $depth) ?></td>
         <?php endforeach; ?>
     </tbody>
     </table><?php
     if ($depth >= WebConsole::$TABLE_COLLAPSE_DEPTH)
       echo '</div>';
-    if ($nest) --$depth;
     return trim (ob_get_clean ());
   }
 
