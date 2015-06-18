@@ -93,9 +93,8 @@ class WebConsole
       ob_start ();
       self::render ();;
       $myContent = ob_get_clean ();
+      // Note: if no <body> is found, the console will not be output.
       echo preg_replace ('#(</body>\s*</html>\s*)$#i', "$myContent\$1", $content, -1, $count);
-      if (!$count)
-        echo $myContent;
     }
     else error_log (self::panel ('log')->render ());
   }
@@ -133,9 +132,8 @@ class WebConsole
         }
       }
       $content = ob_get_clean ();
+      // Note: if no <body> is found, the console will not be output.
       echo preg_replace ('#(</body>\s*</html>\s*)$#i', "$myContent\$1", $content, -1, $count);
-      if (!$count)
-        echo $myContent;
       return null;
     }
     else error_log (self::panel ('console')->render ());
