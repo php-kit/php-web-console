@@ -208,7 +208,9 @@ HTML;
       if ($depth == WebConsole::$TABLE_MAX_DEPTH)
         return '<i>(...)</i>';
       ++$depth;
-      $data = get_object_vars($data);
+      if (method_exists($data, '__debugInfo'))
+        $data = $data->__debugInfo ();
+      else $data = get_object_vars($data);
       if (empty($data))
         return '';
       $label = 'Property';
