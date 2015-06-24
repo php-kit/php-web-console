@@ -85,8 +85,10 @@ class WebConsole
 
   /**
    * Renders the console and inserts its content into the server response, if applicable.
+   * @param bool $force Output console even if no body tag is found.
+   * @throws Exception
    */
-  public static function outputContent ()
+  public static function outputContent ($force = false)
   {
     if (self::$debugMode) {
       $content = ob_get_clean ();
@@ -94,7 +96,8 @@ class WebConsole
       self::render ();;
       $myContent = ob_get_clean ();
       // Note: if no <body> is found, the console will not be output.
-      echo preg_replace ('#(</body>\s*</html>\s*)$#i', "$myContent\$1", $content, -1, $count);
+      $out = preg_replace ('#(</body>\s*</html>\s*)$#i', "$myContent\$1", $content, -1, $count);
+      echo !$count && $force ? $out . $myContent : $out;
     }
     else error_log (self::panel ('log')->render ());
   }
@@ -104,9 +107,10 @@ class WebConsole
    *
    * Renders the console and inserts its content into the server response, if applicable.
    * @param ResponseInterface $response Optional HTTP response object if the host application is PSR-7 compliant.
+   * @param bool $force Output console even if no body tag is found.
    * @return ResponseInterface|null The modified response, or NULL if the $response argument was not given.
    */
-  public static function outputContentViaResponse (ResponseInterface $response)
+  public static function outputContentViaResponse (ResponseInterface $response, $force = false)
   {
     if (self::$debugMode) {
       ob_start ();
@@ -121,7 +125,7 @@ class WebConsole
           }
           $content = $body->getContents ();
           $content = preg_replace ('#(</body>\s*</html>\s*)$#i', "$myContent\$1", $content, -1, $count);
-          if (!$count)
+          if (!$count && $force)
             $content .= $myContent;
           try {
             $body->rewind ();
