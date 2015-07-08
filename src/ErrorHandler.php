@@ -32,9 +32,10 @@ class ErrorHandler
   {
     if (ini_get ('error_reporting') == 0)
       return false;
-    self::globalExceptionHandler (new PHPError($errno, $errstr, $errfile, $errline, $errcontext));
+//    self::globalExceptionHandler (new PHPError($errno, $errstr, $errfile, $errline, $errcontext));
     if (self::$nextErrorHandler)
       call_user_func (self::$nextErrorHandler, $errno, $errstr, $errfile, $errline, $errcontext);
+    throw new PHPError($errno, $errstr, $errfile, $errline, $errcontext);
   }
 
   public static function onShutDown ()
@@ -115,10 +116,19 @@ class ErrorHandler
   private static function showErrorPopup (Exception $exception)
   {
     ob_clean ();
-    ErrorPopupRenderer::renderStyles ();
-    $stackTrace = self::getStackTrace ($exception);
-    ErrorPopupRenderer::renderPopup ($exception, self::$appName, $stackTrace);
-    WebConsole::outputContent ();
+    if (strpos (get($_SERVER, 'HTTP_ACCEPT'), 'text/html') !== false) {
+      ErrorPopupRenderer::renderStyles ();
+      $stackTrace = self::getStackTrace ($exception);
+      ErrorPopupRenderer::renderPopup ($exception, self::$appName, $stackTrace);
+      WebConsole::outputContent ();
+    }
+    else {
+      header ("Content-Type: text/plain");
+      http_response_code (500);
+      echo $exception->getMessage();
+      if (self::$debugMode)
+        echo "\n\nPOST data:\n" . print_r($_POST, true);
+    }
   }
 
   private static function filterStackTrace (array $trace)

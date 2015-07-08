@@ -90,7 +90,7 @@ class WebConsole
    */
   public static function outputContent ($force = false)
   {
-    if (self::$debugMode) {
+    if (self::$debugMode && strpos (get($_SERVER, 'HTTP_ACCEPT'), 'text/html') !== false) {
       $content = ob_get_clean ();
       ob_start ();
       self::render ();;
