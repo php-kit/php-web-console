@@ -39,6 +39,7 @@ class ConsolePanel
   public function write ($msg)
   {
     $this->content .= $msg;
+
     return $this;
   }
 
@@ -55,6 +56,7 @@ class ConsolePanel
         $arg = $this->inspect ($arg);
       $this->write ($arg);
     }
+
     return $this;
   }
 
@@ -76,14 +78,16 @@ class ConsolePanel
     $this->filter = $fn;
     call_user_func_array ([$this, 'log'], $args);
     $this->filter = null;
+
     return $this;
   }
 
   public function withCaption ($caption)
   {
-    $args         = array_slice (func_get_args (), 1);
+    $args          = array_slice (func_get_args (), 1);
     $this->caption = $caption;
     call_user_func_array ([$this, 'log'], $args);
+
     return $this;
   }
 
@@ -94,9 +98,11 @@ class ConsolePanel
       if (!strlen ($arg))
         $arg = is_null ($val) ? 'NULL' : "''";
       $arg = '<i>(' . $this->getType ($val) . ")</i> $arg";
+
       return "<#data>$arg</#data>";
     }
-    return "<#header>Type: <span class='__type'>".$this->getType ($val)."</span></#header>$arg";
+
+    return "<#header>Type: <span class='__type'>" . $this->getType ($val) . "</span></#header>$arg";
   }
 
   /**
@@ -151,6 +157,7 @@ class ConsolePanel
         }, $msg, -1, $count);
       } while ($count);
     }
+
     return $msg;
   }
 
@@ -165,34 +172,33 @@ class ConsolePanel
         (isset($stack[0]['class']) && stripos ($stack[0]['class'], $namespace) === 0)
       )
     ) array_shift ($stack);
-    $trace = $stack[0];
-    $path  = isset($trace['file']) ? $trace['file'] : '';
-    $line  = isset($trace['line']) ? $trace['line'] : '';
+    $trace     = $stack[0];
+    $path      = isset($trace['file']) ? $trace['file'] : '';
+    $line      = isset($trace['line']) ? $trace['line'] : '';
     $shortPath = ErrorHandler::shortFileName ($path);
-    $location = empty($line) ? $shortPath : ErrorHandler::errorLink($path, $line, 1, "$shortPath($line)");
+    $location  = empty($line) ? $shortPath : ErrorHandler::errorLink ($path, $line, 1, "$shortPath($line)");
     if ($path != '')
       $path = <<<HTML
 <div class="__debug-location"><b>At</b> $location</div>
 HTML;
     $this->write ($path);
+
     return $this;
   }
 
   protected function table ($data, $title = '', $depth = 0)
   {
     if ($this->caption) {
-      $title = $this->caption;
+      $title         = $this->caption;
       $this->caption = '';
     }
 
-    $w1   = WebConsole::$TABLE_PROP_WIDTH;
-    $c1   = '';
+    $w1 = WebConsole::$TABLE_PROP_WIDTH;
+    $c1 = '';
     if ($data instanceof \Closure) {
       return '<i>(native code)</i>';
     }
     elseif (is_array ($data)) {
-      if (empty($data))
-        return '';
       if ($depth == WebConsole::$TABLE_MAX_DEPTH)
         return '<i>(...)</i>';
       ++$depth;
@@ -208,9 +214,9 @@ HTML;
       if ($depth == WebConsole::$TABLE_MAX_DEPTH)
         return '<i>(...)</i>';
       ++$depth;
-      if (method_exists($data, '__debugInfo'))
+      if (method_exists ($data, '__debugInfo'))
         $data = $data->__debugInfo ();
-      else $data = get_object_vars($data);
+      else $data = get_object_vars ($data);
       if (empty($data))
         return '';
       $label = 'Property';
@@ -222,12 +228,14 @@ HTML;
       return htmlspecialchars (str_replace ('    ', '  ', trim (print_r ($data, true))));
     }
     $filter = isset($this->filter) ? $this->filter : function ($k) { return true; };
-    ob_start (null,0);
+    ob_start (null, 0);
     if ($depth >= WebConsole::$TABLE_COLLAPSE_DEPTH)
       echo '<div class="__expand"><a class="fa fa-plus-square" href="javascript:void(0)" onclick="this.parentNode.className+=\' show\'"></a>';
     ?>
     <table class="__console-table<?=$title ? ' with-caption' : '' ?>">
     <?= $title ? "<caption>$title</caption>" : '' ?>
+    <?php if (empty($data)) echo '<thead><tr><td colspan=3><i>empty</i>';
+    else { ?>
     <colgroup>
         <col width="<?= $w1 ?>">
         <col width="<?= WebConsole::$TABLE_TYPE_WIDTH ?>">
@@ -240,19 +248,22 @@ HTML;
         <th>Value</th>
       </thead>
     <tbody>
-      <?php foreach ($data as $k => $v):
-      $x = $filter($k, $v, $data);
-      if (!$x) continue;
+      <?php
+      foreach ($data as $k => $v):
+        $x = $filter($k, $v, $data);
+        if (!$x) continue;
       ?>
       <tr>
         <th<?= $c1 ?>><?= $k ?></th>
         <td><?= $this->getType ($v) ?></td>
         <td><?= $x === '...' ? '<i>ommited</i>' : $this->table ($v, '', $depth) ?></td>
-        <?php endforeach; ?>
+        <?php endforeach;?>
     </tbody>
+      <?php } ?>
     </table><?php
     if ($depth >= WebConsole::$TABLE_COLLAPSE_DEPTH)
       echo '</div>';
+
     return trim (ob_get_clean ());
   }
 
@@ -261,10 +272,12 @@ HTML;
     if (is_object ($v)) {
       $c = get_class ($v);
       $l = array_slice (explode ('\\', $c), -1)[0];
+
       return "<span title='$c'>$l</span>";
     }
     if (is_array ($v))
       return 'array(' . count (array_keys ($v)) . ')';
+
     return gettype ($v);
   }
 
