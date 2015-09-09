@@ -1,7 +1,7 @@
 <?php
-namespace Impactwave\WebConsole\Panels;
+namespace PhpKit\WebConsole\Panels;
 
-use Impactwave\WebConsole\ConsolePanel;
+use PhpKit\WebConsole\ConsolePanel;
 
 class HttpRequestPanel extends ConsolePanel
 {

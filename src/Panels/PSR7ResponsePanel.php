@@ -1,7 +1,7 @@
 <?php
-namespace Impactwave\WebConsole\Panels;
+namespace PhpKit\WebConsole\Panels;
 
-use Impactwave\WebConsole\ConsolePanel;
+use PhpKit\WebConsole\ConsolePanel;
 use Psr\Http\Message\ResponseInterface;
 
 class PSR7ResponsePanel extends ConsolePanel

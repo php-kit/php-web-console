@@ -1,5 +1,5 @@
 <?php
-namespace Impactwave\WebConsole\Renderers;
+namespace PhpKit\WebConsole\Renderers;
 
 class WebConsoleRenderer
 {

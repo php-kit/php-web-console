@@ -1,12 +1,12 @@
 <?php
-namespace Impactwave\WebConsole;
+namespace PhpKit\WebConsole;
 
 /*
  * Provides the display of debugging information on a panel on the bottom
  * of the browser window.
  */
 use Exception;
-use Impactwave\WebConsole\Renderers\WebConsoleRenderer;
+use PhpKit\WebConsole\Renderers\WebConsoleRenderer;
 use Psr\Http\Message\ResponseInterface;
 
 /**

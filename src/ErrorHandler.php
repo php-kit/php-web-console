@@ -1,8 +1,8 @@
 <?php
-namespace Impactwave\WebConsole;
+namespace PhpKit\WebConsole;
 
 use Exception;
-use Impactwave\WebConsole\Renderers\ErrorPopupRenderer;
+use PhpKit\WebConsole\Renderers\ErrorPopupRenderer;
 
 /**
  * Displays debugging information when errors occur in dev.mode, or logs it when

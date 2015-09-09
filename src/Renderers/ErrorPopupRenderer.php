@@ -1,8 +1,8 @@
 <?php
-namespace Impactwave\WebConsole\Renderers;
+namespace PhpKit\WebConsole\Renderers;
 
 use Exception;
-use Impactwave\WebConsole\ErrorHandler;
+use PhpKit\WebConsole\ErrorHandler;
 
 class ErrorPopupRenderer
 {

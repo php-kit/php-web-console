@@ -1,6 +1,6 @@
 {
-  "name": "impactwave/php-web-console",
-  "description": "In-browser debugging tools for your PHP applications.",
+  "name": "php-kit/php-web-console",
+  "description": "In-browser debugging tools for your PHP applications",
   "license": "MIT",
   "authors": [
     {
@@ -18,8 +18,7 @@
   },
   "autoload": {
     "psr-4": {
-      "Impactwave\\WebConsole\\": "src"
+      "PhpKit\\WebConsole\\": "src"
     }
-  },
-  "minimum-stability": "dev"
+  }
 }

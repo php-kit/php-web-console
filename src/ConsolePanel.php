@@ -1,5 +1,5 @@
 <?php
-namespace Impactwave\WebConsole;
+namespace PhpKit\WebConsole;
 
 class ConsolePanel
 {
