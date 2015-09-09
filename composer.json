@@ -13,6 +13,7 @@
       "email": "claudio.silva@impactwave.com"
     }
   ],
+  "homepage": "https://github.com/php-kit/php-web-console",
   "require": {
     "psr/http-message": "~1.0"
   },
