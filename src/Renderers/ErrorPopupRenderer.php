@@ -13,7 +13,6 @@ class ErrorPopupRenderer
    */
   static function renderPopup (Exception $exception, $popupTitle, $stackTrace)
   {
-    ob_clean ();
     self::renderStyles ();
     ?>
     <table id="__error">
