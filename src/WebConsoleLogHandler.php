@@ -28,6 +28,6 @@ class WebConsoleLogHandler extends AbstractProcessingHandler
    */
   protected function write (array $record)
   {
-    $this->panel->log ($record);
+    $this->panel->log ($record['formatted']);
   }
 }
