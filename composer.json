@@ -15,7 +15,8 @@
   ],
   "homepage": "https://github.com/php-kit/php-web-console",
   "require": {
-    "psr/http-message": "~1.0"
+    "psr/http-message": "~1.0",
+    "monolog/monolog": "^1.17.1"
   },
   "autoload": {
     "psr-4": {
