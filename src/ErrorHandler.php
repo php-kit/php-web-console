@@ -127,7 +127,7 @@ class ErrorHandler
       http_response_code (500);
       echo $exception->getMessage();
       if (self::$debugMode)
-        echo "\n\nPOST data:\n" . print_r($_POST, true);
+        echo "\n\nStack trace:\n" . $exception->getTraceAsString() . "\n";
     }
   }
 
