@@ -1,17 +1,17 @@
 <?php
 namespace PhpKit\WebConsole\Renderers;
 
-use Exception;
+use Exception, Error;
 use PhpKit\WebConsole\ErrorHandler;
 
 class ErrorPopupRenderer
 {
   /**
-   * @param Exception $exception
+   * @param Exception|Error $exception
    * @param string    $popupTitle
    * @param string    $stackTrace
    */
-  static function renderPopup (Exception $exception, $popupTitle, $stackTrace)
+  static function renderPopup ($exception, $popupTitle, $stackTrace)
   {
     self::renderStyles ();
     ?>

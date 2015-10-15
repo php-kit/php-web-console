@@ -53,7 +53,7 @@ class ErrorHandler
     }
   }
 
-  public static function globalExceptionHandler (Exception $exception)
+  public static function globalExceptionHandler ($exception)
   {
     $handled = false;
     if (self::$debugMode && WebConsole::$initialized) {
@@ -113,7 +113,7 @@ class ErrorHandler
     return "<a class='$class' target='hidden' href='$application->baseURI/goto-source.php?file=$file&line=$line&col=$col'>$label</a>";
   }
 
-  private static function showErrorPopup (Exception $exception)
+  private static function showErrorPopup ($exception)
   {
     if (ob_get_level()) ob_end_clean ();
     if (strpos (get($_SERVER, 'HTTP_ACCEPT'), 'text/html') !== false) {
@@ -157,7 +157,7 @@ class ErrorHandler
     return $arg;
   }
 
-  private static function getStackTrace (Exception $exception)
+  private static function getStackTrace ($exception)
   {
     ob_start ();
     $trace = self::filterStackTrace ($exception instanceof PHPError ? debug_backtrace () : $exception->getTrace ());
