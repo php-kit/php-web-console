@@ -90,10 +90,12 @@ class WebConsole
    */
   public static function outputContent ($force = false)
   {
+    if (!self::$initialized)
+      return;
     if (self::$debugMode && strpos (get($_SERVER, 'HTTP_ACCEPT'), 'text/html') !== false) {
       $content = ob_get_clean ();
       ob_start ();
-      self::render ();;
+      self::render ();
       $myContent = ob_get_clean ();
       // Note: if no <body> is found, the console will not be output.
       $out = preg_replace ('#(</body>\s*</html>\s*)$#i', "$myContent\$1", $content, -1, $count);
