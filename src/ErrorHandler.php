@@ -113,9 +113,17 @@ class ErrorHandler
     return $fileName;
   }
 
+  /**
+   * Outputs the error popup, or a plain message, depending on the response content type.
+   * @param                        $exception
+   * @param ResponseInterface|null $response If null, it outputs directly to the client. Otherwise, it assumes the
+   *                                         object is a new blank response.
+   * @return ResponseInterface
+   */
   static function showErrorPopup ($exception, ResponseInterface $response = null)
   {
-    if (ob_get_level ()) ob_end_clean ();
+    // For HTML pages, output the error popup
+
     if (strpos (get ($_SERVER, 'HTTP_ACCEPT'), 'text/html') !== false) {
       ob_start ();
       ErrorPopupRenderer::renderStyles ();
@@ -124,17 +132,27 @@ class ErrorHandler
       $popup = ob_get_clean ();
       if ($response) {
         $response->getBody ()->write ($popup);
-        return WebConsole::outputContentViaResponse ($response, true);
+        return $response->withStatus (500);
       }
       echo $popup;
-      WebConsole::outputContent ();
     }
+
+    // For other content types, output a plain text message, replacing any existing response content
     else {
+      if ($response) {
+        $response->getBody ()->write ($exception->getMessage ());
+        if (self::$debugMode)
+          $response->getBody ()->write ("\n\nStack trace:\n" . $exception->getTraceAsString ());
+        return $response
+          ->withoutHeader ('Content-Type')
+          ->withHeader ('Content-Type', 'text-plain')
+          ->withStatus (500);
+      }
       header ("Content-Type: text/plain");
       http_response_code (500);
       echo $exception->getMessage ();
       if (self::$debugMode)
-        echo "\n\nStack trace:\n" . $exception->getTraceAsString () . "\n";
+        echo "\n\nStack trace:\n" . $exception->getTraceAsString ();
     }
   }
 
