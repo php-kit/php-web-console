@@ -119,7 +119,9 @@ class WebConsole
       self::render ();
       $myContent = ob_get_clean ();
       if ($response) {
-        if ($response->getHeader ('Content-Type') == 'text/html') {
+        $c = $response->getHeader ('Content-Type');
+        $contentType = $c ? $c[0] : 'text/html';
+        if (substr ($contentType, 0, 9) == 'text/html') {
           $body = $response->getBody ();
           try {
             $body->rewind ();
@@ -134,7 +136,7 @@ class WebConsole
           } catch (Exception $e) {
           }
           $body->write ($content);
-          return $response->withHeader ('Content-Length', strlen ($content));
+          return $response->withHeader ('Content-Length', strval(strlen ($content)));
         }
       }
       $content = ob_get_clean ();

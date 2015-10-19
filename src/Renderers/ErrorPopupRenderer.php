@@ -56,7 +56,6 @@ class ErrorPopupRenderer
     </td>
     </tr>
     </table>
-    <script>document.getElementById ('__more').focus ()</script>
     <iframe name="hidden" style="display:none"></iframe>
     <?php
   }

@@ -9,12 +9,6 @@ class PSR7RequestPanel extends ConsolePanel
   /** @var ServerRequestInterface */
   public $request;
 
-  function __construct (ServerRequestInterface $request, $title = 'Request', $icon = '')
-  {
-    parent::__construct ($title, $icon);
-    $this->request = $request;
-  }
-
   public function render ()
   {
     if (isset($this->request)) {
@@ -29,11 +23,16 @@ class PSR7RequestPanel extends ConsolePanel
         'parsedBody'      => $r->getParsedBody (),
         'attributes'      => $r->getAttributes (),
         'serverParams'    => $r->getServerParams (),
-        'uploadedFiles'   => $r->getUploadedFiles ()
+        'uploadedFiles'   => $r->getUploadedFiles (),
       ];
       return $this->table ($data);
     }
     return $this->table ($_GET, 'Request') . $this->table ($_SERVER, 'Server variables');
+  }
+
+  function setRequest (ServerRequestInterface $request)
+  {
+    $this->request = $request;
   }
 
 }
