@@ -8,6 +8,7 @@ namespace PhpKit\WebConsole;
 use Exception;
 use PhpKit\WebConsole\Renderers\WebConsoleRenderer;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * @method static log(...$args) Alias of WebConsole::panel('log', ...$args).
@@ -108,26 +109,23 @@ class WebConsole
    * PSR-7-compatible version of {@see outputContent()}.
    *
    * Renders the console and inserts its content into the server response, if applicable.
-   * @param ResponseInterface $response Optional HTTP response object if the host application is PSR-7 compliant.
-   * @param bool $force Output console even if no body tag is found.
-   * @return ResponseInterface|null The modified response, or NULL if the $response argument was not given.
+   * @param ServerRequestInterface $request
+   * @param ResponseInterface      $response Optional HTTP response object if the host application is PSR-7 compliant.
+   * @param bool                   $force    Output console even if no body tag is found.
+   * @return null|ResponseInterface The modified response, or NULL if the $response argument was not given.
+   * @throws Exception
    */
-  public static function outputContentViaResponse (ResponseInterface $response, $force = false)
+  public static function outputContentViaResponse (ServerRequestInterface $request, ResponseInterface $response, $force = false)
   {
     if (self::$debugMode) {
       ob_start ();
       self::render ();
       $myContent = ob_get_clean ();
       if ($response) {
-        $c = $response->getHeader ('Content-Type');
-        $contentType = $c ? $c[0] : 'text/html';
-        if (substr ($contentType, 0, 9) == 'text/html') {
+        $contentType = $request->getHeaderLine ('Accept');
+        if (strpos ($contentType, 'text/html') !== false) {
           $body = $response->getBody ();
-          try {
-            $body->rewind ();
-          } catch (Exception $e) {
-          }
-          $content = $body->getContents ();
+          $content = $body->__toString();
           $content = preg_replace ('#(</body>\s*</html>\s*)$#i', "$myContent\$1", $content, -1, $count);
           if (!$count && $force)
             $content .= $myContent;
@@ -138,6 +136,7 @@ class WebConsole
           $body->write ($content);
           return $response->withHeader ('Content-Length', strval(strlen ($content)));
         }
+        return $response;
       }
       $content = ob_get_clean ();
       // Note: if no <body> is found, the console will not be output.

@@ -130,15 +130,24 @@ class ErrorHandler
       $stackTrace = self::getStackTrace ($exception);
       ErrorPopupRenderer::renderPopup ($exception, self::$appName, $stackTrace);
       $popup = ob_get_clean ();
+
+      // PSR-7 output
+
       if ($response) {
         $response->getBody ()->write ($popup);
         return $response->withStatus (500);
       }
+
+      // Direct output
+
       echo $popup;
     }
 
     // For other content types, output a plain text message, replacing any existing response content
     else {
+
+      // PSR-7 output
+
       if ($response) {
         $response->getBody ()->write ($exception->getMessage ());
         if (self::$debugMode)
@@ -148,6 +157,9 @@ class ErrorHandler
           ->withHeader ('Content-Type', 'text-plain')
           ->withStatus (500);
       }
+
+      // Direct output
+
       header ("Content-Type: text/plain");
       http_response_code (500);
       echo $exception->getMessage ();
