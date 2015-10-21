@@ -325,6 +325,10 @@ class ErrorPopupRenderer
         color: #5A5;
       }
 
+      #__error h3 .info {
+        color: #BF3D27;
+      }
+
       #__error .tag {
         color: #ffd064;
       }
