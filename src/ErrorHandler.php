@@ -18,6 +18,7 @@ class ErrorHandler
   private static $baseDir;
   private static $nextErrorHandler;
   private static $nextExceptionHandler;
+  private static $pathsMap;
 
   public static function errorLink ($file, $line = 1, $col = 1, $label = '', $class = '')
   {
@@ -25,7 +26,7 @@ class ErrorHandler
     if (empty($file))
       return '';
     $label = $label ?: self::shortFileName ($file);
-    $file  = urlencode ($file);
+    $file  = urlencode (self::toProjectPath ($file));
     --$line;
     --$col;
     return "<a class='$class' target='hidden' href='$application->baseURI/goto-source.php?file=$file&line=$line&col=$col'>$label</a>";
@@ -58,9 +59,10 @@ class ErrorHandler
     exit;
   }
 
-  public static function init ($debugMode = true, $baseDir = '')
+  public static function init ($debugMode = true, $baseDir = '', $pathsMap = [])
   {
     self::$baseDir              = $baseDir;
+    self::$pathsMap             = $pathsMap;
     self::$debugMode            = $debugMode;
     self::$nextErrorHandler     = set_error_handler ([get_class (), 'globalErrorHandler']);
     self::$nextExceptionHandler = set_exception_handler ([get_class (), 'globalExceptionHandler']);
@@ -95,19 +97,29 @@ class ErrorHandler
 
   public static function processMessage ($msg)
   {
-    $msg = preg_replace_callback ('|<path>([^<]*)</path>|', function ($m) {
+    $msg = preg_replace_callback ('#<path>([^<]*)</path>#', function ($m) {
       return '<b>' . ErrorHandler::shortFileName ($m[1]) . '</b>';
     }, $msg);
     return $msg;
   }
 
+  public static function setPathsMap (array $map)
+  {
+    self::$pathsMap = $map;
+  }
+
   public static function shortFileName ($fileName)
   {
     $fileName = self::normalizePath ($fileName);
-    if (self::$baseDir) {
-      if (strpos ($fileName, self::$baseDir) === 0)
-        return substr ($fileName, strlen (self::$baseDir) + 1);
-    }
+
+    foreach (self::$pathsMap as $from => $to)
+      if (substr ($fileName, 0, $l = strlen ($from)) == $from) {
+        $fileName = $to . substr ($fileName, $l);
+      }
+
+    if (strpos ($fileName, self::$baseDir) === 0)
+      return substr ($fileName, strlen (self::$baseDir) + 1);
+
     $p = strpos ($fileName, '/vendor/');
     if ($p) return substr ($fileName, $p + 1);
     return $fileName;
@@ -267,5 +279,11 @@ class ErrorHandler
       ErrorPopupRenderer::renderStackFrame ($fname, $lineStr, $fn, $args, $at, $edit);
     }
     return ob_get_clean ();
+  }
+
+  private static function toProjectPath ($path)
+  {
+    $path = self::shortFileName ($path);
+    return $path[0] == '/' ? $path : self::$baseDir . '/' . $path;
   }
 }
