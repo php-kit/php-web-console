@@ -303,6 +303,10 @@ class ErrorPopupRenderer
         display: block;
       }
 
+      #__error kbd {
+        font-weight: bold;
+      }
+
       #__error .class {
         cursor: help;
         color: #A00;
