@@ -45,7 +45,7 @@ class ErrorPopupRenderer
                 if ($title)
                   echo "<h3>$title</h3>";
                 echo "<div>" . ucfirst (ErrorHandler::processMessage ($exception->getMessage ())) . "</div>";
-                if (isset ($exception->info)) echo "<div class='__info'>$exception->info</div>";
+                if (!empty ($exception->info)) echo "<div class='__info'>$exception->info</div>";
                 ?>
               </div>
               <div class="error-location">
