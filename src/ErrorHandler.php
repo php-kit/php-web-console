@@ -14,6 +14,7 @@ class ErrorHandler
 
   public static $appName   = 'PHP Web Console';
   public static $debugMode = true;
+  public static $baseUri;
 
   private static $baseDir;
   private static $nextErrorHandler;
@@ -22,14 +23,14 @@ class ErrorHandler
 
   public static function errorLink ($file, $line = 1, $col = 1, $label = '', $class = '')
   {
-    global $application;
     if (empty($file))
       return '';
     $label = $label ?: self::shortFileName ($file);
     $file  = urlencode (self::toProjectPath ($file));
     --$line;
     --$col;
-    return "<a class='$class' target='hidden' href='$application->baseURI/goto-source.php?file=$file&line=$line&col=$col'>$label</a>";
+    $baseUri = self::$baseUri;
+    return "<a class='$class' target='hidden' href='$baseUri/goto-source.php?file=$file&line=$line&col=$col'>$label</a>";
   }
 
   public static function globalErrorHandler ($errno, $errstr, $errfile, $errline, $errcontext)
@@ -62,6 +63,7 @@ class ErrorHandler
   public static function init ($debugMode = true, $baseDir = '', $pathsMap = [])
   {
     self::$baseDir              = $baseDir;
+    self::$baseUri              = dirnameEx (get ($_SERVER, 'SCRIPT_NAME'));
     self::$pathsMap             = $pathsMap;
     self::$debugMode            = $debugMode;
     self::$nextErrorHandler     = set_error_handler ([get_class (), 'globalErrorHandler']);
