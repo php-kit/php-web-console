@@ -129,7 +129,7 @@ class ErrorHandler
 
   /**
    * Outputs the error popup, or a plain message, depending on the response content type.
-   * @param                        $exception
+   * @param \Exception|\Error $exception Note: can't be type hinted, for PHP7 compat.
    * @param ResponseInterface|null $response If null, it outputs directly to the client. Otherwise, it assumes the
    *                                         object is a new blank response.
    * @return ResponseInterface
@@ -141,7 +141,7 @@ class ErrorHandler
     if (strpos (get ($_SERVER, 'HTTP_ACCEPT'), 'text/html') !== false) {
       ob_start ();
       ErrorPopupRenderer::renderStyles ();
-      $stackTrace = self::getStackTrace ($exception);
+      $stackTrace = self::getStackTrace ($exception->getPrevious() ? : $exception);
       ErrorPopupRenderer::renderPopup ($exception, self::$appName, $stackTrace);
       $popup = ob_get_clean ();
 
