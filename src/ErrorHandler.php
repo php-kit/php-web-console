@@ -35,8 +35,8 @@ class ErrorHandler
 
   public static function globalErrorHandler ($errno, $errstr, $errfile, $errline, $errcontext)
   {
-    if (ini_get ('error_reporting') == 0)
-      return false;
+    if (!error_reporting()) return false;
+
 //    self::globalExceptionHandler (new PHPError($errno, $errstr, $errfile, $errline, $errcontext));
     if (self::$nextErrorHandler)
       call_user_func (self::$nextErrorHandler, $errno, $errstr, $errfile, $errline, $errcontext);
