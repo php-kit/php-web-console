@@ -168,6 +168,16 @@ class WebConsole
     throw new Exception ("Invalid panel id: <b>" . htmlentities ($panelId) . '</b>');
   }
 
+  /**
+   * Checks if a ConsolePanel with the given name is registered.
+   * @param string $panelId
+   * @return bool
+   */
+  public static function hasPanel ($panelId)
+  {
+    return isset(self::$panels[$panelId]);
+  }
+
   public static function highlight ($msg, array $keywords, $baseStyle)
   {
     $k = implode ('|', $keywords);
