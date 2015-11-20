@@ -208,7 +208,6 @@ HTML;
         $w1    = WebConsole::$TABLE_INDEX_WIDTH;
         $c1    = ' class="n"';
       }
-      uksort ($data, 'strnatcasecmp');
     }
     elseif (is_object ($data)) {
       if ($depth == WebConsole::$TABLE_MAX_DEPTH)

@@ -27,8 +27,6 @@ class ErrorHandler
       return '';
     $label = $label ?: self::shortFileName ($file);
     $file  = urlencode (self::toProjectPath ($file));
-    --$line;
-    --$col;
     $baseUri = self::$baseUri;
     return "<a class='$class' target='hidden' href='$baseUri/goto-source.php?file=$file&line=$line&col=$col'>$label</a>";
   }
