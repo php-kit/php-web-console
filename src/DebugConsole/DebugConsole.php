@@ -13,13 +13,6 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class DebugConsole
 {
-  const DEFAULT_LOGGER_ID = 'main';
-  static $TABLE_COLLAPSE_DEPTH = 4;
-  static $TABLE_INDEX_WIDTH    = 50;
-  static $TABLE_MAX_DEPTH      = 5;
-  static $TABLE_PROP_WIDTH     = 170;
-  static $TABLE_TYPE_WIDTH     = 100;
-
   /**
    * @var string For compatibility with PHP<5.5
    */
@@ -29,7 +22,10 @@ class DebugConsole
    * @var bool
    */
   static $initialized = false;
-
+  /**
+   * @var DebugConsoleSettings
+   */
+  static $settings;
   private static $debugMode;
   /**
    * Map of panel names (identifiers) to Console subclass instances.
@@ -44,7 +40,7 @@ class DebugConsole
    */
   public static function defaultLogger ()
   {
-    $loggerId = self::DEFAULT_LOGGER_ID;
+    $loggerId = self::$settings->defaultLoggerId;
     if (isset(self::$loggers[$loggerId]))
       return self::$loggers[$loggerId];
     else return self::registerPanel ($loggerId, new ConsoleLogger());
@@ -66,11 +62,13 @@ class DebugConsole
     return "<span class=$baseStyle>" . preg_replace ("#\\b($k)\\b#", '<span class=keyword>$1</span>', $msg) . '</span>';
   }
 
-  static function init ($debugMode = true, $defaultPanelTitle = 'Inspector', $defaultPanelIcon = 'fa fa-search')
+  static function init ($debugMode = true, DebugConsoleSettings $settings = null)
   {
+    self::$settings    = $settings ?: new DebugConsoleSettings;
     self::$initialized = true;
     self::$debugMode   = $debugMode;
-    self::registerPanel (self::DEFAULT_LOGGER_ID, new ConsoleLogger ($defaultPanelTitle, $defaultPanelIcon));
+    self::registerPanel (self::$settings->defaultLoggerId,
+      new ConsoleLogger ($settings->defaultPanelTitle, $settings->defaultPanelIcon));
   }
 
   public static function libraryNamespace ()

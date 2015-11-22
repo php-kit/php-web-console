@@ -277,22 +277,22 @@ HTML;
 
     // SETUP TABULAR DISPLAY OF ARRAYS AND OBJECTS
 
-    $w1 = DebugConsole::$TABLE_PROP_WIDTH;
+    $w1 = DebugConsole::$settings->tablePropertyColumnWidth;
     $c1 = '';
 
     if (is_array ($data)) {
-      if ($depth == DebugConsole::$TABLE_MAX_DEPTH)
+      if ($depth == DebugConsole::$settings->tableMaxDepth)
         return '<i>(...)</i>';
       ++$depth;
       $label = 'Key';
       if (isset($data[0])) {
         $label = 'Index';
-        $w1    = DebugConsole::$TABLE_INDEX_WIDTH;
+        $w1    = DebugConsole::$settings->tableIndexColumnWidth;
         $c1    = ' class="n"';
       }
     }
     elseif (is_object ($data)) {
-      if ($depth == DebugConsole::$TABLE_MAX_DEPTH)
+      if ($depth == DebugConsole::$settings->tableMaxDepth)
         return '<i>(...)</i>';
       ++$depth;
       if (method_exists ($data, '__debugInfo'))
@@ -308,7 +308,7 @@ HTML;
 
     $filter = isset($this->filter) ? $this->filter : function ($k) { return true; };
     ob_start (null, 0);
-    if ($depth >= DebugConsole::$TABLE_COLLAPSE_DEPTH)
+    if ($depth >= DebugConsole::$settings->tableCollapseDepth)
       echo '<div class="__expand"><a class="fa fa-plus-square" href="javascript:void(0)" onclick="this.parentNode.className+=\' show\'"></a>';
     ?>
   <table class="__console-table<?= $title ? ' with-caption' : '' ?>">
@@ -318,7 +318,7 @@ HTML;
     <colgroup>
       <col width="<?= $w1 ?>">
       <?php if ($typeColumn): ?>
-        <col width="<?= DebugConsole::$TABLE_TYPE_WIDTH ?>">
+        <col width="<?= DebugConsole::$settings->tableTypeColumnWidth ?>">
       <?php endif ?>
       <col width="100%">
     </colgroup>
@@ -348,7 +348,7 @@ HTML;
     </tbody>
   <?php } ?>
     </table><?php
-    if ($depth >= DebugConsole::$TABLE_COLLAPSE_DEPTH)
+    if ($depth >= DebugConsole::$settings->tableCollapseDepth)
       echo '</div>';
 
     return trim (ob_get_clean ());
