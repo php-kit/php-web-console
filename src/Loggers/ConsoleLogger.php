@@ -23,7 +23,7 @@ class ConsoleLogger extends AbstractLogger
     600 => 'EMERGENCY',
   ];
 
-  public $hasPanel = true;
+  public $hasPanel = false;
   public $icon;
   public $title;
   /**

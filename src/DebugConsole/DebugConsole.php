@@ -47,7 +47,7 @@ class DebugConsole
     $loggerId = self::DEFAULT_LOGGER_ID;
     if (isset(self::$loggers[$loggerId]))
       return self::$loggers[$loggerId];
-    else return self::$loggers[$loggerId] = new ConsoleLogger();
+    else return self::registerPanel ($loggerId, new ConsoleLogger());
   }
 
   /**
@@ -70,7 +70,7 @@ class DebugConsole
   {
     self::$initialized = true;
     self::$debugMode   = $debugMode;
-    self::registerLogger (self::DEFAULT_LOGGER_ID, new ConsoleLogger ($defaultPanelTitle, $defaultPanelIcon));
+    self::registerPanel (self::DEFAULT_LOGGER_ID, new ConsoleLogger ($defaultPanelTitle, $defaultPanelIcon));
   }
 
   public static function libraryNamespace ()
@@ -172,10 +172,16 @@ class DebugConsole
     self::$loggers[$loggerId] = $logger;
   }
 
+  /**
+   * @param string        $loggerId
+   * @param ConsoleLogger $logger
+   * @return ConsoleLogger
+   */
   public static function registerPanel ($loggerId, ConsoleLogger $logger)
   {
     $logger->hasPanel         = true;
     self::$loggers[$loggerId] = $logger;
+    return $logger;
   }
 
   public static function throwErrorWithLog (Exception $e)
