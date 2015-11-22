@@ -1,11 +1,31 @@
 <?php
-namespace PhpKit\WebConsole;
+namespace PhpKit\WebConsole\Loggers;
 
-class ConsolePanel
+use PhpKit\WebConsole\DebugConsole\DebugConsole;
+use PhpKit\WebConsole\ErrorConsole\ErrorConsole;
+use Psr\Log\AbstractLogger;
+
+class ConsoleLogger extends AbstractLogger
 {
+  /**
+   * Logging levels from syslog protocol defined in RFC 5424
+   *
+   * @var array $LEVELS Logging levels
+   */
+  protected static $LEVELS = [
+    100 => 'DEBUG',
+    200 => 'INFO',
+    250 => 'NOTICE',
+    300 => 'WARNING',
+    400 => 'ERROR',
+    500 => 'CRITICAL',
+    550 => 'ALERT',
+    600 => 'EMERGENCY',
+  ];
+
+  public $hasPanel = true;
   public $icon;
   public $title;
-  public $visible = true;
   /**
    * The caption to be used on the next table.
    * @var string
@@ -25,10 +45,27 @@ class ConsolePanel
    */
   protected $filter;
 
-  function __construct ($title = 'Panel', $icon = '')
+  function __construct ($title = 'Logger', $icon = '')
   {
     $this->title = $title;
     $this->icon  = $icon;
+  }
+
+  /**
+   * Interpolates context values into message placeholders.
+   * @param string $message Message with optional placeholder with syntax {key}.
+   * @param array  $context Array from where to fetch values corresponing to the interpolated keys.
+   * @return string
+   */
+  private static function interpolate ($message, array $context = [])
+  {
+    // build a replacement array with braces around the context keys
+    $replace = [];
+    foreach ($context as $key => $val) {
+      $replace['{' . $key . '}'] = $val;
+    }
+    // interpolate replacement values into the message and return
+    return strtr ($message, $replace);
   }
 
   function getContent ()
@@ -36,24 +73,39 @@ class ConsolePanel
     $c             = $this->content;
     $this->content = '';
     return $c;
-
   }
 
-  public function log ()
+  public function inspect ()
   {
     foreach (func_get_args () as $arg) {
       if (!is_string ($arg))
-        $arg = $this->inspect ($arg);
+        $arg = $this->inspectAndFormat ($arg);
       elseif (substr ($arg, 0, 2) == '<#') {
         if (substr ($arg, 2, 2) == 't>') $arg = substr ($arg, 4, -5);
         // else passthrough
       }
       elseif (substr ($arg, 0, 3) != '</#')
-        $arg = $this->inspect ($arg);
+        $arg = $this->inspectAndFormat ($arg);
       $this->write ($arg);
     }
 
     return $this;
+  }
+
+  /**
+   * PSR-3-compliant logging method.
+   *
+   * @param mixed  $level
+   * @param string $message
+   * @param array  $context
+   *
+   * @return null
+   */
+  public function log ($level, $message, array $context = [])
+  {
+    $levelName = isset(self::$LEVELS[$level]) ? self::$LEVELS[$level] : $level;
+    $message   = self::interpolate ($message, $context);
+    $this->write ("<#log><#i><span class=__alert>$levelName</span> $message</#i></#log>");
   }
 
   public function render ()
@@ -63,7 +115,7 @@ class ConsolePanel
 
   public function showCallLocation ()
   {
-    $namespace = WebConsole::getLibraryNamespace ();
+    $namespace = DebugConsole::libraryNamespace ();
     $base      = __DIR__;
     $stack     = debug_backtrace (0);
     // Discard frames of all functions that belong to this library.
@@ -75,8 +127,8 @@ class ConsolePanel
     $trace     = $stack[0];
     $path      = isset($trace['file']) ? $trace['file'] : '';
     $line      = isset($trace['line']) ? $trace['line'] : '';
-    $shortPath = ErrorHandler::shortFileName ($path);
-    $location  = empty($line) ? $shortPath : ErrorHandler::errorLink ($path, $line, 1, "$shortPath($line)");
+    $shortPath = ErrorConsole::shortFileName ($path);
+    $location  = empty($line) ? $shortPath : ErrorConsole::errorLink ($path, $line, 1, "$shortPath($line)");
     if ($path != '')
       $path = <<<HTML
 <div class="__debug-location"><b>At</b> $location</div>
@@ -96,7 +148,7 @@ HTML;
   {
     $args          = array_slice (func_get_args (), 1);
     $this->caption = $caption;
-    call_user_func_array ([$this, 'log'], $args);
+    call_user_func_array ([$this, 'inspect'], $args);
 
     return $this;
   }
@@ -117,7 +169,7 @@ HTML;
   {
     $args         = array_slice (func_get_args (), 1);
     $this->filter = $fn;
-    call_user_func_array ([$this, 'log'], $args);
+    call_user_func_array ([$this, 'inspect'], $args);
     $this->filter = null;
 
     return $this;
@@ -189,7 +241,7 @@ HTML;
     return $msg;
   }
 
-  protected function inspect ($val)
+  protected function inspectAndFormat ($val)
   {
     $arg = $this->table ($val);
     if (is_scalar ($val) || is_null ($val)) {
@@ -199,8 +251,10 @@ HTML;
 
       return "<#data>$arg</#data>";
     }
-
-    return "<#header>Type: <span class='__type'>" . $this->getType ($val) . "</span></#header>$arg";
+    else if (is_object ($val))
+      $id = ' <small>#' . DebugConsole::objectId ($val) . '</small>';
+    else $id = '';
+    return "<#header>Type: <span class='__type'>" . $this->getType ($val) . "</span>$id</#header>$arg";
   }
 
   protected function table ($data, $title = '', $depth = 0, $typeColumn = true, $columnHeaders = true)
@@ -210,24 +264,35 @@ HTML;
       $this->caption = '';
     }
 
-    $w1 = WebConsole::$TABLE_PROP_WIDTH;
-    $c1 = '';
+    // DISPLAY PRIMITIVE VALUES
+
     if ($data instanceof \Closure) {
       return '<i>(native code)</i>';
     }
-    elseif (is_array ($data)) {
-      if ($depth == WebConsole::$TABLE_MAX_DEPTH)
+    elseif (is_bool ($data))
+      return $data ? 'true' : 'false';
+    elseif (!is_array ($data) && !is_object ($data)) {
+      return htmlspecialchars (str_replace ('    ', '  ', trim (print_r ($data, true))));
+    }
+
+    // SETUP TABULAR DISPLAY OF ARRAYS AND OBJECTS
+
+    $w1 = DebugConsole::$TABLE_PROP_WIDTH;
+    $c1 = '';
+
+    if (is_array ($data)) {
+      if ($depth == DebugConsole::$TABLE_MAX_DEPTH)
         return '<i>(...)</i>';
       ++$depth;
       $label = 'Key';
       if (isset($data[0])) {
         $label = 'Index';
-        $w1    = WebConsole::$TABLE_INDEX_WIDTH;
+        $w1    = DebugConsole::$TABLE_INDEX_WIDTH;
         $c1    = ' class="n"';
       }
     }
     elseif (is_object ($data)) {
-      if ($depth == WebConsole::$TABLE_MAX_DEPTH)
+      if ($depth == DebugConsole::$TABLE_MAX_DEPTH)
         return '<i>(...)</i>';
       ++$depth;
       if (method_exists ($data, '__debugInfo'))
@@ -238,14 +303,12 @@ HTML;
       $label = 'Property';
       uksort ($data, 'strnatcasecmp');
     }
-    elseif (is_bool ($data))
-      return $data ? 'true' : 'false';
-    else {
-      return htmlspecialchars (str_replace ('    ', '  ', trim (print_r ($data, true))));
-    }
+
+    // DRAW TABLE
+
     $filter = isset($this->filter) ? $this->filter : function ($k) { return true; };
     ob_start (null, 0);
-    if ($depth >= WebConsole::$TABLE_COLLAPSE_DEPTH)
+    if ($depth >= DebugConsole::$TABLE_COLLAPSE_DEPTH)
       echo '<div class="__expand"><a class="fa fa-plus-square" href="javascript:void(0)" onclick="this.parentNode.className+=\' show\'"></a>';
     ?>
   <table class="__console-table<?= $title ? ' with-caption' : '' ?>">
@@ -255,19 +318,19 @@ HTML;
     <colgroup>
       <col width="<?= $w1 ?>">
       <?php if ($typeColumn): ?>
-        <col width="<?= WebConsole::$TABLE_TYPE_WIDTH ?>">
+        <col width="<?= DebugConsole::$TABLE_TYPE_WIDTH ?>">
       <?php endif ?>
       <col width="100%">
     </colgroup>
     <?php if ($columnHeaders): ?>
-    <thead>
-    <tr>
-      <th><?= $label ?></th>
-      <?php if ($typeColumn): ?>
-        <th>Type</th>
-      <?php endif ?>
-      <th>Value</th>
-    </thead>
+      <thead>
+      <tr>
+        <th><?= $label ?></th>
+        <?php if ($typeColumn): ?>
+          <th>Type</th>
+        <?php endif ?>
+        <th>Value</th>
+      </thead>
     <?php endif ?>
     <tbody>
     <?php
@@ -278,14 +341,14 @@ HTML;
     <tr>
       <th<?= $c1 ?>><?= $k ?></th>
       <?php if ($typeColumn): ?>
-      <td><?= $this->getType ($v) ?></td>
+        <td><?= $this->getType ($v) ?></td>
       <?php endif ?>
       <td><?= $x === '...' ? '<i>ommited</i>' : $this->table ($v, '', $depth, $typeColumn, $columnHeaders) ?></td>
       <?php endforeach; ?>
     </tbody>
   <?php } ?>
     </table><?php
-    if ($depth >= WebConsole::$TABLE_COLLAPSE_DEPTH)
+    if ($depth >= DebugConsole::$TABLE_COLLAPSE_DEPTH)
       echo '</div>';
 
     return trim (ob_get_clean ());
@@ -308,5 +371,4 @@ HTML;
     $l = array_slice (explode ('\\', $c), -1)[0];
     return "<span title='$c'>$l</span>";
   }
-
 }

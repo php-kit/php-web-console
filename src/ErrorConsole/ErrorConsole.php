@@ -1,146 +1,45 @@
 <?php
-namespace PhpKit\WebConsole;
+namespace PhpKit\WebConsole\ErrorConsole;
 
-use PhpKit\WebConsole\Renderers\ErrorPopupRenderer;
+use PhpKit\WebConsole\DebugConsole\DebugConsole;
+use PhpKit\WebConsole\ErrorConsole\Exceptions\PHPError;
+use PhpKit\WebConsole\ErrorConsole\Renderers\ErrorConsoleRenderer;
 use Psr\Http\Message\ResponseInterface;
 
 /**
  * Displays debugging information when errors occur in dev.mode, or logs it when
  * in production mode.
  */
-class ErrorHandler
+class ErrorConsole
 {
   const TRIM_WIDTH = 50;
 
-  public static $appName   = 'PHP Web Console';
+  /**
+   * @var bool To be read by ErrorHandler::globalExceptionHandler()
+   */
   public static $debugMode = true;
-  public static $baseUri;
 
+  private static $appName = 'PHP Web Console';
   private static $baseDir;
-  private static $nextErrorHandler;
-  private static $nextExceptionHandler;
+  private static $baseUri;
   private static $pathsMap;
-
-  public static function errorLink ($file, $line = 1, $col = 1, $label = '', $class = '')
-  {
-    if (empty($file))
-      return '';
-    $label = $label ?: self::shortFileName ($file);
-    $file  = urlencode (self::toProjectPath ($file));
-    $baseUri = self::$baseUri;
-    return "<a class='$class' target='hidden' href='$baseUri/goto-source.php?file=$file&line=$line&col=$col'>$label</a>";
-  }
-
-  public static function globalErrorHandler ($errno, $errstr, $errfile, $errline, $errcontext)
-  {
-    if (!error_reporting()) return false;
-
-//    self::globalExceptionHandler (new PHPError($errno, $errstr, $errfile, $errline, $errcontext));
-    if (self::$nextErrorHandler)
-      call_user_func (self::$nextErrorHandler, $errno, $errstr, $errfile, $errline, $errcontext);
-    throw new PHPError($errno, $errstr, $errfile, $errline, $errcontext);
-  }
-
-  public static function globalExceptionHandler ($exception)
-  {
-    $handled = false;
-    if (self::$debugMode && WebConsole::$initialized) {
-      self::showErrorPopup ($exception);
-      $handled = true;
-    }
-    if (self::$nextExceptionHandler)
-      call_user_func (self::$nextExceptionHandler, $exception);
-    if (!$handled) {
-      @ob_end_clean ();
-      echo "<style>body{background:silver}table {font-family:Menlo,sans-serif;font-size:12px}</style>";
-      throw $exception;
-    }
-    exit;
-  }
-
-  public static function init ($debugMode = true, $baseDir = '', $pathsMap = [])
-  {
-    self::$baseDir              = $baseDir;
-    self::$baseUri              = dirnameEx (get ($_SERVER, 'SCRIPT_NAME'));
-    self::$pathsMap             = $pathsMap;
-    self::$debugMode            = $debugMode;
-    self::$nextErrorHandler     = set_error_handler ([get_class (), 'globalErrorHandler']);
-    self::$nextExceptionHandler = set_exception_handler ([get_class (), 'globalExceptionHandler']);
-    register_shutdown_function ([get_class (), 'onShutDown']);
-  }
-
-  public static function normalizePath ($path)
-  {
-    do {
-      $path = preg_replace (
-        ['#//|/\./#', '#/([^/]*)/\.\./#'],
-        '/', $path, -1, $count
-      );
-    } while ($count > 0);
-    return $path;
-  }
-
-  public static function onShutDown ()
-  {
-    //Catch fatal errors, which do not trigger globalErrorHandler()
-    $error = error_get_last ();
-    if (isset($error) && ($error['type'] == E_ERROR || $error['type'] == E_PARSE)) {
-      //remove error output
-      /*
-      $buffer = @ob_get_clean ();
-      $buffer = preg_replace ('#<table class=\'xdebug-error\'[\s\S]*?</table>#i', '', $buffer);
-      echo $buffer;
-      */
-      self::globalExceptionHandler (new PHPError(1, $error['message'], $error['file'], $error['line']));
-    }
-  }
-
-  public static function processMessage ($msg)
-  {
-    $msg = preg_replace_callback ('#<path>([^<]*)</path>#', function ($m) {
-      return '<b>' . ErrorHandler::shortFileName ($m[1]) . '</b>';
-    }, $msg);
-    return $msg;
-  }
-
-  public static function setPathsMap (array $map)
-  {
-    self::$pathsMap = $map;
-  }
-
-  public static function shortFileName ($fileName)
-  {
-    $fileName = self::normalizePath ($fileName);
-
-    foreach (self::$pathsMap as $from => $to)
-      if (substr ($fileName, 0, $l = strlen ($from)) == $from) {
-        $fileName = $to . substr ($fileName, $l);
-      }
-
-    if (strpos ($fileName, self::$baseDir) === 0)
-      return substr ($fileName, strlen (self::$baseDir) + 1);
-
-    $p = strpos ($fileName, '/vendor/');
-    if ($p) return substr ($fileName, $p + 1);
-    return $fileName;
-  }
 
   /**
    * Outputs the error popup, or a plain message, depending on the response content type.
-   * @param \Exception|\Error $exception Note: can't be type hinted, for PHP7 compat.
-   * @param ResponseInterface|null $response If null, it outputs directly to the client. Otherwise, it assumes the
-   *                                         object is a new blank response.
-   * @return ResponseInterface
+   * @param \Exception|\Error      $exception Note: can't be type hinted, for PHP7 compat.
+   * @param ResponseInterface|null $response  If null, it outputs directly to the client. Otherwise, it assumes the
+   *                                          object is a new blank response.
+   * @return ResponseInterface|null
    */
-  static function showErrorPopup ($exception, ResponseInterface $response = null)
+  static function display ($exception, ResponseInterface $response = null)
   {
     // For HTML pages, output the error popup
 
     if (strpos (get ($_SERVER, 'HTTP_ACCEPT'), 'text/html') !== false) {
       ob_start ();
-      ErrorPopupRenderer::renderStyles ();
-      $stackTrace = self::getStackTrace ($exception->getPrevious() ? : $exception);
-      ErrorPopupRenderer::renderPopup ($exception, self::$appName, $stackTrace);
+      ErrorConsoleRenderer::renderStyles ();
+      $stackTrace = self::getStackTrace ($exception->getPrevious () ?: $exception);
+      ErrorConsoleRenderer::renderPopup ($exception, self::$appName, $stackTrace);
       $popup = ob_get_clean ();
 
       // PSR-7 output
@@ -178,6 +77,69 @@ class ErrorHandler
       if (self::$debugMode)
         echo "\n\nStack trace:\n" . $exception->getTraceAsString ();
     }
+    return null;
+  }
+
+  public static function errorLink ($file, $line = 1, $col = 1, $label = '', $class = '')
+  {
+    if (empty($file))
+      return '';
+    $label   = $label ?: self::shortFileName ($file);
+    $file    = urlencode (self::toProjectPath ($file));
+    $baseUri = self::$baseUri;
+    return "<a class='$class' target='hidden' href='$baseUri/goto-source.php?file=$file&line=$line&col=$col'>$label</a>";
+  }
+
+  public static function init ($debugMode = true, $baseDir = '', $pathsMap = [])
+  {
+    self::$baseDir   = $baseDir;
+    self::$baseUri   = dirnameEx (get ($_SERVER, 'SCRIPT_NAME'));
+    self::$pathsMap  = $pathsMap;
+    self::$debugMode = $debugMode;
+    ErrorHandler::init ();
+  }
+
+  /**
+   * For use by renderers.
+   * @param string $msg
+   * @return string
+   */
+  public static function processMessage ($msg)
+  {
+    $msg = preg_replace_callback ('#<path>([^<]*)</path>#', function ($m) {
+      return '<b>' . self::shortFileName ($m[1]) . '</b>';
+    }, $msg);
+    return $msg;
+  }
+
+  /**
+   * @param string $appName
+   */
+  public static function setAppName ($appName)
+  {
+    self::$appName = $appName;
+  }
+
+  public static function setPathsMap (array $map)
+  {
+    self::$pathsMap = $map;
+  }
+
+  public static function shortFileName ($fileName)
+  {
+    $fileName = self::normalizePath ($fileName);
+
+    foreach (self::$pathsMap as $from => $to)
+      if (substr ($fileName, 0, $l = strlen ($from)) == $from) {
+        $fileName = $to . substr ($fileName, $l);
+      }
+
+    if (strpos ($fileName, self::$baseDir) === 0)
+      return substr ($fileName, strlen (self::$baseDir) + 1);
+
+    $p = strpos ($fileName, '/vendor/');
+    if ($p) return substr ($fileName, $p + 1);
+    return $fileName;
   }
 
   private static function debugVal ($arg)
@@ -200,12 +162,16 @@ class ErrorHandler
 
   private static function filterStackTrace (array $trace)
   {
-    $namespace = WebConsole::getLibraryNamespace ();
+    $namespace = DebugConsole::libraryNamespace ();
     return array_values (array_filter ($trace, function ($frame) use ($namespace) {
       return !isset($frame['class']) || substr ($frame['class'], 0, strlen ($namespace)) != $namespace;
     }));
   }
 
+  /**
+   * @param \Exception $exception
+   * @return string
+   */
   private static function getStackTrace ($exception)
   {
     ob_start ();
@@ -276,9 +242,20 @@ class ErrorHandler
       $lineStr = $line ? "<span class='line'>$line</span>" : '';
       $edit    = $file ? self::errorLink ($file, $line, 1, 'edit', '__btn') : '';
       $at      = $file ? self::errorLink ($file, $line, 1) : '&lt;unknown location&gt;';
-      ErrorPopupRenderer::renderStackFrame ($fname, $lineStr, $fn, $args, $at, $edit);
+      ErrorConsoleRenderer::renderStackFrame ($fname, $lineStr, $fn, $args, $at, $edit);
     }
     return ob_get_clean ();
+  }
+
+  private static function normalizePath ($path)
+  {
+    do {
+      $path = preg_replace (
+        ['#//|/\./#', '#/([^/]*)/\.\./#'],
+        '/', $path, -1, $count
+      );
+    } while ($count > 0);
+    return $path;
   }
 
   private static function toProjectPath ($path)

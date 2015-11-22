@@ -1,18 +1,18 @@
 <?php
-namespace PhpKit\WebConsole\Renderers;
+namespace PhpKit\WebConsole\ErrorConsole\Renderers;
 
 use Error;
 use Exception;
-use PhpKit\WebConsole\ErrorHandler;
+use PhpKit\WebConsole\ErrorConsole\ErrorConsole;
 
-class ErrorPopupRenderer
+class ErrorConsoleRenderer
 {
   static function friendlyClass ($class)
   {
     $s    = explode ('\\', $class);
     $name = end ($s);
     $name = preg_replace ('/(?=[AEIOU])/', ' ', $name);
-    return "<span class='info' title='$class'>".trim ($name)."</span>";
+    return "<span class='info' title='$class'>" . trim ($name) . "</span>";
   }
 
   static function getIcon ()
@@ -44,13 +44,13 @@ class ErrorPopupRenderer
                 $title = isset($exception->title) ? $exception->title : self::friendlyClass (get_class ($exception));
                 if ($title)
                   echo "<h3>$title</h3>";
-                echo "<div>" . ucfirst (ErrorHandler::processMessage ($exception->getMessage ())) . "</div>";
+                echo "<div>" . ucfirst (ErrorConsole::processMessage ($exception->getMessage ())) . "</div>";
                 if (!empty ($exception->info)) echo "<div class='__info'>$exception->info</div>";
                 ?>
               </div>
               <div class="error-location">
                 <?php
-                $link = ErrorHandler::errorLink ($exception->getFile (), $exception->getLine (), 1);
+                $link = ErrorConsole::errorLink ($exception->getFile (), $exception->getLine (), 1);
                 if ($link)
                   echo "Thrown from $link, line <b>{$exception->getLine()}</b>";
                 ?>

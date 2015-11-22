@@ -1,9 +1,9 @@
 <?php
-namespace PhpKit\WebConsole\Panels;
+namespace PhpKit\WebConsole\Loggers\Specialized;
 
-use PhpKit\WebConsole\ConsolePanel;
+use PhpKit\WebConsole\Loggers\ConsoleLogger;
 
-class HttpRequestPanel extends ConsolePanel
+class HttpRequestLogger extends ConsoleLogger
 {
   function __construct ($title = 'Request', $icon = '')
   {

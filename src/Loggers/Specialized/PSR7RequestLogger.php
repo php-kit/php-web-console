@@ -1,10 +1,10 @@
 <?php
-namespace PhpKit\WebConsole\Panels;
+namespace PhpKit\WebConsole\Loggers\Specialized;
 
-use PhpKit\WebConsole\ConsolePanel;
+use PhpKit\WebConsole\Loggers\ConsoleLogger;
 use Psr\Http\Message\ServerRequestInterface;
 
-class PSR7RequestPanel extends ConsolePanel
+class PSR7RequestLogger extends ConsoleLogger
 {
   /** @var ServerRequestInterface */
   public $request;

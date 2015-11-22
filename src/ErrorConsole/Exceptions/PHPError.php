@@ -1,5 +1,5 @@
 <?php
-namespace PhpKit\WebConsole;
+namespace PhpKit\WebConsole\ErrorConsole\Exceptions;
 
 use Exception;
 

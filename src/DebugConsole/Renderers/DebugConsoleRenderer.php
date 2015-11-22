@@ -1,9 +1,8 @@
 <?php
-namespace PhpKit\WebConsole\Renderers;
+namespace PhpKit\WebConsole\DebugConsole\Renderers;
 
-class WebConsoleRenderer
+class DebugConsoleRenderer
 {
-
   static function renderConsole (array $panels)
   {
     $time   = round (microtime (true) - $_SERVER['REQUEST_TIME_FLOAT'], 3);
@@ -15,7 +14,6 @@ class WebConsoleRenderer
         <span><i class="fa fa-clock-o"></i>&nbsp; <?= $time ?> seconds</span>
         <span><i class="fa fa-cogs"></i>&nbsp; <?= $memory ?> MB</span>
         <?php foreach ($panels as $id => $panel):
-          if ($panel->visible):
             $content = $panel->render ();
             ?>
             <a id="__tab-<?= $id ?>" class="__tab<?= strlen ($content) ? '' : ' disabled' ?>" <?= $nop ?>
@@ -25,9 +23,7 @@ class WebConsoleRenderer
               <?php endif ?>
               <?= $panel->title ?>
             </a>
-            <?php
-          endif;
-        endforeach; ?>
+            <?php endforeach; ?>
         <a class="__minimize fa fa-chevron-down" <?= $nop ?>
            onclick="closeConsole()"></a> <a class="__close fa fa-close" <?= $nop ?>
                                             onclick="find('__console-container').remove()"></a>
@@ -334,6 +330,11 @@ class WebConsoleRenderer
         color: #666;
         font-weight: bold;
         padding: 10px;
+      }
+
+      #__console .__header small {
+        color: #999;
+        font-weight: normal;
       }
 
       #__console .__footer {
