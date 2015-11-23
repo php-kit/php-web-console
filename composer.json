@@ -16,7 +16,10 @@
   "homepage": "https://github.com/php-kit/php-web-console",
   "require": {
     "psr/http-message": "~1.0",
-    "monolog/monolog": "^1.17.1"
+    "psr/log": "~1.0"
+  },
+  "suggest": {
+    "monolog/monolog": "You can redirect Monolog logging output to a Debug Console panel, or vice-versa"
   },
   "autoload": {
     "psr-4": {
