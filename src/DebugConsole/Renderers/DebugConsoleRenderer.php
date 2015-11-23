@@ -370,6 +370,14 @@ class DebugConsoleRenderer
         color: #5A5;
       }
 
+      #__console kbd {
+        font-weight: bold;
+        /* override Bootstrap */
+        background: transparent;
+        box-shadow: none;
+        padding: 0;
+      }
+
       .__console-table {
         font-size: 12px;
         width: 100%;

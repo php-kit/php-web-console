@@ -63,6 +63,8 @@ class ConsoleLogger extends AbstractLogger
     }
     if (is_array ($v))
       return 'array(' . count (array_keys ($v)) . ')';
+    if (is_null ($v))
+      return 'null';
 
     return gettype ($v);
   }
@@ -253,6 +255,8 @@ HTML;
    * - `<#header>text</#header>` - A subsection title.
    * - `<#footer>text</#footer>` - Extra information, right aligned.
    * - `<#alert>text</#alert>` - Warning message.
+   * - `<#type>text</#type>` - A colored short type name with more details on a tooltip.
+   * - `<#indent>text</#indent>` - An indented block (nested blocks are not supported).
    *
    * @param $msg
    * @return mixed
@@ -318,6 +322,8 @@ HTML;
     }
     elseif (is_bool ($data))
       return $data ? 'true' : 'false';
+    elseif (is_string ($data))
+      return strlen ($data) ? $data : "<i>''</i>";
     elseif (!is_array ($data) && !is_object ($data)) {
       return htmlspecialchars (str_replace ('    ', '  ', trim (print_r ($data, true))));
     }
@@ -360,7 +366,7 @@ HTML;
     ?>
   <table class="__console-table<?= $title ? ' with-caption' : '' ?>">
     <?= $title ? "<caption>$title</caption>"
-    : '' ?><?php if (empty($data)) echo '<thead><tr><td colspan=3><i>empty</i>';
+    : '' ?><?php if (empty($data)) echo '<thead><tr><td colspan=3><i>[]</i>';
   else { ?>
     <colgroup>
       <col width="<?= $w1 ?>">
@@ -431,7 +437,7 @@ HTML;
     $arg = $this->table (isset($alt) ? $alt : $val);
     if (is_scalar ($val) || is_null ($val)) {
       if (!strlen ($arg))
-        $arg = is_null ($val) ? 'NULL' : "''";
+        $arg = is_null ($val) ? 'null' : "''";
       $arg = '<i>(' . self::getType ($val) . ")</i> $arg";
 
       return "<#data>$arg</#data>";
