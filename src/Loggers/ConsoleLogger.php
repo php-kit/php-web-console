@@ -75,21 +75,33 @@ class ConsoleLogger extends AbstractLogger
     return $c;
   }
 
+  function getRenderedInspection ($val, $alt = null)
+  {
+    return $this->format ($this->getInspection1 ($val, $alt));
+  }
+
+  /**
+   * Displays detailed information about each specified value.
+   *
+   * @param mixed $...args Each value to be inspected and displayed on an horizontal sequence.
+   * @return $this
+   */
   public function inspect ()
   {
-    foreach (func_get_args () as $arg) {
-      if (!is_string ($arg))
-        $arg = $this->inspectAndFormat ($arg);
-      elseif (substr ($arg, 0, 2) == '<#') {
-        if (substr ($arg, 2, 2) == 't>') $arg = substr ($arg, 4, -5);
-        // else passthrough
-      }
-      elseif (substr ($arg, 0, 3) != '</#')
-        $arg = $this->inspectAndFormat ($arg);
-      $this->write ($arg);
-    }
-
+    foreach (func_get_args () as $arg)
+      $this->write ($this->getInspection1 ($arg));
     return $this;
+  }
+
+  /**
+   * Displays detailed information about the specified value.
+   * @param mixed $val
+   * @param mixed $alt
+   * @return $this
+   */
+  function inspectValue ($val, $alt = null)
+  {
+    return $this->write ($this->getRenderedInspection ($val, $alt));
   }
 
   /**
@@ -106,6 +118,16 @@ class ConsoleLogger extends AbstractLogger
     $levelName = isset(self::$LEVELS[$level]) ? self::$LEVELS[$level] : $level;
     $message   = self::interpolate ($message, $context);
     $this->write ("<#log><#i><span class=__alert>$levelName</span> $message</#i></#log>");
+  }
+
+  /**
+   * Returns an object's unique identifier (a short version), useful for debugging.
+   * @param object $o
+   * @return $this
+   */
+  function objectId ($o)
+  {
+    return $this->write (substr (spl_object_hash ($o), 8, 8));
   }
 
   public function render ()
@@ -144,7 +166,12 @@ HTML;
     return $this;
   }
 
-  public function withCaption ($caption)
+  function typeName ($v)
+  {
+    return $this->write ('<span class="__type">' . $this->getType ($v) . '</span>');
+  }
+
+  function withCaption ($caption)
   {
     $args          = array_slice (func_get_args (), 1);
     $this->caption = $caption;
@@ -241,20 +268,12 @@ HTML;
     return $msg;
   }
 
-  protected function inspectAndFormat ($val)
+  protected function formatType ($val, $expand = '')
   {
-    $arg = $this->table ($val);
-    if (is_scalar ($val) || is_null ($val)) {
-      if (!strlen ($arg))
-        $arg = is_null ($val) ? 'NULL' : "''";
-      $arg = '<i>(' . $this->getType ($val) . ")</i> $arg";
-
-      return "<#data>$arg</#data>";
-    }
-    else if (is_object ($val))
+    if (is_object ($val))
       $id = ' <small>#' . DebugConsole::objectId ($val) . '</small>';
     else $id = '';
-    return "<#header>Type: <span class='__type'>" . $this->getType ($val) . "</span>$id</#header>$arg";
+    return "<#header>Type: <span class='__type'>" . $this->getType ($val) . "</span>$id</#header>$expand";
   }
 
   protected function table ($data, $title = '', $depth = 0, $typeColumn = true, $columnHeaders = true)
@@ -354,6 +373,44 @@ HTML;
     return trim (ob_get_clean ());
   }
 
+  /**
+   * @param mixed $val The value to be inspected.
+   * @param mixed $alt If not null, a replacement for inspection; type information about $val is displayed by the
+   *                   inspection is performed on this argument instead.
+   * @return string
+   */
+  private function getInspection1 ($val, $alt = null)
+  {
+    if (!is_string ($val))
+      $val = $this->getInspection2 ($val, $alt);
+    elseif (substr ($val, 0, 2) == '<#') {
+      if (substr ($val, 2, 2) == 't>') $val = substr ($val, 4, -5);
+      // else passthrough
+    }
+    elseif (substr ($val, 0, 3) != '</#')
+      $val = $this->getInspection2 ($val, $alt);
+    return $val;
+  }
+
+  /**
+   * @param mixed $val The value to be inspected.
+   * @param mixed $alt If not null, a replacement for inspection; type information about $val is displayed by the
+   *                   inspection is performed on this argument instead.
+   * @return string
+   */
+  private function getInspection2 ($val, $alt = null)
+  {
+    $arg = $this->table (isset($alt) ? $alt : $val);
+    if (is_scalar ($val) || is_null ($val)) {
+      if (!strlen ($arg))
+        $arg = is_null ($val) ? 'NULL' : "''";
+      $arg = '<i>(' . $this->getType ($val) . ")</i> $arg";
+
+      return "<#data>$arg</#data>";
+    }
+    return $this->formatType ($val, $arg);
+  }
+
   private function getType ($v)
   {
     if (is_object ($v)) {
@@ -371,4 +428,5 @@ HTML;
     $l = array_slice (explode ('\\', $c), -1)[0];
     return "<span title='$c'>$l</span>";
   }
+
 }

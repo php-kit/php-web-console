@@ -259,6 +259,7 @@ class DebugConsoleRenderer
       }
 
       .__log-section {
+        counter-reset: log-section;
         margin-top: -1px;
         border: 1px solid #DDD;
         position: relative;
@@ -524,14 +525,17 @@ class DebugConsoleRenderer
       }
 
       .__rowHeader {
-        margin: 0 !important;
+        counter-increment: log-section;
+        margin: 0 0 -1px 0 !important;
+        border: 1px solid #EEE;
       }
 
-      .__rowHeader > span:first-child {
-        border-right: 1px solid #DDD;
+      .__rowHeader::before {
+        content: counter(log-section);
         display: inline-block;
+        border-right: 1px solid #DDD;
         text-align: right;
-        min-width: 22px;
+        min-width: 33px; /* 2 digits'width */
         padding: 4px 9px;
         margin-right: 10px;
         color: #B00;

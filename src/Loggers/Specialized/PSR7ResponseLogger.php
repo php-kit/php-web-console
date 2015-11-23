@@ -28,7 +28,7 @@ class PSR7ResponseLogger extends ConsoleLogger
           'headers'         => $r->getHeaders (),
           'size'            => isset($content) ? friendlySize (strlen ($content), 3) : 'unknown',
         ];
-        return $this->table ($data);
+        return $this->getRenderedInspection ($r, $data);
       }
     }
     return '';
