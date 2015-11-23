@@ -52,7 +52,34 @@ class ConsoleLogger extends AbstractLogger
   }
 
   /**
-   * Interpolates context values into message placeholders.
+   * @param mixed $v
+   * @return string
+   */
+  static function getType ($v)
+  {
+    if (is_object ($v)) {
+      $c = get_class ($v);
+      return self::shortenType ($c);
+    }
+    if (is_array ($v))
+      return 'array(' . count (array_keys ($v)) . ')';
+
+    return gettype ($v);
+  }
+
+  /**
+   * @param string $c
+   * @return string
+   */
+  static function shortenType ($c)
+  {
+    $l = array_slice (explode ('\\', $c), -1)[0];
+    return "<span title='$c'>$l</span>";
+  }
+
+  /**
+   * Interpolates context values into message placeholders, for use on PSR-3-compatible logging.
+   *
    * @param string $message Message with optional placeholder with syntax {key}.
    * @param array  $context Array from where to fetch values corresponing to the interpolated keys.
    * @return string
@@ -168,7 +195,7 @@ HTML;
 
   function typeName ($v)
   {
-    return $this->write ('<span class="__type">' . $this->getType ($v) . '</span>');
+    return $this->write ('<span class="__type">' . self::getType ($v) . '</span>');
   }
 
   function withCaption ($caption)
@@ -254,7 +281,8 @@ HTML;
             case 'alert':
               return "<div class='__alert'>$str</div>";
             case 'type':
-              return "<span class='__type'>{$this->shortenType($str)}</span>";
+              $type = self::shortenType ($str);
+              return "<span class='__type'>$type</span>";
             case 'indent':
               return "<div class='indent'>$str</div>";
             default:
@@ -273,7 +301,7 @@ HTML;
     if (is_object ($val))
       $id = ' <small>#' . DebugConsole::objectId ($val) . '</small>';
     else $id = '';
-    return "<#header>Type: <span class='__type'>" . $this->getType ($val) . "</span>$id</#header>$expand";
+    return "<#header>Type: <span class='__type'>" . self::getType ($val) . "</span>$id</#header>$expand";
   }
 
   protected function table ($data, $title = '', $depth = 0, $typeColumn = true, $columnHeaders = true)
@@ -360,7 +388,7 @@ HTML;
     <tr>
       <th<?= $c1 ?>><?= $k ?></th>
       <?php if ($typeColumn): ?>
-        <td><?= $this->getType ($v) ?></td>
+        <td><?= self::getType ($v) ?></td>
       <?php endif ?>
       <td><?= $x === '...' ? '<i>ommited</i>' : $this->table ($v, '', $depth, $typeColumn, $columnHeaders) ?></td>
       <?php endforeach; ?>
@@ -404,29 +432,11 @@ HTML;
     if (is_scalar ($val) || is_null ($val)) {
       if (!strlen ($arg))
         $arg = is_null ($val) ? 'NULL' : "''";
-      $arg = '<i>(' . $this->getType ($val) . ")</i> $arg";
+      $arg = '<i>(' . self::getType ($val) . ")</i> $arg";
 
       return "<#data>$arg</#data>";
     }
     return $this->formatType ($val, $arg);
-  }
-
-  private function getType ($v)
-  {
-    if (is_object ($v)) {
-      $c = get_class ($v);
-      return $this->shortenType ($c);
-    }
-    if (is_array ($v))
-      return 'array(' . count (array_keys ($v)) . ')';
-
-    return gettype ($v);
-  }
-
-  private function shortenType ($c)
-  {
-    $l = array_slice (explode ('\\', $c), -1)[0];
-    return "<span title='$c'>$l</span>";
   }
 
 }

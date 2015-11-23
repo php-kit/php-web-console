@@ -534,17 +534,19 @@ class DebugConsoleRenderer
         content: counter(log-section);
         display: inline-block;
         border-right: 1px solid #DDD;
+        border-bottom: 1px solid #DDD;
         text-align: right;
-        min-width: 33px; /* 2 digits'width */
+        min-width: 14px; /* 2 digits'width */
         padding: 4px 9px;
         margin-right: 10px;
+        margin-bottom: -1px;
         color: #B00;
         background: #F8F8F8;
       }
 
       .__panel .indent {
         background: #F8F8F8;
-        padding: 0 0 0 40px;
+        padding-left: 33px;
       }
 
       .__panel .indent caption {

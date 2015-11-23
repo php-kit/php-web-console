@@ -25,7 +25,7 @@ class DebugConsole
   /**
    * @var DebugConsoleSettings
    */
-  static $settings;
+  static         $settings;
   private static $debugMode;
   /**
    * Map of panel names (identifiers) to Console subclass instances.
@@ -103,65 +103,73 @@ class DebugConsole
 
   /**
    * Renders the console and inserts its content into the server response, if applicable.
+   *
+   * Only GET requests with an `Accept: text/html` header are accepted.
+   * Otherwise, it does nothing and the currently buffered output is kept.
+   *
    * @param bool $force Output console even if no body tag is found.
    * @throws Exception
    */
   public static function outputContent ($force = false)
   {
-    if (!self::$initialized)
-      return;
-    if (self::$debugMode && strpos (get ($_SERVER, 'HTTP_ACCEPT'), 'text/html') !== false) {
-      $content = ob_get_clean ();
-      ob_start ();
-      self::render ();
-      $myContent = ob_get_clean ();
-      // Note: if no <body> is found, the console will not be output.
-      $out = preg_replace ('#(</body>\s*</html>\s*)$#i', "$myContent\$1", $content, -1, $count);
-      echo !$count && $force ? $out . $myContent : $out;
-    }
-    else error_log (self::logger ('log')->render ());
+    if (!self::$initialized
+        || !self::$debugMode
+        || get ($_SERVER, 'REQUEST_METHOD') != 'GET'
+        || strpos (get ($_SERVER, 'HTTP_ACCEPT'), 'text/html') === false
+    ) return;
+
+    $content = ob_get_clean ();
+    ob_start ();
+    self::render ();
+    $myContent = ob_get_clean ();
+    // Note: if no <body> is found, the console will not be output.
+    $out = preg_replace ('#(</body>\s*</html>\s*)$#i', "$myContent\$1", $content, -1, $count);
+    echo !$count && $force ? $out . $myContent : $out;
   }
 
   /**
    * PSR-7-compatible version of {@see outputContent()}.
    *
    * Renders the console and inserts its content into the server response, if applicable.
+   * Only GET requests with an `Accept: text/html` header are transformed. All other output is kept untouched.
+   *
    * @param ServerRequestInterface $request
-   * @param ResponseInterface      $response Optional HTTP response object if the host application is PSR-7 compliant.
+   * @param ResponseInterface|null $response Optional HTTP response object if the host application is PSR-7 compliant.
    * @param bool                   $force    Output console even if no body tag is found.
    * @return null|ResponseInterface The modified response, or NULL if the $response argument was not given.
    * @throws Exception
    */
-  public static function outputContentViaResponse (ServerRequestInterface $request, ResponseInterface $response,
+  public static function outputContentViaResponse (ServerRequestInterface $request, ResponseInterface $response = null,
                                                    $force = false)
   {
     if (self::$debugMode) {
       ob_start ();
       self::render ();
       $myContent = ob_get_clean ();
+
       if ($response) {
-        $contentType = $request->getHeaderLine ('Accept');
-        if (strpos ($contentType, 'text/html') !== false) {
-          $body    = $response->getBody ();
-          $content = $body->__toString ();
-          $content = preg_replace ('#(</body>\s*</html>\s*)$#i', "$myContent\$1", $content, -1, $count);
-          if (!$count && $force)
-            $content .= $myContent;
-          try {
-            $body->rewind ();
-          } catch (Exception $e) {
+        if ($request->getMethod() == 'GET') {
+          $contentType = $request->getHeaderLine ('Accept');
+          if (strpos ($contentType, 'text/html') !== false) {
+            $body    = $response->getBody ();
+            $content = $body->__toString ();
+            $content = preg_replace ('#(</body>\s*</html>\s*)$#i', "$myContent\$1", $content, -1, $count);
+            if (!$count && $force)
+              $content .= $myContent;
+            try {
+              $body->rewind ();
+            } catch (Exception $e) {
+              // suppress exceptions
+            }
+            $body->write ($content);
+            return $response->withHeader ('Content-Length', strval (strlen ($content)));
           }
-          $body->write ($content);
-          return $response->withHeader ('Content-Length', strval (strlen ($content)));
         }
         return $response;
       }
-      $content = ob_get_clean ();
-      // Note: if no <body> is found, the console will not be output.
-      echo preg_replace ('#(</body>\s*</html>\s*)$#i', "$myContent\$1", $content, -1, $count);
-      return null;
+
+      else self::outputContent ($force);
     }
-    else error_log (self::logger ('console')->render ());
     return $response;
   }
 

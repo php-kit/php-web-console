@@ -162,7 +162,9 @@ class ErrorConsole
 
   private static function filterStackTrace (array $trace)
   {
-    $namespace = DebugConsole::libraryNamespace ();
+    $n = explode('\\', DebugConsole::libraryNamespace ());
+    array_pop ($n);
+    $namespace = implode ('\\', $n);
     return array_values (array_filter ($trace, function ($frame) use ($namespace) {
       return !isset($frame['class']) || substr ($frame['class'], 0, strlen ($namespace)) != $namespace;
     }));

@@ -305,6 +305,10 @@ class ErrorConsoleRenderer
 
       #__error kbd {
         font-weight: bold;
+        /* override Bootstrap */
+        background: transparent;
+        box-shadow: none;
+        padding: 0;
       }
 
       #__error .class {
