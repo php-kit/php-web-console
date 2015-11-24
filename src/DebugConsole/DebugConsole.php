@@ -71,13 +71,6 @@ class DebugConsole
       new ConsoleLogger ($settings->defaultPanelTitle, $settings->defaultPanelIcon));
   }
 
-  public static function libraryNamespace ()
-  {
-    $c = explode ('\\', get_class ());
-    array_pop ($c);
-    return implode ('\\', $c);
-  }
-
   /**
    * Returns a ConsolePanel instance by name.
    * @param string $loggerId
@@ -91,15 +84,6 @@ class DebugConsole
     throw new Exception ("Invalid panel id: <b>" . htmlentities ($loggerId) . '</b>');
   }
 
-  /**
-   * Returns an object's unique identifier (a short version), useful for debugging.
-   * @param object $o
-   * @return string
-   */
-  static function objectId ($o)
-  {
-    return substr (spl_object_hash ($o), 8, 8);
-  }
 
   /**
    * Renders the console and inserts its content into the server response, if applicable.
@@ -148,7 +132,7 @@ class DebugConsole
       $myContent = ob_get_clean ();
 
       if ($response) {
-        if ($request->getMethod() == 'GET') {
+        if ($request->getMethod () == 'GET') {
           $contentType = $request->getHeaderLine ('Accept');
           if (strpos ($contentType, 'text/html') !== false) {
             $body    = $response->getBody ();

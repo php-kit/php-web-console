@@ -3,6 +3,7 @@ namespace PhpKit\WebConsole\Loggers;
 
 use PhpKit\WebConsole\DebugConsole\DebugConsole;
 use PhpKit\WebConsole\ErrorConsole\ErrorConsole;
+use PhpKit\WebConsole\Lib\Debug;
 use Psr\Log\AbstractLogger;
 
 class ConsoleLogger extends AbstractLogger
@@ -51,51 +52,6 @@ class ConsoleLogger extends AbstractLogger
     $this->icon  = $icon;
   }
 
-  /**
-   * @param mixed $v
-   * @return string
-   */
-  static function getType ($v)
-  {
-    if (is_object ($v)) {
-      $c = get_class ($v);
-      return self::shortenType ($c);
-    }
-    if (is_array ($v))
-      return 'array(' . count (array_keys ($v)) . ')';
-    if (is_null ($v))
-      return 'null';
-
-    return gettype ($v);
-  }
-
-  /**
-   * @param string $c
-   * @return string
-   */
-  static function shortenType ($c)
-  {
-    $l = array_slice (explode ('\\', $c), -1)[0];
-    return "<span title='$c'>$l</span>";
-  }
-
-  /**
-   * Interpolates context values into message placeholders, for use on PSR-3-compatible logging.
-   *
-   * @param string $message Message with optional placeholder with syntax {key}.
-   * @param array  $context Array from where to fetch values corresponing to the interpolated keys.
-   * @return string
-   */
-  private static function interpolate ($message, array $context = [])
-  {
-    // build a replacement array with braces around the context keys
-    $replace = [];
-    foreach ($context as $key => $val) {
-      $replace['{' . $key . '}'] = $val;
-    }
-    // interpolate replacement values into the message and return
-    return strtr ($message, $replace);
-  }
 
   function getContent ()
   {
@@ -145,7 +101,7 @@ class ConsoleLogger extends AbstractLogger
   public function log ($level, $message, array $context = [])
   {
     $levelName = isset(self::$LEVELS[$level]) ? self::$LEVELS[$level] : $level;
-    $message   = self::interpolate ($message, $context);
+    $message   = Debug::interpolate ($message, $context);
     $this->write ("<#log><#i><span class=__alert>$levelName</span> $message</#i></#log>");
   }
 
@@ -156,7 +112,7 @@ class ConsoleLogger extends AbstractLogger
    */
   function objectId ($o)
   {
-    return $this->write (substr (spl_object_hash ($o), 8, 8));
+    return $this->write (Debug::objectId ($o));
   }
 
   public function render ()
@@ -166,7 +122,7 @@ class ConsoleLogger extends AbstractLogger
 
   public function showCallLocation ()
   {
-    $namespace = DebugConsole::libraryNamespace ();
+    $namespace = Debug::libraryNamespace ();
     $base      = __DIR__;
     $stack     = debug_backtrace (0);
     // Discard frames of all functions that belong to this library.
@@ -197,7 +153,7 @@ HTML;
 
   function typeName ($v)
   {
-    return $this->write ('<span class="__type">' . self::getType ($v) . '</span>');
+    return $this->write ('<span class="__type">' . Debug::getType ($v) . '</span>');
   }
 
   function withCaption ($caption)
@@ -285,7 +241,7 @@ HTML;
             case 'alert':
               return "<div class='__alert'>$str</div>";
             case 'type':
-              $type = self::shortenType ($str);
+              $type = Debug::shortenType ($str);
               return "<span class='__type'>$type</span>";
             case 'indent':
               return "<div class='indent'>$str</div>";
@@ -302,10 +258,7 @@ HTML;
 
   protected function formatType ($val, $expand = '')
   {
-    if (is_object ($val))
-      $id = ' <small>#' . DebugConsole::objectId ($val) . '</small>';
-    else $id = '';
-    return "<#header>Type: <span class='__type'>" . self::getType ($val) . "</span>$id</#header>$expand";
+    return "<#header>Type: <span class='__type'>" . Debug::getType ($val) . "</span></#header>$expand";
   }
 
   protected function table ($data, $title = '', $depth = 0, $typeColumn = true, $columnHeaders = true)
@@ -334,6 +287,8 @@ HTML;
     $c1 = '';
 
     if (is_array ($data)) {
+      if (!count ($data))
+        return '<i>[]</i>';
       if ($depth == DebugConsole::$settings->tableMaxDepth)
         return '<i>(...)</i>';
       ++$depth;
@@ -394,7 +349,7 @@ HTML;
     <tr>
       <th<?= $c1 ?>><?= $k ?></th>
       <?php if ($typeColumn): ?>
-        <td><?= self::getType ($v) ?></td>
+        <td><?= Debug::getType ($v) ?></td>
       <?php endif ?>
       <td><?= $x === '...' ? '<i>ommited</i>' : $this->table ($v, '', $depth, $typeColumn, $columnHeaders) ?></td>
       <?php endforeach; ?>
@@ -438,7 +393,7 @@ HTML;
     if (is_scalar ($val) || is_null ($val)) {
       if (!strlen ($arg))
         $arg = is_null ($val) ? 'null' : "''";
-      $arg = '<i>(' . self::getType ($val) . ")</i> $arg";
+      $arg = '<i>(' . Debug::getType ($val) . ")</i> $arg";
 
       return "<#data>$arg</#data>";
     }

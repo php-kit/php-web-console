@@ -1,9 +1,9 @@
 <?php
 namespace PhpKit\WebConsole\ErrorConsole;
 
-use PhpKit\WebConsole\DebugConsole\DebugConsole;
 use PhpKit\WebConsole\ErrorConsole\Exceptions\PHPError;
 use PhpKit\WebConsole\ErrorConsole\Renderers\ErrorConsoleRenderer;
+use PhpKit\WebConsole\Lib\Debug;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -162,7 +162,7 @@ class ErrorConsole
 
   private static function filterStackTrace (array $trace)
   {
-    $n = explode('\\', DebugConsole::libraryNamespace ());
+    $n = explode('\\', Debug::libraryNamespace ());
     array_pop ($n);
     $namespace = implode ('\\', $n);
     return array_values (array_filter ($trace, function ($frame) use ($namespace) {

@@ -14,16 +14,16 @@ class DebugConsoleRenderer
         <span><i class="fa fa-clock-o"></i>&nbsp; <?= $time ?> seconds</span>
         <span><i class="fa fa-cogs"></i>&nbsp; <?= $memory ?> MB</span>
         <?php foreach ($panels as $id => $panel):
-            $content = $panel->render ();
-            ?>
-            <a id="__tab-<?= $id ?>" class="__tab<?= strlen ($content) ? '' : ' disabled' ?>" <?= $nop ?>
-               onclick="openConsoleTab('<?= $id ?>')">
-              <?php if ($panel->icon): ?>
-                <i class="<?= $panel->icon ?>"></i>
-              <?php endif ?>
-              <?= $panel->title ?>
-            </a>
-            <?php endforeach; ?>
+          $content = $panel->render ();
+          ?>
+          <a id="__tab-<?= $id ?>" class="__tab<?= strlen ($content) ? '' : ' disabled' ?>" <?= $nop ?>
+             onclick="openConsoleTab('<?= $id ?>')">
+            <?php if ($panel->icon): ?>
+              <i class="<?= $panel->icon ?>"></i>
+            <?php endif ?>
+            <?= $panel->title ?>
+          </a>
+        <?php endforeach; ?>
         <a class="__minimize fa fa-chevron-down" <?= $nop ?>
            onclick="closeConsole()"></a> <a class="__close fa fa-close" <?= $nop ?>
                                             onclick="find('__console-container').remove()"></a>
@@ -225,6 +225,12 @@ class DebugConsoleRenderer
       #__console i:not([class]) {
         color: #CCC;
         font-style: normal;
+      }
+
+      #__console sup i {
+        color: #AAA;
+        font-style: normal;
+        margin-left: 2px;
       }
 
       .__close {
@@ -536,6 +542,7 @@ class DebugConsoleRenderer
         counter-increment: log-section;
         margin: 0 0 -1px 0 !important;
         border: 1px solid #EEE;
+        background: #FFF;
       }
 
       .__rowHeader::before {
@@ -559,10 +566,22 @@ class DebugConsoleRenderer
 
       .__panel .indent caption {
         padding: 5px 10px;
-        background: #f8f8f8;
-        border: none;
+        background: #f0f0f0;
+        border-color: none;
         border-top: 1px solid #EEE;
         font-weight: normal;
+        outline: 1px solid #DDD;
+        outline-offset: -1px;
+        margin-bottom: -1px;
+      }
+
+      .__panel .indent > table {
+        outline: 1px solid #DDD;
+        outline-offset: -1px;
+      }
+
+      .__log-section > .indent {
+        padding-left: 26px;
       }
 
     </style>
