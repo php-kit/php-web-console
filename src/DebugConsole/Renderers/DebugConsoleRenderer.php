@@ -217,7 +217,6 @@ class DebugConsoleRenderer
         right: 5px;
         border: 1px solid #CCC;
         white-space: pre-line;
-        background: #FFF;
         overflow: scroll;
         display: none;
       }
@@ -268,6 +267,7 @@ class DebugConsoleRenderer
         counter-reset: log-section;
         margin-top: -1px;
         border: 1px solid #DDD;
+        background: #FFF;
         position: relative;
       }
 

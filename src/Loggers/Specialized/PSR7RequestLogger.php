@@ -25,7 +25,7 @@ class PSR7RequestLogger extends ConsoleLogger
         'serverParams'    => $r->getServerParams (),
         'uploadedFiles'   => $r->getUploadedFiles (),
       ];
-      return $this->table ($data);
+      return $this->getRenderedInspection ($r, $data);
     }
     return $this->table ($_GET, 'Request') . $this->table ($_SERVER, 'Server variables');
   }
