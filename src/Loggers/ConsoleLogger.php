@@ -217,7 +217,7 @@ HTML;
    * - `<#footer>text</#footer>` - Extra information, right aligned.
    * - `<#alert>text</#alert>` - Warning message.
    * - `<#type>text</#type>` - A colored short type name with more details on a tooltip.
-   * - `<#indent>text</#indent>` - An indented block (nested blocks are not supported).
+   * - `<#indent>text</#indent>` - An indented block.
    *
    * @param $msg
    * @return mixed
@@ -226,7 +226,18 @@ HTML;
   {
     if (is_string ($msg)) {
       do {
-        $msg = preg_replace_callback ('~<#(.+?)(?:\|([^>]+))?>(.*?)</#\1>~s', function ($m) {
+        $msg = preg_replace_callback ('~
+<\#(\w+) \s* (?: \| ([^>]+) )? >
+  (                               # capture the tag\'s content
+    (?:                           # loop begin
+      (?= <\#\1[\s\|>] )          # either the same tag is opened again
+      (?R)                        # and we must recurse
+    |                             # or
+      (?! </\#\1> ).              # consume one char until the closing tag is reached
+    )*                            # repeat
+  )
+</\#\1>
+~sx', function ($m) {
           list ($all, $tag, $args, $str) = $m;
           $args = $args ? explode ('|', $args) : [];
           switch ($tag) {
