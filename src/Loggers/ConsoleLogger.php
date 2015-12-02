@@ -199,6 +199,13 @@ HTML;
     return $this;
   }
 
+  public function writef ()
+  {
+    $this->content .= call_user_func_array ('sprintf', func_get_args ());
+
+    return $this;
+  }
+
   /**
    * Renders log markup to HTML.
    *
@@ -208,16 +215,23 @@ HTML;
    *    <#tag|arg1|...argN>text</#tag>
    * ```
    * ##### Supported tags:
-   * - `<#t>text</#t>` - non-evaluated raw HTML text.
-   * - `<#i>text</#i>` - Log item. It adds spacing.
-   * - `<#section|title>text</#section>` - A section box with an optional title.
-   * - `<#log>content</#log>` - Output content wrapped by a log stripe.
-   * - `<#data>data</#data>` - Format a data structure's textual representation.
-   * - `<#header>text</#header>` - A subsection title.
-   * - `<#footer>text</#footer>` - Extra information, right aligned.
-   * - `<#alert>text</#alert>` - Warning message.
-   * - `<#type>text</#type>` - A colored short type name with more details on a tooltip.
-   * - `<#indent>text</#indent>` - An indented block.
+   *
+   * <table>
+   * <tr><td><kbd> &lt;#t> text &lt;/#t></kbd>                    <td> non-evaluated raw HTML text.
+   * <tr><td><kbd> &lt;#i|CSS classes> text &lt;/#i></kbd>        <td> Log item. It adds spacing.
+   * <tr><td><kbd> &lt;#row|CSS classes> text &lt;/#wor></kbd>    <td> A line of information, similar to #i, but with an
+   * automatically numbered row header column.
+   * <tr><td><kbd> &lt;#section|title> text &lt;/#section></kbd>  <td> A section box with an optional title.
+   * <tr><td><kbd> &lt;#log> content &lt;/#log></kbd>             <td> Output content wrapped by a log stripe.
+   * <tr><td><kbd> &lt;#data> data &lt;/#data></kbd>              <td> Format a data structure's textual
+   * representation.
+   * <tr><td><kbd> &lt;#header> text &lt;/#header></kbd>          <td> A subsection title.
+   * <tr><td><kbd> &lt;#footer> text &lt;/#footer></kbd>          <td> Extra information, right aligned.
+   * <tr><td><kbd> &lt;#alert> text &lt;/#alert></kbd>            <td> Warning message.
+   * <tr><td><kbd> &lt;#type> text &lt;/#type></kbd>              <td> A colored short type name with more details on a
+   * tooltip.
+   * <tr><td><kbd> &lt;#indent> text &lt;/#indent></kbd>          <td> An indented block.
+   * </table>
    *
    * @param $msg
    * @return mixed
@@ -227,22 +241,27 @@ HTML;
     if (is_string ($msg)) {
       do {
         $msg = preg_replace_callback ('~
-<\#(\w+) \s* (?: \| ([^>]+) )? >
-  (                               # capture the tag\'s content
-    (?:                           # loop begin
-      (?= <\#\1[\s\|>] )          # either the same tag is opened again
-      (?R)                        # and we must recurse
-    |                             # or
-      (?! </\#\1> ).              # consume one char until the closing tag is reached
-    )*                            # repeat
-  )
-</\#\1>
+<\#(\w+)                            # capture LOG MARKUP TAG (ex: <#tag -> tag)
+\s* (?: \| ([^>]+) )?               # capture optional tag arguments  (ex: <#tag|a|b|c> -> a|b|c)
+>
+(                                   # capture the tag\'s content
+  (?:                               # begin loop
+    (?= <\#\1 [ \s\|> ] )           # either the same tag is opened again (<#tag> <#tag| or <#tag(space))
+    (?R)                            # and we must recurse
+  |                                 # or
+    .*?                             # capture everything
+    (?= </\#\1> | <\#\1 [ \s\|> ] ) # until a closing/opening tag with the same name occurs
+  )*                                # repeat loop
+)                                   # end capture
+</\#\1>                             # consume closing tag
 ~sx', function ($m) {
           list ($all, $tag, $args, $str) = $m;
           $args = $args ? explode ('|', $args) : [];
           switch ($tag) {
             case 'i':
               return "<div class='__log-item " . get ($args, 0) . "'>$str</div>";
+            case 'row':
+              return "<div class='__log-item __rowHeader " . get ($args, 0) . "'>$str</div>";
             case 'section':
               return "<div class='__log-section'>" . ($args ? "<div class='__log-title'>$args[0]</div>" : '') .
                      "$str</div>";
@@ -268,7 +287,6 @@ HTML;
         }, $msg, -1, $count);
       } while ($count);
     }
-
     return $msg;
   }
 

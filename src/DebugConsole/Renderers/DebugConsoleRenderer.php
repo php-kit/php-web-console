@@ -376,6 +376,12 @@ class DebugConsoleRenderer
         color: #5A5;
       }
 
+      #__console span[title], #__console .__type {
+        color: #5A5;
+        font-weight: normal;
+        cursor: help;
+      }
+
       #__console kbd {
         font-weight: bold;
         /* override Bootstrap */
@@ -459,12 +465,6 @@ class DebugConsoleRenderer
 
       .__console-table td:nth-child(2) {
         color: #55A;
-      }
-
-      .__console-table span[title], .__type {
-        color: #5A5;
-        font-weight: normal;
-        cursor: help;
       }
 
       .__console-table tr:nth-child(even) > td,
@@ -551,7 +551,8 @@ class DebugConsoleRenderer
         border-right: 1px solid #DDD;
         border-bottom: 1px solid #DDD;
         text-align: right;
-        min-width: 14px; /* 2 digits'width */
+        box-sizing: border-box;
+        min-width: 33px; /* 2 digits'width */
         padding: 4px 9px;
         margin-right: 10px;
         margin-bottom: -1px;
@@ -581,7 +582,7 @@ class DebugConsoleRenderer
       }
 
       .__log-section > .indent {
-        padding-left: 26px;
+        padding-left: 33px;
       }
 
     </style>
