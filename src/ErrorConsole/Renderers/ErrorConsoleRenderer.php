@@ -21,6 +21,8 @@ class ErrorConsoleRenderer
   }
 
   /**
+   * Note: if the exception has a `getTitle()` method, that value is displayed as the popup's header, otherwise the
+   * exception's class name will be shown instead.
    * @param Exception|Error $exception
    * @param string          $popupTitle
    * @param string          $stackTrace
@@ -41,7 +43,8 @@ class ErrorConsoleRenderer
               <img src="<?= self::getIcon () ?>">
               <div class="__message">
                 <?php
-                $title = isset($exception->title) ? $exception->title : self::friendlyClass (get_class ($exception));
+                $title = method_exists ($exception, 'getTitle') ? $exception->getTitle ()
+                  : self::friendlyClass (get_class ($exception));
                 if ($title)
                   echo "<h3>$title</h3>";
                 echo "<div>" . ucfirst (ErrorConsole::processMessage ($exception->getMessage ())) . "</div>";
@@ -74,6 +77,7 @@ class ErrorConsoleRenderer
   }
 
   /**
+   * @param int    $rowNum  Row number.
    * @param string $fname   File name.
    * @param string $lineStr Line number.
    * @param string $fn      Method name.
@@ -81,11 +85,12 @@ class ErrorConsoleRenderer
    * @param string $at      Full error location.
    * @param string $edit    Edit button.
    */
-  static function renderStackFrame ($fname, $lineStr, $fn, $args, $at, $edit = '')
+  static function renderStackFrame ($rowNum, $fname, $lineStr, $fn, $args, $at, $edit = '')
   { ?>
     <div class="stack-frame">
       <div class="code">
         <div>
+          <span class="rowHeader"><?= $rowNum ?></span>
           <?= $fname ?>
           <?= $lineStr ?>
           <div class="__call">
@@ -234,6 +239,14 @@ class ErrorConsoleRenderer
 
       #__error .code > div {
         display: table-row;
+      }
+
+      #__error .rowHeader {
+        display: table-cell;
+        padding: 5px 15px;
+        width: 22px;
+        text-align: right;
+        border-right: 1px solid #DDD;
       }
 
       #__error .file {

@@ -180,6 +180,7 @@ class ErrorConsole
     $trace = self::filterStackTrace ($exception instanceof PHPError ? debug_backtrace () : $exception->getTrace ());
     if (count ($trace) && $trace[count ($trace) - 1]['function'] == '{main}')
       array_pop ($trace);
+    $count = count($trace);
     foreach ($trace as $k => $v) {
       $class = isset($v['class']) ? $v['class'] : '';
       if ($class == 'ErrorHandler')
@@ -244,7 +245,7 @@ class ErrorConsole
       $lineStr = $line ? "<span class='line'>$line</span>" : '';
       $edit    = $file ? self::errorLink ($file, $line, 1, 'edit', '__btn') : '';
       $at      = $file ? self::errorLink ($file, $line, 1) : '&lt;unknown location&gt;';
-      ErrorConsoleRenderer::renderStackFrame ($fname, $lineStr, $fn, $args, $at, $edit);
+      ErrorConsoleRenderer::renderStackFrame ($count - $k, $fname, $lineStr, $fn, $args, $at, $edit);
     }
     return ob_get_clean ();
   }
