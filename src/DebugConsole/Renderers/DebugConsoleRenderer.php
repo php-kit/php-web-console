@@ -376,6 +376,14 @@ class DebugConsoleRenderer
         color: #5A5;
       }
 
+      #__console a {
+        color: #55A;
+      }
+
+      #__console a.fa {
+        text-decoration: none;
+      }
+
       #__console span[title], #__console .__type {
         color: #5A5;
         font-weight: normal;
