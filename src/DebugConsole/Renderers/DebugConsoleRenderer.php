@@ -198,6 +198,12 @@ class DebugConsoleRenderer
         pointer-events: none;
       }
 
+      #__debug-bar .fa.big {
+        font-size: 15px;
+        position: relative;
+        top: 1px;
+      }
+
       #__console {
         clear: both;
         height: 100%;
@@ -377,7 +383,7 @@ class DebugConsoleRenderer
       }
 
       #__console a {
-        color: #55A;
+        color: #888;
       }
 
       #__console a.fa {
@@ -490,7 +496,7 @@ class DebugConsoleRenderer
       }
 
       .__expand > a {
-        color: #888;
+        color: #888 !important;
         text-decoration: none;
         line-height: 24px;
       }
