@@ -10,7 +10,7 @@ class DebugConsoleSettings
 
   public $tableCollapseDepth       = 4;
   public $tableIndexColumnWidth    = 50;
-  public $tableMaxDepth            = 5;
-  public $tablePropertyColumnWidth = 170;
-  public $tableTypeColumnWidth     = 100;
+  public $tableMaxDepth            = 7;
+  public $tablePropertyColumnWidth = 160;
+  public $tableTypeColumnWidth     = 80;
 }

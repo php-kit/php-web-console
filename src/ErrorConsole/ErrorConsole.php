@@ -177,7 +177,8 @@ class ErrorConsole
   private static function getStackTrace ($exception)
   {
     ob_start ();
-    $trace = self::filterStackTrace ($exception instanceof PHPError ? debug_backtrace () : $exception->getTrace ());
+//    $trace = self::filterStackTrace ($exception instanceof PHPError ? debug_backtrace () : $exception->getTrace ());
+    $trace = $exception->getTrace ();
     if (count ($trace) && $trace[count ($trace) - 1]['function'] == '{main}')
       array_pop ($trace);
     $count = count($trace);
