@@ -415,10 +415,6 @@ class DebugConsoleRenderer
         margin: -1px 0;
       }
 
-      .__console-table.trace tbody tr:last-of-type {
-        display: none;
-      }
-
       .__debug-location + .__console-table {
         margin-top: -10px;
       }

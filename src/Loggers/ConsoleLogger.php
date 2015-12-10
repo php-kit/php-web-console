@@ -69,6 +69,11 @@ class ConsoleLogger extends AbstractLogger
     return $this->format ($this->getInspection1 ($val, $alt));
   }
 
+  function hasContent ()
+  {
+    return $this->content != '';
+  }
+
   /**
    * Displays detailed information about each specified value.
    *

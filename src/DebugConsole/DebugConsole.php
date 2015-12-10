@@ -180,7 +180,7 @@ namespace PhpKit\WebConsole\DebugConsole {
 
     public static function registerLogger ($loggerId, ConsoleLogger $logger)
     {
-      self::$loggers[$loggerId] = $logger;
+      return self::$loggers[$loggerId] = $logger;
     }
 
     /**
@@ -204,8 +204,9 @@ namespace PhpKit\WebConsole\DebugConsole {
     }
 
     /**
-     * Outputs a stack trace up to (but excluding) the call to this method. It displays detailed timing and memory
-     * consumption information about each function/method call.
+     * Outputs a stack trace up to the first call to a trace function (which may be this one or a wrapper that calls
+     * this one).
+     * <p>It displays detailed timing and memory consumption information about each function/method call.
      *
      * <p>It requires a logger panel named 'trace' to be defined.
      * <p>It also requires XDebug to be installed.
@@ -228,8 +229,11 @@ namespace PhpKit\WebConsole\DebugConsole {
       $trace = preg_replace ('@^(?:.*?)<table class=\'xdebug-error xe-xdebug\'(.*?)<tr>(?:.*?)>Location</th></tr>@s',
         '<table class="__console-table trace"$1<colgroup>
       <col width=40><col width=72><col width=72><col width=75%><col width=25%>
-      <thead><tr><th>#<th>Time (ms)<th>Memory (MB)<th>Function<th>Location</tr></thead>', $trace);
-      $trace = preg_replace (['@</table>.*@s', "/align='center'/"], ['</table>', 'align=right'], $trace);
+      <thead><tr><th>#<th>Time (ms)<th>Mem.(MB)<th>Function<th>Location</tr></thead>', $trace);
+      $trace = preg_replace (
+        ['@</table>.*@s', "/align='center'/", '@(trace\(  \)</td>.*?</tr>)(.*)</table>@s'],
+        ['</table>', 'align=right', '$1</table>'],
+        $trace);
       $trace = preg_replace_callback (
         '#<tr><td (.*?)>(.*?)</td><td (.*?)>(.*?)</td><td (.*?)>(.*?)</td><td (.*?)>(.*?)</td><td title=\'(.*?)\'(.*?)>(.*?)</td></tr>#',
         function ($m) {
