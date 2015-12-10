@@ -410,8 +410,13 @@ class DebugConsoleRenderer
         min-width: 320px; /* Prevent overflow of value column label */
         table-layout: fixed;
         border-spacing: 0;
-        margin: -1px 0;
         border-collapse: collapse;
+        border: none;
+        margin: -1px 0;
+      }
+
+      .__console-table.trace tbody tr:last-of-type {
+        display: none;
       }
 
       .__debug-location + .__console-table {
@@ -444,6 +449,10 @@ class DebugConsoleRenderer
       .__console-table th, .__console-table td {
         padding: 0 0 0 10px;
         line-height: 24px;
+      }
+
+      .__console-table td[align=right] {
+        padding: 0 10px 0 0;
       }
 
       .__console-table > thead > tr > th {

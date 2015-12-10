@@ -24,6 +24,7 @@ namespace PhpKit\WebConsole\DebugConsole {
    */
   use Exception;
   use PhpKit\WebConsole\DebugConsole\Renderers\DebugConsoleRenderer;
+  use PhpKit\WebConsole\ErrorConsole\ErrorConsole;
   use PhpKit\WebConsole\Loggers\ConsoleLogger;
   use Psr\Http\Message\ResponseInterface;
   use Psr\Http\Message\ServerRequestInterface;
@@ -161,7 +162,8 @@ namespace PhpKit\WebConsole\DebugConsole {
                 $content .= $myContent;
               try {
                 $body->rewind ();
-              } catch (Exception $e) {
+              }
+              catch (Exception $e) {
                 // suppress exceptions
               }
               $body->write ($content);
@@ -199,6 +201,46 @@ namespace PhpKit\WebConsole\DebugConsole {
       $openLogPaneMessage =
         "<p><a href='javascript:void(0)' onclick='openConsoleTab(\"database\")'>Open the log pane</a> to see more details.";
       throw new $class($e->getMessage () . $openLogPaneMessage, 0, $e);
+    }
+
+    /**
+     * Outputs a stack trace up to (but excluding) the call to this method. It displays detailed timing and memory
+     * consumption information about each function/method call.
+     *
+     * <p>It requires a logger panel named 'trace' to be defined.
+     * <p>It also requires XDebug to be installed.
+     *
+     * ##### Usage
+     *
+     * Put the following code at the place where you want the trace log to be captured:
+     *
+     *       \PhpKit\WebConsole\DebugConsole\DebugConsole::trace ();
+     *
+     * @return string
+     */
+    public static function trace ()
+    {
+      $v = ini_get ('xdebug.collect_params');
+      ob_start ();
+      ini_set ('xdebug.collect_params', 1);
+      xdebug_print_function_stack ();
+      $trace = ob_get_clean ();
+      $trace = preg_replace ('@^(?:.*?)<table class=\'xdebug-error xe-xdebug\'(.*?)<tr>(?:.*?)>Location</th></tr>@s',
+        '<table class="__console-table trace"$1<colgroup>
+      <col width=40><col width=72><col width=72><col width=75%><col width=25%>
+      <thead><tr><th>#<th>Time (ms)<th>Memory (MB)<th>Function<th>Location</tr></thead>', $trace);
+      $trace = preg_replace (['@</table>.*@s', "/align='center'/"], ['</table>', 'align=right'], $trace);
+      $trace = preg_replace_callback (
+        '#<tr><td (.*?)>(.*?)</td><td (.*?)>(.*?)</td><td (.*?)>(.*?)</td><td (.*?)>(.*?)</td><td title=\'(.*?)\'(.*?)>(.*?)</td></tr>#',
+        function ($m) {
+          $t = number_format ($m[4] * 1000, 1);
+          $r = number_format ($m[6] / 1048576, 3);
+          $p = ErrorConsole::shortFileName ($m[9]);
+          $f = substr ($m[11], 3);
+          return "<tr><th $m[1]>$m[2]<td $m[3]>$t<td $m[5]>$r<td $m[7]>$m[8]<td class='__type' title='$p'$m[10]>$f</tr>";
+        }, $trace);
+      ini_set ('xdebug.collect_params', $v);
+      self::logger ('trace')->write ($trace);
     }
 
     /**

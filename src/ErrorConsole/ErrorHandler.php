@@ -44,6 +44,16 @@ class ErrorHandler
     self::$nextErrorHandler     = set_error_handler ([get_class (), 'globalErrorHandler']);
     self::$nextExceptionHandler = set_exception_handler ([get_class (), 'globalExceptionHandler']);
     register_shutdown_function ([get_class (), 'onShutDown']);
+
+    if (extension_loaded('xdebug')) {
+      ini_set('xdebug.collect_params', 1);            //[0..4] collect the parameters passed to functions when a function call is recorded
+      ini_set('xdebug.collect_vars', 0);              //gather information about which variables are used in a certain scope
+      ini_set('xdebug.dump_globals', 0);
+      ini_set('xdebug.var_display_max_children', 99); //how many array keys and object's properties are shown
+      ini_set('xdebug.var_display_max_depth', 5);     //how many nested levels of array elements and object properties
+      ini_set('xdebug.var_display_max_data', 512);    //maximum string length that is shown when variables are displayed
+      ini_set('xdebug.max_nesting_level', 300);       //maximum level of nested functions that are allowed
+    }
   }
 
   public static function onShutDown ()
