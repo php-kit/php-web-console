@@ -218,9 +218,12 @@ namespace PhpKit\WebConsole\DebugConsole {
      *       \PhpKit\WebConsole\DebugConsole\DebugConsole::trace ();
      *
      * @return string
+     * @throws Exception
      */
     public static function trace ()
     {
+      if (!extension_loaded('xdebug'))
+        throw new Exception ("<kbd>trace()</kbd> requires Xdebug to be installed.");
       $v = ini_get ('xdebug.collect_params');
       ob_start ();
       ini_set ('xdebug.collect_params', 1);
