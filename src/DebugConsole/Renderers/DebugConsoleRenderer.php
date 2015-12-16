@@ -26,7 +26,7 @@ class DebugConsoleRenderer
         <?php endforeach; ?>
         <a class="__minimize fa fa-chevron-down" <?= $nop ?>
            onclick="closeConsole()"></a> <a class="__close fa fa-close" <?= $nop ?>
-                                            onclick="find('__console-container').remove()"></a>
+                                            onclick="removeConsole()"></a>
       </div>
       <div id="__console">
         <?php foreach ($panels as $id => $panel): ?>
@@ -67,6 +67,10 @@ class DebugConsoleRenderer
         find ('__console-container').className = '';
         clearTabSel ()
       };
+      window.removeConsole = function (s) {
+        find ('__console-container').remove ();
+        find ('__shrink').remove ();
+      };
       window.__doAction = function (a) {
         find ('__action').setAttribute('value', a);
         find ('__post').submit()
@@ -78,11 +82,12 @@ class DebugConsoleRenderer
   static function renderStyles ()
   { ?>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css">
-    <style>
+    <style id='__shrink'>
       body {
         height: calc(100% - 33px); /* Make room for the debug-bar */
       }
-
+    </style>
+    <style>
       .__btn {
         text-decoration: none;
         background: #EEE;
