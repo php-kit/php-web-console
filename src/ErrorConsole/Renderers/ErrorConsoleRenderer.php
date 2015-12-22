@@ -317,6 +317,7 @@ class ErrorConsoleRenderer
       }
 
       #__error kbd {
+        font-family: menlo, monospace;
         font-weight: bold;
         /* override Bootstrap */
         background: transparent;
