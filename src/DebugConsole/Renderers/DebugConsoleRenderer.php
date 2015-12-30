@@ -530,8 +530,8 @@ class DebugConsoleRenderer
       }
 
       .__panel code {
-        background: #222;
-        color: #EEE;
+        background: #FFF;
+        color: #777;
         display: block;
         padding: 10px;
         font-family: Menlo, monospace;
@@ -547,6 +547,7 @@ class DebugConsoleRenderer
       }
 
       .__panel code table {
+        background: #FFF;
         font-size: inherit;
         border-spacing: 0;
         line-height: 1.2;
@@ -554,8 +555,9 @@ class DebugConsoleRenderer
       }
 
       .__panel code table td {
-        padding: 0 15px 0 0;
         vertical-align: top;
+        border: 1px solid #eee;
+        padding: 3px 5px 2px;
       }
 
       .__panel code table th {
