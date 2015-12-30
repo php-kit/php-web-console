@@ -400,9 +400,10 @@ class ErrorConsoleRenderer
       .__message code {
         overflow: auto;
         max-height: 160px;
-        background: #3C3F41;
-        color: #EEE;
+        background: #FFF;
+        color: #777;
         display: block;
+        border: 1px solid #DDD;
         padding: 10px;
         font-family: Menlo, monospace;
         font-size: 13px;
