@@ -16,12 +16,12 @@ class DebugConsoleRenderer
         <?php foreach ($panels as $id => $panel):
           $content = $panel->render ();
           ?>
-          <a id="__tab-<?= $id ?>" class="__tab<?= strlen ($content) ? '' : ' disabled' ?>" <?= $nop ?>
-             onclick="openConsoleTab('<?= $id ?>')">
+          <a id="__tab-<?= $id ?>" class="__tab hint--rounded hint--top<?= strlen ($content) ? '' : ' disabled' ?>" <?= $nop ?>
+             onclick="openConsoleTab('<?= $id ?>')" data-hint="<?= $panel->title ?>">
             <?php if ($panel->icon): ?>
               <i class="<?= $panel->icon ?>"></i>
             <?php endif ?>
-            <?= $panel->title ?>
+            <span><?= $panel->title ?></span>
           </a>
         <?php endforeach; ?>
         <a class="__minimize fa fa-chevron-down" <?= $nop ?>
@@ -47,8 +47,11 @@ class DebugConsoleRenderer
       window.find = function (s) { return document.getElementById (s) };
       window.select = function (s) { return [].concat.apply ([], document.querySelectorAll (s)) };
       window.clearTabSel =
-        function () {
-          select ('.__tab').forEach (function (e) {e.className = e.className.replace (' active', '')});
+        function (closed) {
+          select ('.__tab').forEach (function (e) {
+            e.className = '__tab hint--rounded hint--' + (closed ? 'top' : 'bottom') + (~e.className.indexOf('disabled') ? ' disabled' : '');
+            e.setAttribute('data-hint', e.querySelector('span').innerText);
+          });
         };
       window.clearSel =
         function () {
@@ -60,12 +63,14 @@ class DebugConsoleRenderer
         openConsole ();
         find ('__console').className             = 'show-console';
         find ('__' + tab + '-tab').style.display = 'block';
-        find ('__tab-' + tab).className          = '__tab active';
+        var e = find ('__tab-' + tab);
+        e.className = '__tab active hint--rounded hint--bottom';
+        e.removeAttribute('data-hint');
       }
       window.openConsole = function (s) { find ('__console-container').className = 'Console-show' };
       window.closeConsole = function (s) {
         find ('__console-container').className = '';
-        clearTabSel ()
+        clearTabSel (true)
       };
       window.removeConsole = function (s) {
         find ('__console-container').remove ();
@@ -82,6 +87,7 @@ class DebugConsoleRenderer
   static function renderStyles ()
   { ?>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/hint.css/1.3.6/hint.min.css">
     <style id='__shrink'>
       body {
         height: calc(100% - 33px); /* Make room for the debug-bar */
@@ -181,7 +187,7 @@ class DebugConsoleRenderer
         text-decoration: none;
         padding: 0 15px;
         margin-right: -3px;
-        text-shadow: 0 1px #000;
+        /*text-shadow: 0 1px #000;*/
         background-color: #666;
         background-image: linear-gradient(0deg, #42454a, #545b61);
         border-radius: 4px 4px 0 0;
@@ -195,10 +201,20 @@ class DebugConsoleRenderer
         color: #333;
         text-shadow: none;
         padding-bottom: 1px;
+        font-size: 12px;
+      }
+
+      #__debug-bar .__tab span {
+        display: none;
       }
 
       #__debug-bar .__tab i {
-        margin-right: 5px;
+        line-height: 26px;
+      }
+
+      #__debug-bar .__tab.active span {
+        display: inline;
+        margin-left: 5px;
       }
 
       #__debug-bar .__tab.disabled {
