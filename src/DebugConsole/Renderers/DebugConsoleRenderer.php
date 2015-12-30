@@ -50,7 +50,7 @@ class DebugConsoleRenderer
         function (closed) {
           select ('.__tab').forEach (function (e) {
             e.className = '__tab hint--rounded hint--' + (closed ? 'top' : 'bottom') + (~e.className.indexOf('disabled') ? ' disabled' : '');
-            e.setAttribute('data-hint', e.querySelector('span').innerText);
+            e.setAttribute('data-hint', e.querySelector('span').textContent);
           });
         };
       window.clearSel =
@@ -90,7 +90,7 @@ class DebugConsoleRenderer
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/hint.css/1.3.6/hint.min.css">
     <style id='__shrink'>
       body {
-        height: calc(100% - 33px); /* Make room for the debug-bar */
+        height: calc(100% - 32px); /* Make room for the debug-bar */
       }
     </style>
     <style>
@@ -133,22 +133,18 @@ class DebugConsoleRenderer
       }
 
       #__console-container.Console-show {
-        top: 33px;
+        top: 32px;
         -webkit-transition: top 0.1s;
         transition: top 0.1s;
       }
 
       #__debug-bar {
         font-family: sans-serif;
-        box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
         box-sizing: border-box;
         margin: -32px 0 0 0;
         height: 32px;
         padding: 3px 0 0 10px;
-        border: 1px solid #73787E;
-        border-right-color: #33363d;
-        border-bottom-color: #33363d;
-        outline: 1px solid #272a2f;
+        border: 1px solid #33363D;
         background-color: #EEE;
         background-image: linear-gradient(0deg, #42454a, #545b61);
         text-align: right;
