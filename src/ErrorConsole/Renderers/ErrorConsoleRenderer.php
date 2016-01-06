@@ -352,11 +352,11 @@ class ErrorConsoleRenderer
       }
 
       #__error .tag {
-        color: #ffd064;
+        color: #5AA;
       }
 
       #__error .tag-hilight {
-        color: #5ed4e4;
+        color: #F00;
       }
 
       #__error .error-location {
