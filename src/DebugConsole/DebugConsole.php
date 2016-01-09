@@ -261,9 +261,11 @@ namespace PhpKit\WebConsole\DebugConsole {
     private static function render ()
     {
       if (self::$debugMode && strpos ($_SERVER['HTTP_ACCEPT'], 'text/html') !== false) {
+        echo "\n<!-- PHP WEB CONSOLE -->\n";
         DebugConsoleRenderer::renderStyles ();
         DebugConsoleRenderer::renderScripts ();
         DebugConsoleRenderer::renderConsole (self::getPanels ());
+        echo "\n<!--/PHP WEB CONSOLE -->\n";
       }
     }
 
