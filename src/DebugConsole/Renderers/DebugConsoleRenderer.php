@@ -385,9 +385,19 @@ class DebugConsoleRenderer
 
       #__console .__alert {
         color: #C00;
-        font-weight: bold;
         background: #FFA;
+        line-height: 10px;
+        padding: 12px;
+        border-bottom: 1px solid #DDD;
+      }
+
+      #__console .__comment {
+        olor: #999;
+        margin: -1px 0;
+        background: #fff;
         padding: 5px 10px;
+        border: 1px solid #eee;
+        border-left: 5px solid #ccc;
       }
 
       #__console .keyword {
