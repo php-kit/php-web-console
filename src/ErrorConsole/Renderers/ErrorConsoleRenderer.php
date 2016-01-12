@@ -191,6 +191,7 @@ class ErrorConsoleRenderer
 
       #__error .__message {
         padding: 26px 20px 20px 88px;
+        color: #555;
       }
 
       #__error .__more {
@@ -323,6 +324,7 @@ class ErrorConsoleRenderer
         background: transparent;
         box-shadow: none;
         padding: 0;
+        color: inherit;
       }
 
       #__error .class {
