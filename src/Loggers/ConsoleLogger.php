@@ -33,6 +33,7 @@ class ConsoleLogger extends AbstractLogger
   public $title;
   /**
    * The caption to be used on the next table.
+   *
    * @var string
    */
   protected $caption;
@@ -46,6 +47,7 @@ class ConsoleLogger extends AbstractLogger
    * <p>When set, for each object/array being debugged, the callbak receives the key name, the value and the target
    * object/array.
    * <p>It should return `true` if the value should be displayed.
+   *
    * @var callable
    */
   protected $filter;
@@ -89,6 +91,7 @@ class ConsoleLogger extends AbstractLogger
 
   /**
    * Displays detailed information about the specified value.
+   *
    * @param mixed $val
    * @param mixed $alt
    * @return $this
@@ -116,6 +119,7 @@ class ConsoleLogger extends AbstractLogger
 
   /**
    * Returns an object's unique identifier (a short version), useful for debugging.
+   *
    * @param object $o
    * @return $this
    */
@@ -179,8 +183,11 @@ HTML;
    * Logs detailed information about the specified values or variables to the PHP console.
    *
    * > The filter function may remove some keys from the tabular output of objects or arrays.
+   * <p>**Warning:** always use the `===` operator to compare keys with something, because if the key is the integer
+   * 0, the operator `==` will return `true` when it shouldn't.
    *
    * Extra params: list of one or more values to be displayed.
+   *
    * @param callable $fn Filter callback. Receives the key name, the value and the target object/array.<br>
    *                     Returns <kbd>true</kbd> if the value should be displayed, <kbd>false</kbd> if the whole
    *                     key + value should be hidden, or <kbd>'...'</kbd> if the key should appear, but the value
@@ -302,6 +309,7 @@ HTML;
 
   protected function table ($data, $title = '', $depth = 0, $typeColumn = true, $columnHeaders = true)
   {
+    $originalData = $data;
     if ($this->caption) {
       $title         = $this->caption;
       $this->caption = '';
@@ -353,7 +361,7 @@ HTML;
 
     // DRAW TABLE
 
-    $filter = isset($this->filter) ? $this->filter : function ($k) { return true; };
+    $filter = isset($this->filter) ? $this->filter : function () { return true; };
     ob_start (null, 0);
     if ($depth >= DebugConsole::$settings->tableCollapseDepth)
       echo '<div class="__expand"><a class="fa fa-plus-square" href="javascript:void(0)" onclick="this.parentNode.className+=\' show\'"></a>';
@@ -382,11 +390,11 @@ HTML;
     <tbody>
     <?php
     foreach ($data as $k => $v):
-    $x = $filter($k, $v, $data);
+    $x = $filter($k, $v, $originalData);
     if (!$x) continue;
     ?>
     <tr>
-      <th<?= $c1 ?>><?= $k ?></th>
+      <th<?= $c1 ?>><?= strlen ($k) ? $k : "<i>''</i>" ?></th>
       <?php if ($typeColumn): ?>
         <td><?= Debug::getType ($v) ?></td>
       <?php endif ?>
