@@ -74,7 +74,6 @@ class DebugConsoleRenderer
       };
       window.removeConsole = function (s) {
         find ('__console-container').remove ();
-        find ('__shrink').remove ();
       };
       window.__doAction = function (a) {
         find ('__action').setAttribute('value', a);
@@ -88,11 +87,6 @@ class DebugConsoleRenderer
   { ?>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/hint.css/1.3.6/hint.min.css">
-    <style id='__shrink'>
-      body {
-        height: calc(100% - 32px); /* Make room for the debug-bar */
-      }
-    </style>
     <style>
       .__btn {
         text-decoration: none;
