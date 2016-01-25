@@ -321,9 +321,10 @@ class ErrorConsoleRenderer
         font-family: menlo, monospace;
         font-weight: bold;
         /* override Bootstrap */
-        background: transparent;
+        background: #fff1cc;
+        border: 1px solid #ffde81;
         box-shadow: none;
-        padding: 0;
+        padding: 2px 5px;
         color: inherit;
       }
 
@@ -388,7 +389,7 @@ class ErrorConsoleRenderer
 
       .__message h3 {
         font-size: 16px;
-        margin: -4px 0 20px;
+        margin: -4px 0 30px;
       }
 
       .__message h3 b {
