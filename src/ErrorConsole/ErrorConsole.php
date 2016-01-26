@@ -1,7 +1,6 @@
 <?php
 namespace PhpKit\WebConsole\ErrorConsole;
 
-use PhpKit\WebConsole\ErrorConsole\Exceptions\PHPError;
 use PhpKit\WebConsole\ErrorConsole\Renderers\ErrorConsoleRenderer;
 use PhpKit\WebConsole\Lib\Debug;
 use Psr\Http\Message\ResponseInterface;
@@ -26,6 +25,7 @@ class ErrorConsole
 
   /**
    * Outputs the error popup, or a plain message, depending on the response content type.
+   *
    * @param \Exception|\Error      $exception Note: can't be type hinted, for PHP7 compat.
    * @param ResponseInterface|null $response  If null, it outputs directly to the client. Otherwise, it assumes the
    *                                          object is a new blank response.
@@ -101,6 +101,7 @@ class ErrorConsole
 
   /**
    * For use by renderers.
+   *
    * @param string $msg
    * @return string
    */
@@ -162,7 +163,7 @@ class ErrorConsole
 
   private static function filterStackTrace (array $trace)
   {
-    $n = explode('\\', Debug::libraryNamespace ());
+    $n = explode ('\\', Debug::libraryNamespace ());
     array_pop ($n);
     $namespace = implode ('\\', $n);
     return array_values (array_filter ($trace, function ($frame) use ($namespace) {
@@ -181,7 +182,7 @@ class ErrorConsole
     $trace = $exception->getTrace ();
     if (count ($trace) && $trace[count ($trace) - 1]['function'] == '{main}')
       array_pop ($trace);
-    $count = count($trace);
+    $count = count ($trace);
     foreach ($trace as $k => $v) {
       $class = isset($v['class']) ? $v['class'] : '';
       if ($class == 'ErrorHandler')

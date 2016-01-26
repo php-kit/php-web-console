@@ -9,9 +9,12 @@ use Psr\Log\AbstractLogger;
 class ConsoleLogger extends AbstractLogger
 {
   /**
-   * The name of the global logging function, defined on DebugConsole.php
+   * The name of the global logging functions, defined on DebugConsole.php
    */
-  const GLOBAL_LOG_FN = 'inspect';
+  const GLOBAL_LOG_FNS = [
+    'inspect' => 1,
+    '_log'    => 1,
+  ];
   /**
    * Logging levels from syslog protocol defined in RFC 5424
    *
@@ -138,11 +141,12 @@ class ConsoleLogger extends AbstractLogger
     $namespace = Debug::libraryNamespace ();
     $base      = __DIR__;
     $stack     = debug_backtrace (0);
+    $FNS       = self::GLOBAL_LOG_FNS;
     // Discard frames of all functions that belong to this library.
     while (!empty($stack) && (
         (isset($stack[0]['file']) && stripos ($stack[0]['file'], $base) === 0) ||
         (isset($stack[0]['class']) && stripos ($stack[0]['class'], $namespace) === 0) ||
-        (isset($stack[0]['function']) && $stack[0]['function'] != self::GLOBAL_LOG_FN)
+        (isset($stack[0]['function']) && !isset($FNS[$stack[0]['function']]))
       )
     ) array_shift ($stack);
     $trace     = $stack[0];

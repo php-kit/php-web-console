@@ -1,42 +1,46 @@
 <?php
 namespace PhpKit\WebConsole\ErrorConsole\Exceptions;
 
+use ErrorException;
 use Exception;
 
-class PHPError extends Exception
+class PHPError extends ErrorException
 {
-  /** @var string */
-  public $title;
   /** @var array */
   public $context;
+  /** @var string */
+  public $title;
 
-  public function __construct ($errno, $errstr, $errfile, $errline, $errcontext = null)
+  public function __construct ($message = "", $code = 0, $severity = E_ERROR, $filename = __FILE__,
+                               $lineno = __LINE__, Exception $previous = null, array $errcontext = null)
   {
-    switch ($errno) {
+    switch ($severity) {
       case E_ERROR:
-        $type = "ERROR";
+        $type = "Error";
         break;
       case E_NOTICE:
-        $type = 'NOTICE';
+        $type = 'Notice';
         break;
       case E_STRICT:
-        $type = 'ADVICE';
+        $type = 'Advice';
         break;
       case E_WARNING:
-        $type = 'WARNING';
+        $type = 'Warning';
         break;
       case E_DEPRECATED:
-        $type = 'DEPRECATION WARNING';
+        $type = 'Deprecation Warning';
         break;
       default:
-        $type = "error type $errno";
+        $type = "error type $code";
     }
-    $this->code    = $errno;
-    $this->message = $errstr;
-    $this->file    = $errfile;
-    $this->line    = $errline;
     $this->title   = "PHP $type";
     $this->context = $errcontext;
+    parent::__construct ($message, $code, $severity, $filename, $lineno, $previous);
+  }
+
+  function getTitle ()
+  {
+    return $this->title;
   }
 
 }

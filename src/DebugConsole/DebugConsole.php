@@ -8,11 +8,19 @@ namespace {
    * <p>This is a shortcut for easing debugging.
    * @return ConsoleLogger
    */
-  function inspect () //Note: if you rename this function, you must change ConsoleLogger::GLOBAL_LOG_FN too
+  function inspect () //Note: if you rename this function, you must change ConsoleLogger::GLOBAL_LOG_FNS too
   {
     $args   = array_merge (['<#log><#i>'], func_get_args ());
     $logger = DebugConsole::defaultLogger ();
     return call_user_func_array ([$logger, 'inspect'], $args)->showCallLocation ()->inspect ('</#i></#log>');
+  }
+
+  /**
+   * @return ConsoleLogger
+   */
+  function _log() //Note: if you rename this function, you must change ConsoleLogger::GLOBAL_LOG_FNS too
+  {
+    return DebugConsole::defaultLogger ();
   }
 
 }
@@ -83,7 +91,8 @@ namespace PhpKit\WebConsole\DebugConsole {
 
     static function init ($debugMode = true, DebugConsoleSettings $settings = null)
     {
-      self::$settings    = $settings ?: new DebugConsoleSettings;
+      $settings = $settings ?: new DebugConsoleSettings;
+      self::$settings    = $settings;
       self::$initialized = true;
       self::$debugMode   = $debugMode;
       self::registerPanel (self::$settings->defaultLoggerId,

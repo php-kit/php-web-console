@@ -1,6 +1,7 @@
 <?php
 namespace PhpKit\WebConsole\ErrorConsole;
 
+use ErrorException;
 use PhpKit\WebConsole\ErrorConsole\Exceptions\PHPError;
 
 /**
@@ -19,7 +20,7 @@ class ErrorHandler
 //    self::globalExceptionHandler (new PHPError($errno, $errstr, $errfile, $errline, $errcontext));
     if (self::$nextErrorHandler)
       call_user_func (self::$nextErrorHandler, $errno, $errstr, $errfile, $errline, $errcontext);
-    throw new PHPError($errno, $errstr, $errfile, $errline, $errcontext);
+    throw new PHPError($errstr, 0, $errno, $errfile, $errline, null, $errcontext);
   }
 
   public static function globalExceptionHandler ($exception)
@@ -67,7 +68,7 @@ class ErrorHandler
       $buffer = preg_replace ('#<table class=\'xdebug-error\'[\s\S]*?</table>#i', '', $buffer);
       echo $buffer;
       */
-      self::globalExceptionHandler (new PHPError(1, $error['message'], $error['file'], $error['line']));
+      self::globalExceptionHandler (new PHPError($error['message'], 0, $error['type'], $error['file'], $error['line']));
     }
   }
 
