@@ -319,13 +319,13 @@ class ErrorConsoleRenderer
 
       #__error kbd {
         font-family: menlo, monospace;
-        font-weight: bold;
-        /* override Bootstrap */
+        font-weight: normal;
         background: #fff1cc;
         border: 1px solid #ffde81;
         box-shadow: none;
         padding: 2px 5px;
-        color: inherit;
+        color: #333;
+        font-size: 12px;
       }
 
       #__error .class {

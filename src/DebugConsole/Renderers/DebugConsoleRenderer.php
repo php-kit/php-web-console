@@ -422,11 +422,14 @@ class DebugConsoleRenderer
       }
 
       #__console kbd {
-        font-weight: bold;
-        /* override Bootstrap */
-        background: transparent;
+        font-family: menlo, monospace;
+        font-weight: normal;
+        background: #fff1cc;
+        border: 1px solid #ffde81;
         box-shadow: none;
-        padding: 0;
+        padding: 2px 5px;
+        color: #333;
+        font-size: 12px;
       }
 
       .__console-table {
