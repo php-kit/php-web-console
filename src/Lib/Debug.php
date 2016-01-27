@@ -1,6 +1,10 @@
 <?php
 namespace PhpKit\WebConsole\Lib;
 
+use Exception;
+use PhpKit\WebConsole\ErrorConsole\ErrorConsole;
+use Psr\Log\LoggerInterface;
+
 class Debug
 {
   /**
@@ -41,6 +45,7 @@ class Debug
 
   /**
    * Gets the base PHP namespace for this library.
+   *
    * @return string
    */
   public static function libraryNamespace ()
@@ -51,7 +56,20 @@ class Debug
   }
 
   /**
+   * Shortcut to log a formatted exception on the provided logger.
+   *
+   * @param LoggerInterface $logger
+   * @param Exception       $exception
+   */
+  public static function logException (LoggerInterface $logger, Exception $exception)
+  {
+    $logger->error (sprintf ("%s, at %s(%s)", $exception->getMessage (),
+      ErrorConsole::shortFileName ($exception->getFile ()), $exception->getLine ()));
+  }
+
+  /**
    * Returns an object's unique identifier (a short version), useful for debugging.
+   *
    * @param object $o
    * @return string
    */

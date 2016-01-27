@@ -130,16 +130,15 @@ class ErrorConsole
   {
     $fileName = self::normalizePath ($fileName);
 
-    foreach (self::$pathsMap as $from => $to)
-      if (substr ($fileName, 0, $l = strlen ($from)) == $from) {
-        $fileName = $to . substr ($fileName, $l);
-      }
+    if (self::$pathsMap)
+      foreach (self::$pathsMap as $from => $to)
+        if (substr ($fileName, 0, $l = strlen ($from)) == $from) {
+          $fileName = $to . substr ($fileName, $l);
+        }
 
     if (strpos ($fileName, self::$baseDir) === 0)
       return substr ($fileName, strlen (self::$baseDir) + 1);
 
-    $p = strpos ($fileName, '/vendor/');
-    if ($p) return substr ($fileName, $p + 1);
     return $fileName;
   }
 

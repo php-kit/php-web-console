@@ -1,11 +1,15 @@
 <?php
 namespace {
+
   use PhpKit\WebConsole\DebugConsole\DebugConsole;
   use PhpKit\WebConsole\Loggers\ConsoleLogger;
 
   /**
    * Displays a formatted representation of the given arguments to the default panel on the Debug Console.
-   * <p>This is a shortcut for easing debugging.
+   *
+   * <p>Use this method only temporarily while debugging. If you want to permanently log something, use a
+   * {@see LoggerInterface} instance.
+   *
    * @return ConsoleLogger
    */
   function inspect () //Note: if you rename this function, you must change ConsoleLogger::GLOBAL_LOG_FNS too
@@ -16,9 +20,14 @@ namespace {
   }
 
   /**
+   * Gets the PHP Web Console default logger instance. You can use it to write to the Inspector panel.
+   *
+   * <p>Use this method only temporarily while debugging. If you want to permanently log something, use a
+   * {@see LoggerInterface} instance.
+   *
    * @return ConsoleLogger
    */
-  function _log() //Note: if you rename this function, you must change ConsoleLogger::GLOBAL_LOG_FNS too
+  function _log () //Note: if you rename this function, you must change ConsoleLogger::GLOBAL_LOG_FNS too
   {
     return DebugConsole::defaultLogger ();
   }
@@ -45,6 +54,7 @@ namespace PhpKit\WebConsole\DebugConsole {
     static $class = __CLASS__;
     /**
      * Is WebConsole available?
+     *
      * @var bool
      */
     static $initialized = false;
@@ -55,6 +65,7 @@ namespace PhpKit\WebConsole\DebugConsole {
     private static $debugMode;
     /**
      * Map of panel names (identifiers) to Console subclass instances.
+     *
      * @var ConsoleLogger[]
      */
     private static $loggers = [];
@@ -62,6 +73,7 @@ namespace PhpKit\WebConsole\DebugConsole {
     /**
      * Gets the default logger instance.
      * If one doesn't exist yet, it creates it.
+     *
      * @return ConsoleLogger
      */
     public static function defaultLogger ()
@@ -74,6 +86,7 @@ namespace PhpKit\WebConsole\DebugConsole {
 
     /**
      * Checks if a ConsolePanel with the given name is registered.
+     *
      * @param string $panelId
      * @return bool
      */
@@ -91,7 +104,7 @@ namespace PhpKit\WebConsole\DebugConsole {
 
     static function init ($debugMode = true, DebugConsoleSettings $settings = null)
     {
-      $settings = $settings ?: new DebugConsoleSettings;
+      $settings          = $settings ?: new DebugConsoleSettings;
       self::$settings    = $settings;
       self::$initialized = true;
       self::$debugMode   = $debugMode;
@@ -101,6 +114,7 @@ namespace PhpKit\WebConsole\DebugConsole {
 
     /**
      * Returns a ConsolePanel instance by name.
+     *
      * @param string $loggerId
      * @return ConsoleLogger
      * @throws Exception When the id is invalid.
@@ -231,7 +245,7 @@ namespace PhpKit\WebConsole\DebugConsole {
      */
     public static function trace ()
     {
-      if (!extension_loaded('xdebug'))
+      if (!extension_loaded ('xdebug'))
         throw new Exception ("<kbd>trace()</kbd> requires Xdebug to be installed.");
       $v = ini_get ('xdebug.collect_params');
       ob_start ();
