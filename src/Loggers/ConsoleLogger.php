@@ -20,7 +20,7 @@ class ConsoleLogger extends AbstractLogger
    *
    * @var array $LEVELS Logging levels
    */
-  protected static $LEVELS = [
+  static protected $LEVELS = [
     100 => 'DEBUG',
     200 => 'INFO',
     250 => 'NOTICE',
@@ -313,6 +313,7 @@ HTML;
 
   protected function table ($data, $title = '', $depth = 0, $typeColumn = true, $columnHeaders = true)
   {
+    $isList = false;
     $originalData = $data;
     if ($this->caption) {
       $title         = $this->caption;
@@ -345,6 +346,7 @@ HTML;
       ++$depth;
       $label = 'Key';
       if (isset($data[0])) {
+        $isList = true;
         $label = 'Index';
         $w1    = DebugConsole::$settings->tableIndexColumnWidth;
         $c1    = ' class="n"';
@@ -393,7 +395,12 @@ HTML;
     <?php endif ?>
     <tbody>
     <?php
+    $c = 0;
     foreach ($data as $k => $v):
+      if ($isList && ++$c > DebugConsole::$settings->maxIndexedArrayItems) {
+        echo '<tr><td><i>(...)</i>';
+        break;
+      }
     $x = $filter($k, $v, $originalData);
     if (!$x) continue;
     ?>
