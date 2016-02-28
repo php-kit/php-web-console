@@ -313,7 +313,7 @@ HTML;
 
   protected function table ($data, $title = '', $depth = 0, $typeColumn = true, $columnHeaders = true)
   {
-    $isList = false;
+    $isList       = false;
     $originalData = $data;
     if ($this->caption) {
       $title         = $this->caption;
@@ -328,7 +328,7 @@ HTML;
     elseif (is_bool ($data))
       return $data ? 'true' : 'false';
     elseif (is_string ($data))
-      return strlen ($data) ? $data : "<i>''</i>";
+      return strlen ($data) ? htmlspecialchars ($data) : "<i>''</i>";
     elseif (!is_array ($data) && !is_object ($data)) {
       return htmlspecialchars (str_replace ('    ', '  ', trim (print_r ($data, true))));
     }
@@ -347,9 +347,9 @@ HTML;
       $label = 'Key';
       if (isset($data[0])) {
         $isList = true;
-        $label = 'Index';
-        $w1    = DebugConsole::$settings->tableIndexColumnWidth;
-        $c1    = ' class="n"';
+        $label  = 'Index';
+        $w1     = DebugConsole::$settings->tableIndexColumnWidth;
+        $c1     = ' class="n"';
       }
     }
     elseif (is_object ($data)) {
@@ -397,10 +397,10 @@ HTML;
     <?php
     $c = 0;
     foreach ($data as $k => $v):
-      if ($isList && ++$c > DebugConsole::$settings->maxIndexedArrayItems) {
-        echo '<tr><td><i>(...)</i>';
-        break;
-      }
+    if ($isList && ++$c > DebugConsole::$settings->maxIndexedArrayItems) {
+      echo '<tr><td><i>(...)</i>';
+      break;
+    }
     $x = $filter($k, $v, $originalData);
     if (!$x) continue;
     ?>
@@ -409,7 +409,7 @@ HTML;
       <?php if ($typeColumn): ?>
         <td><?= Debug::getType ($v) ?></td>
       <?php endif ?>
-      <td><?= $x === '...' ? '<i>ommited</i>' : $this->table ($v, '', $depth, $typeColumn, $columnHeaders) ?></td>
+      <td class="v"><?= $x === '...' ? '<i>ommited</i>' : $this->table ($v, '', $depth, $typeColumn, $columnHeaders) ?></td>
       <?php endforeach; ?>
     </tbody>
   <?php } ?>

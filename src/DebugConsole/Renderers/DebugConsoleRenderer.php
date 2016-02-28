@@ -34,10 +34,8 @@ class DebugConsoleRenderer
         <?php endforeach; ?>
       </div>
     </div>
+    <!-- Used by goto-source links -->
     <iframe name="hidden" style="display:none"></iframe>
-    <form id="__post" style="display:none" method="post">
-      <input id="__action" type="hidden" name="_action">
-    </form>
     <?php
   }
 
@@ -74,10 +72,6 @@ class DebugConsoleRenderer
       };
       window.removeConsole = function (s) {
         find ('__console-container').remove ();
-      };
-      window.__doAction = function (a) {
-        find ('__action').setAttribute('value', a);
-        find ('__post').submit()
       };
     </script>
     <?php
@@ -344,6 +338,10 @@ class DebugConsoleRenderer
 
       .__console-table + .__debug-location {
         margin-top: -7px;
+      }
+
+      .__console-table td.v {
+        white-space: pre-wrap;
       }
 
       #__console .__log-item {
