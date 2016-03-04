@@ -7,7 +7,12 @@ use Psr\Http\Message\ServerRequestInterface;
 class PSR7RequestLogger extends ConsoleLogger
 {
   /** @var ServerRequestInterface */
-  public $request;
+  private $request;
+
+  function hasRequest ()
+  {
+    return !!$this->request;
+  }
 
   public function render ()
   {
