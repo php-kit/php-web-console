@@ -419,7 +419,23 @@ class ErrorConsoleRenderer
         font-weight: normal;
       }
 
+      .__message table.grid i {
+        color: #CCC;
+      }
+      .__message table.grid th {
+        border:1px solid #CCC;
+        padding: 5px 10px;
+        background: #EEE;
+        max-width: 160px;
+      }
+      .__message table.grid td {
+        border:1px solid #CCC;
+        padding: 5px 10px;
+        background: #FFF;
+      }
+
       .__message table {
+        border-collapse: collapse;
         font-size: inherit;
         border-spacing: 0;
         line-height: 1.2;
