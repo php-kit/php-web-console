@@ -24,9 +24,11 @@ class WebConsoleMonologHandler extends AbstractProcessingHandler
    */
   protected function write (array $record)
   {
-    $channel  = $record['channel'];
-    $loggerId = DebugConsole::hasLogger ($channel) ? $channel : DebugConsole::$settings->defaultLoggerId;
-    $logger   = DebugConsole::logger ($loggerId);
-    $logger->log ($record['level'], $record['message'], $record['context']);
+    if (DebugConsole::$initialized) {
+      $channel  = $record['channel'];
+      $loggerId = DebugConsole::hasLogger ($channel) ? $channel : DebugConsole::$settings->defaultLoggerId;
+      $logger   = DebugConsole::logger ($loggerId);
+      $logger->log ($record['level'], $record['message'], $record['context']);
+    }
   }
 }
