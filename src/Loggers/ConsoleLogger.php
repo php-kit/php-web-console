@@ -71,7 +71,10 @@ class ConsoleLogger extends AbstractLogger
 
   function getRenderedInspection ($val, $alt = null)
   {
-    return $this->format ($this->getInspection1 ($val, $alt));
+    // Note: Selenia's CustomInspectionInterface implements the inspect() method, but this library is not dependent on
+    // any external interface.
+    return is_null ($alt) && method_exists ($val, 'inspect') ? $val->inspect ()
+      : $this->format ($this->getInspection1 ($val, $alt));
   }
 
   function hasContent ()
@@ -88,7 +91,7 @@ class ConsoleLogger extends AbstractLogger
   public function inspect ()
   {
     foreach (func_get_args () as $arg)
-      $this->write ($this->getInspection1 ($arg));
+      $this->inspectValue ($arg);
     return $this;
   }
 
@@ -409,7 +412,8 @@ HTML;
       <?php if ($typeColumn): ?>
         <td><?= Debug::getType ($v) ?></td>
       <?php endif ?>
-      <td class="v"><?= $x === '...' ? '<i>ommited</i>' : $this->table ($v, '', $depth, $typeColumn, $columnHeaders) ?></td>
+      <td class="v"><?= $x === '...' ? '<i>ommited</i>'
+          : $this->table ($v, '', $depth, $typeColumn, $columnHeaders) ?></td>
       <?php endforeach; ?>
     </tbody>
   <?php } ?>
