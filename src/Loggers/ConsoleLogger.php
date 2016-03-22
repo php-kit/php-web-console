@@ -359,6 +359,8 @@ HTML;
       if ($depth == DebugConsole::$settings->tableMaxDepth)
         return '<i>(...)</i>';
       ++$depth;
+      if (method_exists ($data, 'inspect'))
+        return $data->inspect ();
       if (method_exists ($data, '__debugInfo'))
         $data = $data->__debugInfo ();
       else $data = get_object_vars ($data);
