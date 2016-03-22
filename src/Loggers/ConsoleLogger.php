@@ -5,6 +5,8 @@ use PhpKit\WebConsole\DebugConsole\DebugConsole;
 use PhpKit\WebConsole\ErrorConsole\ErrorConsole;
 use PhpKit\WebConsole\Lib\Debug;
 use Psr\Log\AbstractLogger;
+use Selenia\Interfaces\CustomInspectionInterface;
+use Selenia\Matisse\Components\Base\Component;
 
 class ConsoleLogger extends AbstractLogger
 {
@@ -73,7 +75,7 @@ class ConsoleLogger extends AbstractLogger
   {
     // Note: Selenia's CustomInspectionInterface implements the inspect() method, but this library is not dependent on
     // any external interface.
-    return is_null ($alt) && method_exists ($val, 'inspect') ? $val->inspect ()
+    return is_null ($alt) && $alt instanceof CustomInspectionInterface ? $val->inspect ()
       : $this->format ($this->getInspection1 ($val, $alt));
   }
 
@@ -359,15 +361,19 @@ HTML;
       if ($depth == DebugConsole::$settings->tableMaxDepth)
         return '<i>(...)</i>';
       ++$depth;
-      if (method_exists ($data, 'inspect'))
+      // Note: Selenia's CustomInspectionInterface implements the inspect() method, but this library is not dependent on
+      // any external interface.
+      if ($data instanceof CustomInspectionInterface)
         return $data->inspect ();
-      if (method_exists ($data, '__debugInfo'))
+      elseif (method_exists ($data, '__debugInfo'))
         $data = $data->__debugInfo ();
       else $data = get_object_vars ($data);
       if (empty($data))
         return '';
-      $label = 'Property';
-      uksort ($data, 'strnatcasecmp');
+      if (!is_string ($data)) {
+        $label = 'Property';
+        uksort ($data, 'strnatcasecmp');
+      }
     }
 
     // DRAW TABLE
@@ -376,50 +382,55 @@ HTML;
     ob_start (null, 0);
     if ($depth >= DebugConsole::$settings->tableCollapseDepth)
       echo '<div class="__expand"><a class="fa fa-plus-square" href="javascript:void(0)" onclick="this.parentNode.className+=\' show\'"></a>';
-    ?>
-  <table class="__console-table<?= $title ? ' with-caption' : '' ?>">
-    <?= $title ? "<caption>$title</caption>"
-    : '' ?><?php if (empty($data)) echo '<thead><tr><td colspan=3><i>[]</i>';
-  else { ?>
-    <colgroup>
-      <col width="<?= $w1 ?>">
-      <?php if ($typeColumn): ?>
-        <col width="<?= DebugConsole::$settings->tableTypeColumnWidth ?>">
-      <?php endif ?>
-      <col width="100%">
-    </colgroup>
-    <?php if ($columnHeaders): ?>
-      <thead>
-      <tr>
-        <th><?= $label ?></th>
-        <?php if ($typeColumn): ?>
-          <th>Type</th>
+
+    if (is_string ($data))
+      echo $data;
+    else {
+      ?>
+    <table class="__console-table<?= $title ? ' with-caption' : '' ?>">
+      <?= $title ? "<caption>$title</caption>"
+      : '' ?><?php if (empty($data)) echo '<thead><tr><td colspan=3><i>[]</i>';
+      else { ?>
+        <colgroup>
+          <col width="<?= $w1 ?>">
+          <?php if ($typeColumn): ?>
+            <col width="<?= DebugConsole::$settings->tableTypeColumnWidth ?>">
+          <?php endif ?>
+          <col width="100%">
+        </colgroup>
+        <?php if ($columnHeaders): ?>
+          <thead>
+          <tr>
+            <th><?= $label ?></th>
+            <?php if ($typeColumn): ?>
+              <th>Type</th>
+            <?php endif ?>
+            <th>Value</th>
+          </thead>
         <?php endif ?>
-        <th>Value</th>
-      </thead>
-    <?php endif ?>
-    <tbody>
-    <?php
-    $c = 0;
-    foreach ($data as $k => $v):
-    if ($isList && ++$c > DebugConsole::$settings->maxIndexedArrayItems) {
-      echo '<tr><td><i>(...)</i>';
-      break;
+        <tbody>
+        <?php
+        $c = 0;
+        foreach ($data as $k => $v):
+        if ($isList && ++$c > DebugConsole::$settings->maxIndexedArrayItems) {
+          echo '<tr><td><i>(...)</i>';
+          break;
+        }
+        $x = $filter($k, $v, $originalData);
+        if (!$x) continue;
+        ?>
+        <tr>
+          <th<?= $c1 ?>><?= strlen ($k) ? $k : "<i>''</i>" ?></th>
+          <?php if ($typeColumn): ?>
+            <td><?= Debug::getType ($v) ?></td>
+          <?php endif ?>
+          <td class="v"><?= $x === '...' ? '<i>ommited</i>'
+              : $this->table ($v, '', $depth, $typeColumn, $columnHeaders) ?></td>
+          <?php endforeach; ?>
+        </tbody>
+      <?php } ?>
+      </table><?php
     }
-    $x = $filter($k, $v, $originalData);
-    if (!$x) continue;
-    ?>
-    <tr>
-      <th<?= $c1 ?>><?= strlen ($k) ? $k : "<i>''</i>" ?></th>
-      <?php if ($typeColumn): ?>
-        <td><?= Debug::getType ($v) ?></td>
-      <?php endif ?>
-      <td class="v"><?= $x === '...' ? '<i>ommited</i>'
-          : $this->table ($v, '', $depth, $typeColumn, $columnHeaders) ?></td>
-      <?php endforeach; ?>
-    </tbody>
-  <?php } ?>
-    </table><?php
     if ($depth >= DebugConsole::$settings->tableCollapseDepth)
       echo '</div>';
 
