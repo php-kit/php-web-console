@@ -6,7 +6,6 @@ use PhpKit\WebConsole\ErrorConsole\ErrorConsole;
 use PhpKit\WebConsole\Lib\Debug;
 use Psr\Log\AbstractLogger;
 use Selenia\Interfaces\CustomInspectionInterface;
-use Selenia\Matisse\Components\Base\Component;
 
 class ConsoleLogger extends AbstractLogger
 {
@@ -333,7 +332,7 @@ HTML;
     elseif (is_bool ($data))
       return $data ? 'true' : 'false';
     elseif (is_string ($data))
-      return strlen ($data) ? htmlspecialchars ($data) : "<i>''</i>";
+      return strlen (trim ($data)) ? htmlspecialchars ($data) : "<i>'$data'</i>";
     elseif (!is_array ($data) && !is_object ($data)) {
       return htmlspecialchars (str_replace ('    ', '  ', trim (print_r ($data, true))));
     }
