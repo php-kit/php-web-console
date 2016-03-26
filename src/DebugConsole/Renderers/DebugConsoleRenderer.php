@@ -552,8 +552,8 @@ class DebugConsoleRenderer
         display: block;
         padding: 10px;
         font-family: Menlo, monospace;
-        font-size: 10px;
-        line-height: 1.2;
+        font-size: 12px;
+        line-height: 1.3;
         white-space: pre;
         border-radius: 0;
       }
