@@ -26,6 +26,25 @@ class Debug
   }
 
   /**
+   * Generates a table with a header column and a value column from the given array.
+   *
+   * @param array  $props
+   * @param string $title [optional]
+   * @return string
+   */
+  public static function grid (array $props, $title = '')
+  {
+    if ($title) $title = "<p><b>$title</b></p>";
+    return "<div style='margin:30px 0'>$title
+<table class=grid>
+" . implode ('',
+      map ($props, function ($v, $k) {
+        return "<tr><th>$k<td>$v";
+      })) . "
+</table></div>";
+  }
+
+  /**
    * Interpolates context values into message placeholders, for use on PSR-3-compatible logging.
    *
    * @param string $message Message with optional placeholder with syntax {key}.

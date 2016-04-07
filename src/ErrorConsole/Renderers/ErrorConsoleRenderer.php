@@ -287,7 +287,7 @@ class ErrorConsoleRenderer
         border: 1px solid #CCC;
         color: #666;
         font-family: sans-serif;
-        width: 70px;
+        width: 92px;
         text-align: center;
         box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.03), inset 0 15px 10px rgba(255, 255, 255, 0.9);
       }
