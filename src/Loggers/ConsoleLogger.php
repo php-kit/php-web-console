@@ -385,8 +385,7 @@ HTML;
     if (is_string ($data))
       echo $data;
     else {
-      ?>
-    <table class="__console-table<?= $title ? ' with-caption' : '' ?>">
+      ?><table class="__console-table<?= $title ? ' with-caption' : '' ?>">
       <?= $title ? "<caption>$title</caption>"
       : '' ?><?php if (empty($data)) echo '<thead><tr><td colspan=3><i>[]</i>';
       else { ?>

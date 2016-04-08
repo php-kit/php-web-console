@@ -298,11 +298,14 @@ class DebugConsoleRenderer
 
       .__log-stripe {
         position: relative;
+        padding: 30px 5px 10px;
+        border: 1px solid #DDD;
+        margin-top: -1px;
       }
 
       .__log-data {
         white-space: pre;
-        padding: 10px 5px 0;
+        /*padding: 0 5px 0;*/
         display: inline-block;
       }
 
@@ -319,37 +322,23 @@ class DebugConsoleRenderer
       .__debug-location {
         color: #999;
         right: 10px;
-        top: 10px;
+        top: 3px;
         z-index: 1;
         position: absolute;
       }
 
-      .__debug-location a {
-        text-decoration: none;
-      }
-
-      .__debug-location a:link {
-        color: #99C;
-      }
-
-      .__debug-location a {
-        color: #AAA;
-      }
-
-      .__console-table + .__debug-location {
-        margin-top: -7px;
-      }
+      /*.__console-table + .__debug-location {*/
+        /*margin-top: -7px;*/
+      /*}*/
 
       .__console-table td.v {
         white-space: pre-wrap;
       }
 
       #__console .__log-item {
-        margin: 10px 10px 0;
       }
 
       #__console .__log-item:last-child {
-        margin-bottom: 10px;
       }
 
       #__console .__header {
@@ -406,7 +395,7 @@ class DebugConsoleRenderer
       }
 
       #__console a {
-        color: #888;
+        color: #99C;
       }
 
       #__console a.fa {
