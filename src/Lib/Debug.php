@@ -103,24 +103,6 @@ class Debug
   }
 
   /**
-   * Returns a formatted properties table.
-   *
-   * @param array $props
-   * @return string
-   */
-  public static function properties (array $props)
-  {
-    return "<div style='margin:30px 0'>
-<p><b>Properties being assigned:</b></p>
-<table class=grid>
-" . str_replace ("'", "<i>'</i>", implode ('',
-      map ($props, function ($v, $k) {
-        return "<tr><th>$k<td>" . var_export ($v, true);
-      })), $o) . "
-</table></div>";
-  }
-
-  /**
    * @param string $c
    * @return string
    */

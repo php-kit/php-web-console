@@ -135,6 +135,24 @@ class ErrorConsoleRenderer
         text-decoration: underline;
       }
 
+      #__error h5 {
+        color: #488;
+        margin: 15px 0;
+        font-size: 14px;
+      }
+
+      #__error h6 {
+        margin: 15px 0;
+        font-size: 12px;
+        text-transform: uppercase;
+      }
+
+      #__error hr {
+        margin: 20px 0;
+        border: 0;
+        border-top: 1px solid #BF3D27;
+      }
+
       #__panel {
         display: inline-block;
         position: relative;
