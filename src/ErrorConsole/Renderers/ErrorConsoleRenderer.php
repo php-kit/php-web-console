@@ -260,6 +260,11 @@ class ErrorConsoleRenderer
         display: table-row;
       }
 
+      #__error td > code {
+        border: none;
+        padding: 0;
+      }
+
       #__error .rowHeader {
         display: table-cell;
         padding: 5px 15px;
