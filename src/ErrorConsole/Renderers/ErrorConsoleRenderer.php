@@ -153,6 +153,15 @@ class ErrorConsoleRenderer
         border-top: 1px solid #BF3D27;
       }
 
+      #__error blockquote {
+        background: #eaebec;
+        border: 1px solid #d7d7df;
+        border-left: 4px solid #BF3D27;
+        padding: 15px;
+        margin-left: 0;
+        color: #999;
+      }
+
       #__panel {
         display: inline-block;
         position: relative;
