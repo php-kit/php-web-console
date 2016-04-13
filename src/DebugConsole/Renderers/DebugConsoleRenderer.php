@@ -344,6 +344,36 @@ class DebugConsoleRenderer
       #__console .__log-item:last-child {
       }
 
+      #__console table.grid {
+        border-collapse: collapse;
+        font-size: inherit;
+        border-spacing: 0;
+        line-height: 1.2;
+        margin: 0;
+      }
+      #__console td > table.grid {
+        margin: -4px -6px -3px;
+      }
+      #__console table.grid th {
+        border:1px solid #CCC;
+        padding: 5px 10px;
+        background: #EEE;
+        max-width: 160px;
+        vertical-align: top;
+        font-weight: normal;
+        color: #08A;
+        text-align: left;
+      }
+      #__console table.grid td {
+        border:1px solid #CCC;
+        padding: 5px 10px;
+        background: #FFF;
+        vertical-align: top;
+      }
+      #__console table.grid i {
+        color: #CCC;
+      }
+
       #__console .__header {
         color: #666;
         font-weight: bold;
@@ -561,6 +591,7 @@ class DebugConsoleRenderer
         border-spacing: 0;
         line-height: 1.2;
         margin: 15px 0;
+        border-collapse: collapse;
       }
 
       .__panel code table td {

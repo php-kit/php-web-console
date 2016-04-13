@@ -349,7 +349,7 @@ class ErrorConsoleRenderer
         display: block;
       }
 
-      #__error kbd {
+      #__error .__message kbd {
         font-family: menlo, monospace;
         font-weight: normal;
         background: #fff1cc;
@@ -451,6 +451,9 @@ class ErrorConsoleRenderer
         font-weight: normal;
       }
 
+      .__message table.grid {
+        margin:30px 0;
+      }
       .__message table.grid i {
         color: #CCC;
       }

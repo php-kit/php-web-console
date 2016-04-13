@@ -231,7 +231,7 @@ class ErrorConsole
                         $arg))) . "\n]" : 'Empty array') . '">array</span>';
                 break;
               default:
-                $arg = ucfirst (gettype ($arg));
+                $arg = typeInfoOf ($arg);
             }
             $args[] = $arg;
           }

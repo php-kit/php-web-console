@@ -35,13 +35,13 @@ class Debug
   public static function grid (array $props, $title = '')
   {
     if ($title) $title = "<p><b>$title</b></p>";
-    return "<div style='margin:30px 0'>$title
+    return "$title
 <table class=grid>
 " . implode ('',
       map ($props, function ($v, $k) {
         return "<tr><th>$k<td>$v";
       })) . "
-</table></div>";
+</table>";
   }
 
   /**
