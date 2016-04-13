@@ -157,10 +157,11 @@ class ConsoleLogger extends AbstractLogger
     $path      = isset($trace['file']) ? $trace['file'] : '';
     $line      = isset($trace['line']) ? $trace['line'] : '';
     $shortPath = ErrorConsole::shortFileName ($path);
-    $location  = empty($line) ? $shortPath : ErrorConsole::errorLink ($path, $line, 1, "$shortPath($line)");
+    $shortPath = str_segmentsLast($shortPath, '/');
+    $location  = empty($line) ? $shortPath : ErrorConsole::errorLink ($path, $line, 1, "$shortPath:$line", 'hint--rounded hint--left', 'data-hint');
     if ($path != '')
       $path = <<<HTML
-<div class="__debug-location"><b>At</b> $location</div>
+<div class="__debug-location">At $location</div>
 HTML;
     $this->write ($path);
 

@@ -298,7 +298,7 @@ class DebugConsoleRenderer
 
       .__log-stripe {
         position: relative;
-        padding: 30px 5px 10px;
+        padding: 30px 0 0;
         border: 1px solid #DDD;
         margin-top: -1px;
       }
@@ -321,8 +321,8 @@ class DebugConsoleRenderer
       /* must lie inside a __log-stripe */
       .__debug-location {
         color: #999;
-        right: 10px;
-        top: 3px;
+        right: 15px;
+        top: 6px;
         z-index: 1;
         position: absolute;
       }
@@ -336,6 +336,9 @@ class DebugConsoleRenderer
       }
 
       #__console .__log-item {
+        background: #fff;
+        padding: 10px;
+        border-top: 1px solid #e4e4e4;
       }
 
       #__console .__log-item:last-child {
@@ -579,6 +582,7 @@ class DebugConsoleRenderer
         margin: 0 0 -1px 0 !important;
         border: 1px solid #EEE;
         background: #FFF;
+        padding: 0 !important;
       }
 
       .__rowHeader::before {

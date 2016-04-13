@@ -80,14 +80,15 @@ class ErrorConsole
     return null;
   }
 
-  public static function errorLink ($file, $line = 1, $col = 1, $label = '', $class = '')
+  public static function errorLink ($file, $line = 1, $col = 1, $label = '', $class = '', $tooltipAttr = 'title')
   {
     if (empty($file))
       return '';
-    $label   = $label ?: self::shortFileName ($file);
+    $path    = self::shortFileName ($file);
+    $label   = $label ?: $path;
     $file    = urlencode (self::toProjectPath ($file));
     $baseUri = self::$baseUri;
-    return "<a class='$class' target='hidden' href='$baseUri/goto-source.php?file=$file&line=$line&col=$col'>$label</a>";
+    return "<a class='$class' target='hidden' $tooltipAttr='$path' href='$baseUri/goto-source.php?file=$file&line=$line&col=$col'>$label</a>";
   }
 
   public static function init ($debugMode = true, $baseDir = '', $pathsMap = [])
