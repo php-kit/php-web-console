@@ -12,7 +12,8 @@ namespace {
    *
    * @return ConsoleLogger
    */
-  function inspect () //Note: if you rename this function, you must change ConsoleLogger::GLOBAL_LOG_FNS too
+  //Note: if you rename this function, you must change ConsoleLogger::GLOBAL_LOG_FNS too
+  function inspect ()
   {
     $args   = array_merge (['<#log><#i>'], func_get_args ());
     $logger = DebugConsole::defaultLogger ();
@@ -27,7 +28,8 @@ namespace {
    *
    * @return ConsoleLogger
    */
-  function _log () //Note: if you rename this function, you must change ConsoleLogger::GLOBAL_LOG_FNS too
+  //Note: if you rename this function, you must change ConsoleLogger::GLOBAL_LOG_FNS too
+  function _log ()
   {
     return DebugConsole::defaultLogger ();
   }

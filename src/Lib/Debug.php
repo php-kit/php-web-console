@@ -35,8 +35,7 @@ class Debug
   public static function grid (array $props, $title = '')
   {
     if ($title) $title = "<p><b>$title</b></p>";
-    return "$title
-<table class=grid>
+    return "$title<table class=grid>
 " . implode ('',
       map ($props, function ($v, $k) {
         return "<tr><th>$k<td>$v";

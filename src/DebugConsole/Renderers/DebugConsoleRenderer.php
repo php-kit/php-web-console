@@ -398,15 +398,20 @@ class DebugConsoleRenderer
       }
 
       #__console .__alert {
+        display: inline-block;
         color: #C00;
         background: #FFA;
-        line-height: 10px;
         padding: 12px;
         border-bottom: 1px solid #DDD;
+        margin: -10px 5px -10px -10px;
+      }
+
+      #__console .__alert + div {
+        margin-top: 20px;
       }
 
       #__console .__comment {
-        olor: #999;
+        color: #999;
         margin: -1px 0;
         background: #fff;
         padding: 5px 10px;
