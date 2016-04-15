@@ -82,6 +82,12 @@ class DebugConsoleRenderer
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/hint.css/1.3.6/hint.min.css">
     <style>
+      .hint:after, [data-hint]:after {
+        padding: 8px 15px;
+        white-space: pre;
+        line-height: 20px;
+      }
+
       .__btn {
         text-decoration: none;
         background: #EEE;
@@ -211,6 +217,7 @@ class DebugConsoleRenderer
         font-size: 15px;
         position: relative;
         top: 1px;
+        line-height: 23px;
       }
 
       #__console {
@@ -565,6 +572,15 @@ class DebugConsoleRenderer
 
       .__expand.show > a {
         display: none;
+      }
+
+      .__panel .icon {
+        margin-left: 5px;
+        color: #AAA;
+        cursor: help;
+      }
+      .__panel .icon:hover {
+        color: #333;
       }
 
       .__panel > code:first-child {
