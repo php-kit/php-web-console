@@ -7,6 +7,8 @@ use Psr\Log\LoggerInterface;
 
 class Debug
 {
+  const RAW_TEXT = '*RAW*';
+
   /**
    * @param mixed $v
    * @return string
@@ -28,16 +30,35 @@ class Debug
   /**
    * Generates a table with a header column and a value column from the given array.
    *
-   * @param array  $props
-   * @param string $title [optional]
+   * @param mixed  $value
+   * @param string $title        [optional]
+   * @param int    $maxDepth     [optional] Max. recursion depth.
+   * @param array  $excludeProps [optional] Exclude properties whose name is on the list.
+   * @param bool   $excludeEmpty [optional] Exclude empty properties.
+   * @param int    $depth        [optional] For internal use.
    * @return string
    */
-  public static function grid (array $props, $title = '')
+  public static function grid ($value, $title = '', $maxDepth = 0, $excludeProps = [], $excludeEmpty = false,
+                               $depth = 0)
   {
+    if (is_null ($value) || is_scalar ($value))
+      return $title . self::toString ($value);
+    if (is_object ($value)) {
+      if (method_exists ($value, '__debugInfo'))
+        $value = $value->__debugInfo ();
+      else $value = get_object_vars ($value);
+    }
     if ($title) $title = "<p><b>$title</b></p>";
     return "$title<table class=grid>
 " . implode ('',
-      map ($props, function ($v, $k) {
+      map ($value, function ($v, $k) use ($depth, $maxDepth, $excludeProps, $excludeEmpty) {
+        if (in_array ($k, $excludeProps) || ($excludeEmpty && !exists ($v)))
+          return '';
+        if (is_scalar ($v) || is_null ($v))
+          $v = self::toString ($v);
+        elseif ($depth < $maxDepth)
+          $v = self::grid ($v, '', $maxDepth, $excludeProps, $excludeEmpty, $depth + 1);
+        else $v = typeInfoOf ($v);
         return "<tr><th>$k<td>$v";
       })) . "
 </table>";
@@ -109,6 +130,28 @@ class Debug
   {
     $l = array_slice (explode ('\\', $c), -1)[0];
     return "<span title='$c'>$l</span>";
+  }
+
+  /**
+   * @param mixed $v When it's a string, if it begins with {@see RAW_TEXT}, it is not escaped.
+   * @param bool  $enhanced
+   * @return string
+   */
+  public static function toString ($v, $enhanced = true)
+  {
+    if ($v instanceof \Closure)
+      return '<i>(native code)</i>';
+    elseif (is_bool ($v))
+      return $v ? 'true' : 'false';
+    elseif (is_string ($v)) {
+      $l = strlen (self::RAW_TEXT);
+      return substr ($v, 0, $l) == self::RAW_TEXT ? substr ($v, $l)
+        : sprintf ("<i>'</i>%s<i>'</i>", htmlspecialchars ($v));
+    }
+    elseif (!is_array ($v) && !is_object ($v))
+      return htmlspecialchars (str_replace ('    ', '  ', trim (print_r ($v, true))));
+
+    return $enhanced ? self::getType ($v) : typeOf ($v);
   }
 
 }

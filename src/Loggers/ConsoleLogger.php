@@ -327,16 +327,8 @@ HTML;
 
     // DISPLAY PRIMITIVE VALUES
 
-    if ($data instanceof \Closure) {
-      return '<i>(native code)</i>';
-    }
-    elseif (is_bool ($data))
-      return $data ? 'true' : 'false';
-    elseif (is_string ($data))
-      return strlen (trim ($data)) ? htmlspecialchars ($data) : "<i>'$data'</i>";
-    elseif (!is_array ($data) && !is_object ($data)) {
-      return htmlspecialchars (str_replace ('    ', '  ', trim (print_r ($data, true))));
-    }
+    if (!is_array ($data) && !is_object ($data))
+      return Debug::toString($data);
 
     // SETUP TABULAR DISPLAY OF ARRAYS AND OBJECTS
 
