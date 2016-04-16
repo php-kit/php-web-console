@@ -182,8 +182,11 @@ namespace PhpKit\WebConsole\DebugConsole {
             if (strpos ($contentType, 'text/html') !== false) {
               $body    = $response->getBody ();
               $content = $body->__toString ();
-              $content = preg_replace ('#(</body>\s*</html>\s*)$#i', "$myContent\$1", $content, -1, $count);
-              if (!$count && $force)
+              if (preg_match ('#</body>\s*</html>\s*$#i', $content, $m, PREG_OFFSET_CAPTURE)) {
+                list ($end, $ofs) = $m[0];
+                $content = substr($content, 0, $ofs) . $myContent . $end;
+              }
+              else if ($force)
                 $content .= $myContent;
               try {
                 $body->rewind ();

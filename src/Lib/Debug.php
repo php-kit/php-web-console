@@ -49,19 +49,22 @@ class Debug
       else $value = get_object_vars ($value);
     }
     if ($title) $title = "<p><b>$title</b></p>";
-    return "$title<table class=grid>
+
+    // Exclude some properties or values.
+    $value = array_exclude ($value, $excludeProps);
+    if ($excludeEmpty)
+      $value = array_prune ($value);
+
+    return $value ? "$title<table class=grid>
 " . implode ('',
-      map ($value, function ($v, $k) use ($depth, $maxDepth, $excludeProps, $excludeEmpty) {
-        if (in_array ($k, $excludeProps) || ($excludeEmpty && !exists ($v)))
-          return '';
-        if (is_scalar ($v) || is_null ($v))
-          $v = self::toString ($v);
-        elseif ($depth < $maxDepth)
-          $v = self::grid ($v, '', $maxDepth, $excludeProps, $excludeEmpty, $depth + 1);
-        else $v = typeInfoOf ($v);
-        return "<tr><th>$k<td>$v";
-      })) . "
-</table>";
+        map ($value, function ($v, $k) use ($depth, $maxDepth, $excludeProps, $excludeEmpty) {
+          if (!is_scalar ($v) && !is_null ($v) && $depth < $maxDepth)
+            $v = self::grid ($v, '', $maxDepth, $excludeProps, $excludeEmpty, $depth + 1);
+          else $v = self::toString ($v);
+          return "<tr><th>$k<td>$v";
+        })) . "
+</table>"
+      : '<i>[]</i>';
   }
 
   /**
@@ -139,18 +142,23 @@ class Debug
    */
   public static function toString ($v, $enhanced = true)
   {
-    if ($v instanceof \Closure)
-      return '<i>(native code)</i>';
-    elseif (is_bool ($v))
-      return $v ? 'true' : 'false';
-    elseif (is_string ($v)) {
-      $l = strlen (self::RAW_TEXT);
-      return substr ($v, 0, $l) == self::RAW_TEXT ? substr ($v, $l)
-        : sprintf ("<i>'</i>%s<i>'</i>", htmlspecialchars ($v));
+    if (isset($v)) {
+      if ($v instanceof \Closure)
+        return '<i>(native code)</i>';
+      elseif (is_bool ($v))
+        return $v ? 'true' : 'false';
+      elseif (is_string ($v)) {
+        $l = strlen (self::RAW_TEXT);
+        return substr ($v, 0, $l) == self::RAW_TEXT ? substr ($v, $l)
+          : sprintf ("<i>'</i>%s<i>'</i>", htmlspecialchars ($v));
+      }
+      elseif ($v instanceof \PowerString)
+        return sprintf ("<i>(</i>%s<i>)'</i>%s<i>'</i>",
+          $enhanced ? self::shortenType (\PowerString::class) : typeOf ($v),
+          htmlspecialchars ($v));
+      elseif (!is_array ($v) && !is_object ($v))
+        return htmlspecialchars (str_replace ('    ', '  ', trim (print_r ($v, true))));
     }
-    elseif (!is_array ($v) && !is_object ($v))
-      return htmlspecialchars (str_replace ('    ', '  ', trim (print_r ($v, true))));
-
     return $enhanced ? self::getType ($v) : typeOf ($v);
   }
 

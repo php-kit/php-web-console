@@ -105,7 +105,7 @@ class ConsoleLogger extends AbstractLogger
    */
   function inspectValue ($val, $alt = null)
   {
-    return $this->write ($this->getRenderedInspection ($val, $alt));
+    return $this->write ($this->getRenderedInspection ($val, $alt))->write (' ');
   }
 
   /**
@@ -157,8 +157,10 @@ class ConsoleLogger extends AbstractLogger
     $path      = isset($trace['file']) ? $trace['file'] : '';
     $line      = isset($trace['line']) ? $trace['line'] : '';
     $shortPath = ErrorConsole::shortFileName ($path);
-    $shortPath = str_segmentsLast($shortPath, '/');
-    $location  = empty($line) ? $shortPath : ErrorConsole::errorLink ($path, $line, 1, "$shortPath:$line", 'hint--rounded hint--left', 'data-hint');
+    $shortPath = str_segmentsLast ($shortPath, '/');
+    $location  = empty($line)
+      ? $shortPath : ErrorConsole::errorLink ($path, $line, 1, "$shortPath:$line", 'hint--rounded hint--left',
+        'data-hint');
     if ($path != '')
       $path = <<<HTML
 <div class="__debug-location">At $location</div>
@@ -327,8 +329,8 @@ HTML;
 
     // DISPLAY PRIMITIVE VALUES
 
-    if (!is_array ($data) && !is_object ($data))
-      return Debug::toString($data);
+    if (!is_array ($data) && !is_object ($data) || $data instanceof \PowerString)
+      return Debug::toString ($data);
 
     // SETUP TABULAR DISPLAY OF ARRAYS AND OBJECTS
 
@@ -378,7 +380,8 @@ HTML;
     if (is_string ($data))
       echo $data;
     else {
-      ?><table class="__console-table<?= $title ? ' with-caption' : '' ?>">
+      ?>
+      <table class="__console-table<?= $title ? ' with-caption' : '' ?>">
       <?= $title ? "<caption>$title</caption>"
       : '' ?><?php if (empty($data)) echo '<thead><tr><td colspan=3><i>[]</i>';
       else { ?>
@@ -449,7 +452,7 @@ HTML;
 
   /**
    * @param mixed $val The value to be inspected.
-   * @param mixed $alt If not null, a replacement for inspection; type information about $val is displayed by the
+   * @param mixed $alt If not null, a replacement for inspection; type information about $val is displayed but the
    *                   inspection is performed on this argument instead.
    * @return string
    */
@@ -459,10 +462,12 @@ HTML;
     if (is_scalar ($val) || is_null ($val)) {
       if (!strlen ($arg))
         $arg = is_null ($val) ? 'null' : "''";
-      $arg = '<i>(' . Debug::getType ($val) . ")</i> $arg";
+      $arg = '<i>(' . Debug::getType ($val) . ")</i>$arg";
 
       return "<#data>$arg</#data>";
     }
+    if ($val instanceof \PowerString)
+      return Debug::toString ($val);
     return $this->formatType ($val, $arg);
   }
 
