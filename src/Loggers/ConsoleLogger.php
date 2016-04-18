@@ -359,11 +359,14 @@ HTML;
       // any external interface.
       if ($data instanceof CustomInspectionInterface)
         return $data->inspect ();
-      elseif (method_exists ($data, '__debugInfo'))
+      elseif (method_exists ($data, '__debugInfo')) {
         $data = $data->__debugInfo ();
+        if (empty($data))
+          return '<i>(empty)</i>';
+      }
       else $data = get_object_vars ($data);
       if (empty($data))
-        return '';
+        return '<i>(not inspectable)</i>';
       if (!is_string ($data)) {
         $label = 'Property';
         uksort ($data, 'strnatcasecmp');
