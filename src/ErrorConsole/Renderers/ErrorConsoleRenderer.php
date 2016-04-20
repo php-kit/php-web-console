@@ -377,9 +377,10 @@ class ErrorConsoleRenderer
         color: #5A5;
       }
 
-      #__error .info {
+      #__error .__type {
         cursor: help;
-        color: #5A5;
+        color: #595;
+        font-family: Menlo, monospace;
       }
 
       #__error h3 .info {

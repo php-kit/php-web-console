@@ -13,5 +13,6 @@ class DebugConsoleSettings
   public $tableMaxDepth            = 7;
   public $tablePropertyColumnWidth = 160;
   public $tableTypeColumnWidth     = 80;
+  public $tableUseColumWidths      = true;
   public $maxIndexedArrayItems     = 30;
 }

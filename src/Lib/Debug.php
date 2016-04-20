@@ -38,11 +38,14 @@ class Debug
    * @param int    $depth        [optional] For internal use.
    * @return string
    */
-  public static function grid ($value, $title = '', $maxDepth = 0, $excludeProps = [], $excludeEmpty = false,
+  public static function grid ($value, $title = '', $maxDepth = 1, $excludeProps = [], $excludeEmpty = false,
                                $depth = 0)
   {
     if (is_null ($value) || is_scalar ($value))
-      return $title . self::toString ($value);
+      return self::toString ($value);
+    if ($depth >= $maxDepth)
+      return "<i>(...)</i>";
+
     if (is_object ($value)) {
       if (method_exists ($value, '__debugInfo'))
         $value = $value->__debugInfo ();
@@ -55,17 +58,16 @@ class Debug
     if ($excludeEmpty)
       $value = array_prune ($value);
 
-    return $value ? "$title<table class=grid>
+    return $value ? "$title<table class=__console-table><colgroup><col width=160><col width=100%></colgroup>
 " . implode ('',
         map ($value, function ($v, $k) use ($depth, $maxDepth, $excludeProps, $excludeEmpty) {
-          if (!is_scalar ($v) && !is_null ($v) && $depth < $maxDepth)
-            $v = self::grid ($v, '', $maxDepth, $excludeProps, $excludeEmpty, $depth + 1);
-          else $v = self::toString ($v);
+          $v = self::grid ($v, '', $maxDepth, $excludeProps, $excludeEmpty, $depth + 1);
           return "<tr><th>$k<td>$v";
         })) . "
 </table>"
       : '<i>[]</i>';
   }
+
 
   /**
    * Interpolates context values into message placeholders, for use on PSR-3-compatible logging.
@@ -146,7 +148,7 @@ class Debug
       if ($v instanceof \Closure)
         return '<i>(native code)</i>';
       elseif (is_bool ($v))
-        return $v ? 'true' : 'false';
+        return $v ? '<span class=__type>true</span>' : '<span class=__type>false</span>';
       elseif (is_string ($v)) {
         $l = strlen (self::RAW_TEXT);
         return substr ($v, 0, $l) == self::RAW_TEXT ? substr ($v, $l)
@@ -159,7 +161,7 @@ class Debug
       elseif (!is_array ($v) && !is_object ($v))
         return htmlspecialchars (str_replace ('    ', '  ', trim (print_r ($v, true))));
     }
-    return $enhanced ? self::getType ($v) : typeOf ($v);
+    return $enhanced ? sprintf ('<span class=__type>%s</span>', self::getType ($v)) : typeOf ($v);
   }
 
 }

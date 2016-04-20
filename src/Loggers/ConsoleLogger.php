@@ -74,8 +74,21 @@ class ConsoleLogger extends AbstractLogger
   {
     // Note: Selenia's CustomInspectionInterface implements the inspect() method, but this library is not dependent on
     // any external interface.
-    return is_null ($alt) && $alt instanceof CustomInspectionInterface ? $val->inspect ()
+    return isset ($alt) && $alt instanceof CustomInspectionInterface ? $val->inspect ()
       : $this->format ($this->getInspection1 ($val, $alt));
+  }
+
+  function getTable ($data, $title = '', $typeColumn = false, $columnHeaders = false, $maxDepth = -1,
+                     $excludeProps = null)
+  {
+    $prev = $this->filter;
+    if ($excludeProps)
+      $this->filter = function ($k, $v, $o) use ($excludeProps) {
+        return !in_array ($k, $excludeProps);
+      };
+    $x            = $this->table ($data, $title, 0, $typeColumn, $columnHeaders, $maxDepth);
+    $this->filter = $prev;
+    return $x;
   }
 
   function hasContent ()
@@ -153,13 +166,14 @@ class ConsoleLogger extends AbstractLogger
         (isset($stack[0]['function']) && !isset($FNS[$stack[0]['function']]))
       )
     ) array_shift ($stack);
-    $trace     = $stack[0];
+    $trace     = $stack ? $stack[0] : [];
     $path      = isset($trace['file']) ? $trace['file'] : '';
     $line      = isset($trace['line']) ? $trace['line'] : '';
     $shortPath = ErrorConsole::shortFileName ($path);
     $shortPath = str_segmentsLast ($shortPath, '/');
     $location  = empty($line)
-      ? $shortPath : ErrorConsole::errorLink ($path, $line, 1, "$shortPath:$line", 'hint--rounded hint--left',
+      ? $shortPath
+      : ErrorConsole::errorLink ($path, $line, 1, "$shortPath:$line", 'hint--rounded hint--left',
         'data-hint');
     if ($path != '')
       $path = <<<HTML
@@ -170,9 +184,9 @@ HTML;
     return $this;
   }
 
-  function simpleTable ($data, $title = '', $columnHeaders = false)
+  function simpleTable ($data, $title = '', $typeColumn = false, $columnHeaders = false)
   {
-    $this->write ($this->table ($data, $title, 0, false, $columnHeaders));
+    $this->write ($this->table ($data, $title, 0, $typeColumn, $columnHeaders));
     return $this;
   }
 
@@ -318,7 +332,7 @@ HTML;
     return "<#header>Type: <span class='__type'>" . Debug::getType ($val) . "</span></#header>$expand";
   }
 
-  protected function table ($data, $title = '', $depth = 0, $typeColumn = true, $columnHeaders = true)
+  protected function table ($data, $title = '', $depth = 0, $typeColumn = true, $columnHeaders = true, $maxDepth = -1)
   {
     $isList       = false;
     $originalData = $data;
@@ -329,7 +343,7 @@ HTML;
 
     // DISPLAY PRIMITIVE VALUES
 
-    if (!is_array ($data) && !is_object ($data) || $data instanceof \PowerString)
+    if (!is_array ($data) && !is_object ($data) || is_null ($data) || $data instanceof \PowerString)
       return Debug::toString ($data);
 
     // SETUP TABULAR DISPLAY OF ARRAYS AND OBJECTS
@@ -340,7 +354,7 @@ HTML;
     if (is_array ($data)) {
       if (!count ($data))
         return '<i>[]</i>';
-      if ($depth == DebugConsole::$settings->tableMaxDepth)
+      if ($depth == DebugConsole::$settings->tableMaxDepth || $depth == $maxDepth)
         return '<i>(...)</i>';
       ++$depth;
       $label = 'Key';
@@ -352,7 +366,7 @@ HTML;
       }
     }
     elseif (is_object ($data)) {
-      if ($depth == DebugConsole::$settings->tableMaxDepth)
+      if ($depth == DebugConsole::$settings->tableMaxDepth || $depth == $maxDepth)
         return '<i>(...)</i>';
       ++$depth;
       // Note: Selenia's CustomInspectionInterface implements the inspect() method, but this library is not dependent on
@@ -384,18 +398,22 @@ HTML;
       echo $data;
     else {
       ?>
-      <table class="__console-table<?= $title ? ' with-caption' : '' ?>">
+    <table class="__console-table<?= $title ? ' with-caption' : '' ?>">
       <?= $title ? "<caption>$title</caption>"
       : '' ?><?php if (empty($data)) echo '<thead><tr><td colspan=3><i>[]</i>';
-      else { ?>
-        <colgroup>
-          <col width="<?= $w1 ?>">
-          <?php if ($typeColumn): ?>
-            <col width="<?= DebugConsole::$settings->tableTypeColumnWidth ?>">
-          <?php endif ?>
-          <col width="100%">
-        </colgroup>
-        <?php if ($columnHeaders): ?>
+      else {
+        if (DebugConsole::$settings->tableUseColumWidths) {
+          ?>
+          <colgroup>
+            <col width="<?= $w1 ?>">
+            <?php if ($typeColumn): ?>
+              <col width="<?= DebugConsole::$settings->tableTypeColumnWidth ?>">
+            <?php endif ?>
+            <col width="100%">
+          </colgroup>
+          <?php
+        }
+        if ($columnHeaders): ?>
           <thead>
           <tr>
             <th><?= $label ?></th>
@@ -422,7 +440,7 @@ HTML;
             <td><?= Debug::getType ($v) ?></td>
           <?php endif ?>
           <td class="v"><?= $x === '...' ? '<i>ommited</i>'
-              : $this->table ($v, '', $depth, $typeColumn, $columnHeaders) ?></td>
+              : $this->table ($v, '', $depth, $typeColumn, $columnHeaders, $maxDepth) ?></td>
           <?php endforeach; ?>
         </tbody>
       <?php } ?>
@@ -463,8 +481,6 @@ HTML;
   {
     $arg = $this->table (isset($alt) ? $alt : $val);
     if (is_scalar ($val) || is_null ($val)) {
-      if (!strlen ($arg))
-        $arg = is_null ($val) ? 'null' : "''";
       $arg = '<i>(' . Debug::getType ($val) . ")</i>$arg";
 
       return "<#data>$arg</#data>";

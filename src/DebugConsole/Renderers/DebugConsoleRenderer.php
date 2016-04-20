@@ -248,10 +248,16 @@ class DebugConsoleRenderer
         font-style: normal;
       }
 
+      #__console sup {
+        line-height: 0;;
+      }
       #__console sup i {
         color: #AAA;
         font-style: normal;
         margin-left: 2px;
+        vertical-align: baseline;
+        position: relative;
+        top: -2px;
       }
 
       .__close {
@@ -309,6 +315,9 @@ class DebugConsoleRenderer
         border: 1px solid #DDD;
         margin-top: -1px;
       }
+      .__log-stripe .__log-item {
+        margin-top: -45px;;
+      }
 
       .__log-data {
         white-space: pre;
@@ -343,42 +352,12 @@ class DebugConsoleRenderer
       }
 
       #__console .__log-item {
-        background: #fff;
+        /*background: #fff;*/
         padding: 10px;
         border-top: 1px solid #e4e4e4;
       }
 
       #__console .__log-item:last-child {
-      }
-
-      #__console table.grid {
-        border-collapse: collapse;
-        font-size: inherit;
-        border-spacing: 0;
-        line-height: 1.2;
-        margin: 0;
-      }
-      #__console td > table.grid {
-        margin: -4px -6px -3px;
-      }
-      #__console table.grid th {
-        border:1px solid #CCC;
-        padding: 5px 10px;
-        background: #EEE;
-        max-width: 160px;
-        vertical-align: top;
-        font-weight: normal;
-        color: #08A;
-        text-align: left;
-      }
-      #__console table.grid td {
-        border:1px solid #CCC;
-        padding: 5px 10px;
-        background: #FFF;
-        vertical-align: top;
-      }
-      #__console table.grid i {
-        color: #CCC;
       }
 
       #__console .__header {
@@ -405,12 +384,10 @@ class DebugConsoleRenderer
       }
 
       #__console .__alert {
-        display: inline-block;
         color: #C00;
         background: #FFA;
         padding: 12px;
         border-bottom: 1px solid #DDD;
-        margin: -10px 5px -10px -10px;
       }
 
       #__console .__alert + div {
@@ -448,8 +425,11 @@ class DebugConsoleRenderer
       }
 
       #__console span[title], #__console .__type {
-        color: #5A5;
+        color: #595;
         font-weight: normal;
+        font-family: Menlo, monospace;
+      }
+      #__console span[title] {
         cursor: help;
       }
 
@@ -480,7 +460,7 @@ class DebugConsoleRenderer
       }
 
       .__console-table + .__console-table {
-        margin-top: 10px;
+        margin-top: 5px;
       }
 
       .__console-table .__console-table {
@@ -526,6 +506,7 @@ class DebugConsoleRenderer
         vertical-align: top;
         word-break: break-all;
         border: 1px solid #EEE;
+        border-top: none;
         color: #B00;
       }
 
@@ -534,6 +515,7 @@ class DebugConsoleRenderer
         word-break: break-all;
         white-space: pre-line;
         border: 1px solid #EEE;
+        border-top: none;
       }
 
       .__console-table .n {
@@ -555,6 +537,36 @@ class DebugConsoleRenderer
       .__console-table tbody > tr:nth-child(odd) > th {
         background-color: #FFF;
       }
+
+      .__component .__console-table {
+        width: auto;
+        table-layout: auto;
+      }
+      .__component .__console-table td,
+      .__component .__console-table th
+      {
+        line-height: 15px;
+      }
+      .__component .__console-table tr:first-of-type td,
+      .__component .__console-table tr:first-of-type th
+      {
+        border-top: 1px solid #EEE;
+      }
+      .__component > .__console-table {
+        margin: 0 0 0 15px;
+      }
+      .__component .__console-table .__console-table  {
+        margin: -1px -1px -1px -11px;
+      }
+      .__component .__modified th,
+      .__component .__modified td
+      {
+        background-color: #FFE !important;
+      }
+      .__component .__original {
+        opacity: 0.5;
+      }
+
 
       .__expand > table {
         display: none;
@@ -604,29 +616,6 @@ class DebugConsoleRenderer
       .__panel code b {
         color: #F66;
         font-weight: normal;
-      }
-
-      .__panel code table {
-        background: #FFF;
-        font-size: inherit;
-        border-spacing: 0;
-        line-height: 1.2;
-        margin: 15px 0;
-        border-collapse: collapse;
-      }
-
-      .__panel code table td {
-        vertical-align: top;
-        border: 1px solid #eee;
-        padding: 3px 5px 2px;
-      }
-
-      .__panel code table th {
-        vertical-align: top;
-        font-weight: normal;
-        color: #08A;
-        text-align: left;
-        padding-right: 10px;
       }
 
       .__rowHeader {
