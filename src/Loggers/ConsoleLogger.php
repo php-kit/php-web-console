@@ -78,14 +78,27 @@ class ConsoleLogger extends AbstractLogger
       : $this->format ($this->getInspection1 ($val, $alt));
   }
 
+  /**
+   * @param mixed                  $data
+   * @param string                 $title
+   * @param bool                   $typeColumn
+   * @param bool                   $columnHeaders
+   * @param int                    $maxDepth
+   * @param string[]|callable|null $excludeProps [optional]
+   * @return string
+   */
   function getTable ($data, $title = '', $typeColumn = false, $columnHeaders = false, $maxDepth = -1,
                      $excludeProps = null)
   {
     $prev = $this->filter;
-    if ($excludeProps)
-      $this->filter = function ($k, $v, $o) use ($excludeProps) {
-        return !in_array ($k, $excludeProps);
-      };
+    if ($excludeProps) {
+      if (is_array ($excludeProps))
+        $this->filter = function ($k, $v, $o) use ($excludeProps) {
+          return !in_array ($k, $excludeProps);
+        };
+      else if (is_callable ($excludeProps))
+        $this->filter = $excludeProps;
+    }
     $x            = $this->table ($data, $title, 0, $typeColumn, $columnHeaders, $maxDepth);
     $this->filter = $prev;
     return $x;
