@@ -114,11 +114,13 @@ class Debug
   /**
    * Returns an object's unique identifier (a short version), useful for debugging.
    *
-   * @param object $o
-   * @return string
+   * @param object|null $o
+   * @return int|string A serial number from a global inspection sequence; '' if it is null.
    */
   public static function objectId ($o)
   {
+    if (is_null ($o))
+      return '';
     static $ids = [];
     static $c = 0;
     $id = spl_object_hash ($o);
