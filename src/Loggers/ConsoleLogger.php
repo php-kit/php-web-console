@@ -5,7 +5,7 @@ use PhpKit\WebConsole\DebugConsole\DebugConsole;
 use PhpKit\WebConsole\ErrorConsole\ErrorConsole;
 use PhpKit\WebConsole\Lib\Debug;
 use Psr\Log\AbstractLogger;
-use Selenia\Interfaces\CustomInspectionInterface;
+use Electro\Interfaces\CustomInspectionInterface;
 
 class ConsoleLogger extends AbstractLogger
 {
