@@ -259,7 +259,7 @@ namespace PhpKit\WebConsole\DebugConsole {
         throw new Exception ("<kbd>trace()</kbd> requires Xdebug to be installed.");
       $v = ini_get ('xdebug.collect_params');
       ob_start ();
-      ini_set ('xdebug.collect_params', 1);
+      ini_set ('xdebug.collect_params', 2);
       xdebug_print_function_stack ();
       $trace = ob_get_clean ();
       $trace = preg_replace ('@^(?:.*?)<table class=\'xdebug-error xe-xdebug\'(.*?)<tr>(?:.*?)>Location</th></tr>@s',
