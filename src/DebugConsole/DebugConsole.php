@@ -51,6 +51,11 @@ namespace PhpKit\WebConsole\DebugConsole {
   class DebugConsole
   {
     /**
+     * The minimum milisseconds that must elapse between logged function calls that will trigger a visual warning on the
+     * profiler panel's table.
+     */
+    const PROFILER_WARNING_TRESHOLD = 5;
+    /**
      * @var string For compatibility with PHP<5.5
      */
     static $class = __CLASS__;
@@ -259,20 +264,28 @@ namespace PhpKit\WebConsole\DebugConsole {
       $trace = ob_get_clean ();
       $trace = preg_replace ('@^(?:.*?)<table class=\'xdebug-error xe-xdebug\'(.*?)<tr>(?:.*?)>Location</th></tr>@s',
         '<table class="__console-table trace"$1<colgroup>
-      <col width=40><col width=72><col width=72><col width=75%><col width=25%>
-      <thead><tr><th>#<th>Time (ms)<th>Mem.(MB)<th>Function<th>Location</tr></thead>', $trace);
+      <col width=40><col width=72><col width=72><col width=72><col width=75%><col width=25%>
+      <thead><tr><th>#<th>Time (ms)<th>Delta (ms)<th>Mem.(MB)<th>Function<th>Location</tr></thead>', $trace);
       $trace = preg_replace (
         ['@</table>.*@s', "/align='center'/", '@(trace\(  \)</td>.*?</tr>)(.*)</table>@s'],
         ['</table>', 'align=right', '$1</table>'],
         $trace);
+      $prev = 0;
       $trace = preg_replace_callback (
         '#<tr><td (.*?)>(.*?)</td><td (.*?)>(.*?)</td><td (.*?)>(.*?)</td><td (.*?)>(.*?)</td><td title=\'(.*?)\'(.*?)>(.*?)</td></tr>#',
-        function ($m) {
-          $t = number_format ($m[4] * 1000, 1);
+        function ($m) use (&$prev) {
+          $t = $m[4] * 1000;
+          $s = $t - $prev;
+          $d = number_format ($s, 1);
+          $dd = $s >= self::PROFILER_WARNING_TRESHOLD ? ' class=__alert' : '';
+          $prev = $t;
+          $t = number_format ($t, 1);
           $r = number_format ($m[6] / 1048576, 3);
           $p = ErrorConsole::shortFileName ($m[9]);
           $f = substr ($m[11], 3);
-          return "<tr><th $m[1]>$m[2]<td $m[3]>$t<td $m[5]>$r<td $m[7]>$m[8]<td class='__type' title='$p'$m[10]>$f</tr>";
+          list ($fn, $args) = explode('(', $m[8], 2);
+          $info = preg_replace('/[\w{}]+$/', '<b>$0</b>', $fn) . '(' . $args;
+          return "<tr><th $m[1]>$m[2]<td $m[3]>$t<td align=right$dd>$d<td $m[5]>$r<td $m[7]>$info<td class='__type' title='$p'$m[10]>$f</tr>";
         }, $trace);
       ini_set ('xdebug.collect_params', $v);
       self::logger ('trace')->write ($trace);
