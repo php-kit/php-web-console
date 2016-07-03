@@ -72,7 +72,9 @@ class DebugConsoleRenderer
       };
       window.removeConsole = function (s) {
         find ('__console-container').remove ();
+        document.documentElement.style.paddingBottom = null;
       };
+      document.documentElement.style.paddingBottom = "32px";
     </script>
     <?php
   }
@@ -122,14 +124,14 @@ class DebugConsoleRenderer
         left: 0;
         right: 0;
         font-size: 12px;
-        -webkit-transition: top 0.2s;
-        transition: top 0.2s;
+        -webkit-transition: top 0.5s;
+        transition: top 0.5s;
       }
 
       #__console-container.Console-show {
         top: 32px;
-        -webkit-transition: top 0.1s;
-        transition: top 0.1s;
+        -webkit-transition: top 0.5s;
+        transition: top 0.5s;
       }
 
       #__debug-bar {
@@ -138,21 +140,27 @@ class DebugConsoleRenderer
         margin: -32px 0 0 0;
         height: 32px;
         padding: 3px 0 0 10px;
-        border: 1px solid #33363D;
-        background-color: #EEE;
-        background-image: linear-gradient(0deg, #42454a, #545b61);
+        border-top: 1px solid #CCC;
+        background: #DDD;
+        /*box-shadow: 0 -1px 5px rgba(0,0,0,0.1);*/
         text-align: right;
+        color: #666;
+      }
+
+      .Console-show #__debug-bar {
+        background: #DDD;
+        border-top: none;
+        border-bottom: 1px solid #CCC;
       }
 
       #__debug-bar > span {
         display: inline-block;
         float: left;
-        color: #FFF;
         line-height: 28px;
         padding: 4px 10px 0;
         margin-top: -4px;
-        border-left: 1px solid #686d73;
-        border-right: 1px solid #000;
+        border-left: 1px solid #EEE;
+        border-right: 1px solid #CCC;
         position: relative;
       }
 
@@ -168,27 +176,23 @@ class DebugConsoleRenderer
         height: 32px;
         right: -2px;
         top: 0;
-        border-left: 1px solid #686d73;
+        border-left: 1px solid #DDD;
       }
 
       #__debug-bar .__tab {
         display: inline-block;
-        color: #FFF;
+        color: #666;
         text-decoration: none;
         padding: 0 15px;
         margin-right: -3px;
         /*text-shadow: 0 1px #000;*/
-        background-color: #666;
-        background-image: linear-gradient(0deg, #42454a, #545b61);
-        border-radius: 4px 4px 0 0;
-        box-shadow: inset 1px 1px 0px rgba(255, 255, 255, 0.1);
         line-height: 26px;
-        border: 1px solid #33363d;
       }
 
       #__debug-bar .__tab.active {
-        background: #EEE;
-        color: #333;
+        background: #EEE;;
+        border: 1px solid #CCC;
+        border-bottom: 1px solid #EEE;
         text-shadow: none;
         padding-bottom: 1px;
         font-size: 12px;
@@ -209,7 +213,7 @@ class DebugConsoleRenderer
 
       #__debug-bar .__tab.disabled {
         cursor: default;
-        color: #737373;
+        color: #CCC;
         pointer-events: none;
       }
 
@@ -260,35 +264,29 @@ class DebugConsoleRenderer
         top: -2px;
       }
 
-      .__close {
-        line-height: 26px;
-        padding: 0 10px;
-        color: #FFF;
-        text-decoration: none;
-      }
-
-      .__close:hover, .__close:focus {
-        text-decoration: none;
-        color: #FFF;
-      }
-
+      .__close,
       .__minimize {
         line-height: 26px;
-        padding: 0 10px;
-        color: #777;
         text-decoration: none;
-        cursor: default;
+      }
+      .__close {
+        padding: 0 15px;
+      }
+      .__minimize,
+      .__minimize:hover,
+      .__minimize:focus {
+        padding: 0 5px 0 10px;
+        color: #CCC;
       }
 
       .__minimize:hover, .__minimize:focus {
         text-decoration: none;
-        color: #777;
       }
 
-      .Console-show .__minimize {
+      .Console-show .__minimize,
+      .Console-show .__minimize:hover {
         cursor: pointer;
-        color: #FFF;
-        text-shadow: 0 1px #000;
+        color: #666;
       }
 
       .__log-section {
