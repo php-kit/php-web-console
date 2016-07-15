@@ -178,6 +178,8 @@ class ErrorConsoleRenderer
 
       #__error .__panel-body {
         border-top: 1px solid #FFF;
+        max-height: 800px;
+        overflow: auto;
       }
 
       #__error .__title-bar {
