@@ -23,6 +23,7 @@ class ErrorConsoleRenderer
   /**
    * Note: if the exception has a `getTitle()` method, that value is displayed as the popup's header, otherwise the
    * exception's class name will be shown instead.
+   *
    * @param Exception|Error $exception
    * @param string          $popupTitle
    * @param string          $stackTrace
@@ -31,48 +32,49 @@ class ErrorConsoleRenderer
   {
     self::renderStyles ();
     ?>
-    <table id="__error">
-      <tr>
-        <td valign="center" align="center">
-          <div id="__panel">
-            <div class="__title-bar"><?= $popupTitle ?>
-              <span onclick="document.getElementById('__error').style.display='none'">&#xD7;</span>
+    <!DOCTYPE HTML><html>
+
+    <head>
+      <meta charset="UTF-8">
+      <title><?= $popupTitle ?></title>
+    </head>
+
+    <body id="__error">
+      <div id="__panel">
+        <div class="__title-bar"><?= $popupTitle ?></div>
+        <div class="__panel-body">
+          <div id="__feedback">Please switch to PHPStorm / IDEA to view the code at the error location.</div>
+          <img src="<?= self::getIcon () ?>">
+          <div class="__message">
+            <?php
+            $title = method_exists ($exception, 'getTitle') ? $exception->getTitle ()
+              : self::friendlyClass (get_class ($exception));
+            if ($title)
+              echo "<h3>$title</h3>";
+            echo "<div>" . ucfirst (ErrorConsole::processMessage ($exception->getMessage ())) . "</div>";
+            if (!empty ($exception->info)) echo "<div class='__info'>$exception->info</div>";
+            ?>
+          </div>
+          <div id="__error-location">
+            <?php
+            $link = ErrorConsole::errorLink ($exception->getFile (), $exception->getLine (), 1);
+            if ($link)
+              echo "Thrown from $link, line <b>{$exception->getLine()}</b>";
+            ?>
+            <div class="__more">
+              <a id="__more"
+                 class=" __btn"
+                 href="javascript:void(document.getElementById('__panel').className='__show')"
+                 onclick="this.style.display='none';window.setTimeout(function(){document.body.scrollTop=document.getElementById('__error-location').offsetTop})"> Stack trace
+                <span style="font-size:16px">&blacktriangledown;</span></a>
             </div>
-            <div class="__panel-body">
-              <div id="__feedback">Please switch to PHPStorm / IDEA to view the code at the error location.</div>
-              <img src="<?= self::getIcon () ?>">
-              <div class="__message">
-                <?php
-                $title = method_exists ($exception, 'getTitle') ? $exception->getTitle ()
-                  : self::friendlyClass (get_class ($exception));
-                if ($title)
-                  echo "<h3>$title</h3>";
-                echo "<div>" . ucfirst (ErrorConsole::processMessage ($exception->getMessage ())) . "</div>";
-                if (!empty ($exception->info)) echo "<div class='__info'>$exception->info</div>";
-                ?>
-              </div>
-              <div class="error-location">
-                <?php
-                $link = ErrorConsole::errorLink ($exception->getFile (), $exception->getLine (), 1);
-                if ($link)
-                  echo "Thrown from $link, line <b>{$exception->getLine()}</b>";
-                ?>
-                <div class="__more">
-                  <a id="__more"
-                     class=" __btn"
-                     href="javascript:void(document.getElementById('__panel').className='__show')"
-                     onclick="this.style.display='none'"> Stack trace
-                    <span style="font-size:16px">&blacktriangledown;</span> </a>
-                </div>
-              </div>
-            </div>
-            <div id="__trace">
-              <?= $stackTrace ?>
-            </div>
-        </td>
-      </tr>
-    </table>
-    <iframe name="hidden" style="display:none"></iframe>
+          </div>
+        </div>
+        <div id="__trace">
+          <?= $stackTrace ?>
+        </div>
+        <iframe name="hidden" style="display:none"></iframe>
+    </body><html>
     <?php
   }
 
@@ -96,7 +98,9 @@ class ErrorConsoleRenderer
           <div class="__call">
             <?= "$fn $args" ?>
             <?= $edit ?>
-            <a class="__btn" href="javascript:void(0)" onclick="this.nextSibling.nextSibling.style.display='block'">more...</a>
+            <a class="__btn" href="javascript:void(0)" onclick="this.nextSibling.nextSibling.style.display='block'">
+              more...
+            </a>
             <div class='__location'>At <?= $at ?></div>
           </div>
         </div>
@@ -109,13 +113,7 @@ class ErrorConsoleRenderer
   { ?>
     <style>
       #__error {
-        position: fixed;
-        z-index: 9998;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
+        margin: 0;
       }
 
       #__error a {
@@ -163,46 +161,22 @@ class ErrorConsoleRenderer
       }
 
       #__panel {
-        display: inline-block;
-        position: relative;
-        min-width: 512px;
-        max-width: 1024px;
-        min-height: 128px;
         text-align: left;
-        border: 1px solid #73787E;
-        background: #F5F5F5;
         font-family: "Helvetica Neue", Arial, Verdana, sans-serif;
         font-size: 14px;
-        box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
       }
 
       #__error .__panel-body {
-        border-top: 1px solid #FFF;
-        max-height: 800px;
-        overflow: auto;
+        padding-top: 20px;
       }
 
       #__error .__title-bar {
-        background-color: #EEE;
-        background-image: linear-gradient(0deg, #42454a, #545b61);
-        outline: 1px solid #272a2f;
-        border: 1px solid #73787E;
-        border-right-color: #33363d;
-        border-bottom: none;
-        color: #FFF;
-        text-shadow: #000 1px 1px;
-        text-align: center;
-        font-size: 14px;
-        position: relative;
-        line-height: 25px;
-        padding-top: 3px;
-      }
-
-      #__error .__title-bar span {
-        position: absolute;
-        right: 13px;
-        cursor: pointer;
-        top: 2px;
+        background: #ddd;
+        text-align: left;
+        font-size: 18px;
+        padding: 1px 20px;
+        border: 1px solid #CCC;
+        color: #555;
       }
 
       #__feedback {
@@ -342,8 +316,6 @@ class ErrorConsoleRenderer
         font-size: 12px;
         display: none;
         color: #555;
-        overflow: auto;
-        max-height: 220px;
         white-space: nowrap;
       }
 
@@ -397,7 +369,7 @@ class ErrorConsoleRenderer
         color: #F00;
       }
 
-      #__error .error-location {
+      #__error-location {
         padding: 20px;
         border-top: 1px solid #BF3D27;
         font-family: menlo, monospace;
@@ -455,19 +427,22 @@ class ErrorConsoleRenderer
       }
 
       .__message table.grid {
-        margin:30px 0;
+        margin: 30px 0;
       }
+
       .__message table.grid i {
         color: #CCC;
       }
+
       .__message table.grid th {
-        border:1px solid #CCC;
+        border: 1px solid #CCC;
         padding: 5px 10px;
         background: #EEE;
         max-width: 160px;
       }
+
       .__message table.grid td {
-        border:1px solid #CCC;
+        border: 1px solid #CCC;
         padding: 5px 10px;
         background: #FFF;
       }
