@@ -53,7 +53,7 @@ class ErrorHandler
       ini_set('xdebug.var_display_max_children', 99); //how many array keys and object's properties are shown
       ini_set('xdebug.var_display_max_depth', 5);     //how many nested levels of array elements and object properties
       ini_set('xdebug.var_display_max_data', 512);    //maximum string length that is shown when variables are displayed
-      ini_set('xdebug.max_nesting_level', 300);       //maximum level of nested functions that are allowed
+      ini_set('xdebug.max_nesting_level', 500);       //maximum level of nested functions that are allowed
     }
   }
 
