@@ -53,8 +53,8 @@ class Debug
     }
     if ($title) $title = "<p><b>$title</b></p>";
 
-    // Exclude some properties or values.
-    $value = array_exclude ($value, $excludeProps);
+    // Exclude some properties ($excludeProps) from $value.
+    $value = array_diff_key ($value, array_fill_keys ($excludeProps, false));
     if ($excludeEmpty)
       $value = array_prune ($value);
 
