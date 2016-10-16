@@ -56,7 +56,7 @@ class Debug
     // Exclude some properties ($excludeProps) from $value.
     $value = array_diff_key ($value, array_fill_keys ($excludeProps, false));
     if ($excludeEmpty)
-      $value = array_prune ($value);
+      $value = array_prune_empty ($value);
 
     return $value ? "$title<table class=__console-table><colgroup><col width=160><col width=100%></colgroup>
 " . implode ('',
