@@ -80,7 +80,7 @@ class ErrorConsole
     return null;
   }
 
-  public static function errorLink ($file, $line = 1, $col = 1, $label = '', $class = '', $tooltipAttr = 'title')
+  public static function errorLink ($file, $line = 1, $col = 1, $label = '', $class = 'hint--rounded hint--top', $tooltipAttr = 'data-hint')
   {
     if (empty($file))
       return '';
@@ -225,13 +225,34 @@ class ErrorConsole
               case 'double':
                 break;
               case 'array':
-                $arg = '<span class="info" title="' . (($arg) ? "[\n  " . htmlspecialchars (implode (",\n  ",
+                $arg = '<span class="info __type hint--rounded hint--top" data-hint="' . (($arg) ? "[\n  " . htmlspecialchars (implode (",\n  ",
                       array_map (function ($k, $v) use ($arg) { return "$k => " . self::debugVal ($v); },
                         array_keys ($arg),
                         $arg))) . "\n]" : 'Empty array') . '">array</span>';
                 break;
               default:
-                $arg = typeInfoOf ($arg);
+                if (is_object ($arg))
+                  switch (get_class ($arg)) {
+                    case \ReflectionMethod::class:
+                      /** @var \ReflectionMethod $arg */
+                      $arg = sprintf ('<span class=type>ReflectionMethod</span>&lt;%s::%s>', $arg->getDeclaringClass ()->getName (), $arg->getName ());
+                      break;
+                    case \ReflectionFunction::class:
+                      /** @var \ReflectionFunction $arg */
+                      $arg = sprintf ('<span class=type>ReflectionFunction</span>&lt;function at %s>',
+                        self::errorLink ($arg->getFileName (), $arg->getStartLine (), 1,
+                          sprintf ('%s line %d', basename ($arg->getFileName ()), $arg->getStartLine ()),
+                          'tag hint--rounded hint--top'
+                        ));
+                      break;
+                    case \ReflectionParameter::class:
+                      /** @var \ReflectionParameter $arg */
+                      $arg = sprintf('<span class=type>ReflectionParameter</span>&lt;$%s>', $arg->getName ());
+                      break;
+                    default:
+                      $arg = Debug::typeInfoOf ($arg);
+                  }
+                  else $arg = Debug::typeInfoOf ($arg);
             }
             $args[] = $arg;
           }

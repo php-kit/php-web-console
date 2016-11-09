@@ -10,6 +10,20 @@ class Debug
   const RAW_TEXT = '*RAW*';
 
   /**
+   * Returns a formatted HTML span showing the given class name without the namespace part, but it also including the
+   * namespace via a tooltip.
+   *
+   * @param string $name
+   * @return string
+   */
+  static function formatClassName ($name)
+  {
+    $n = explode ('\\', $name);
+    $c = array_pop ($n);
+    return sprintf ("<span class='__type hint--rounded hint--top' data-hint='%s'>%s</span>", $name, $c);
+  }
+
+  /**
    * @param mixed $v
    * @return string
    */
@@ -67,7 +81,6 @@ class Debug
 </table>"
       : '<i>[]</i>';
   }
-
 
   /**
    * Interpolates context values into message placeholders, for use on PSR-3-compatible logging.
@@ -164,6 +177,20 @@ class Debug
         return htmlspecialchars (str_replace ('    ', '  ', trim (print_r ($v, true))));
     }
     return $enhanced ? sprintf ('<span class=__type>%s</span>', self::getType ($v)) : typeOf ($v);
+  }
+
+  /**
+   * If the argument is an object, this returns a formatted HTML span showing its class name without the namespace part,
+   * but it also includes the namespace via a tooltip.
+   * Other argument types are converted the same way {@see typeOf()} does, but enclosed within a `kbd` tag.
+   *
+   * @param mixed $x
+   * @return string
+   */
+  static function typeInfoOf ($x)
+  {
+    if (is_null ($x)) return 'null';
+    return is_object ($x) ? self::formatClassName (get_class ($x)) : '<span class=__type>' . typeOf ($x) . '</span>';
   }
 
 }

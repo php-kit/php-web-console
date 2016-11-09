@@ -284,7 +284,7 @@ class ErrorConsoleRenderer
         white-space: normal;
       }
 
-      #__error .__call > a {
+      #__error .__call > a:not(.tag) {
         float: right;
         margin-left: 10px;
       }
@@ -348,7 +348,7 @@ class ErrorConsoleRenderer
       }
 
       #__error .type {
-        color: #5A5;
+        color: #595;
       }
 
       #__error .__type {

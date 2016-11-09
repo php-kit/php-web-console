@@ -250,7 +250,6 @@ namespace PhpKit\WebConsole\DebugConsole {
      *
      *       \PhpKit\WebConsole\DebugConsole\DebugConsole::trace ();
      *
-     * @return string
      * @throws Exception
      */
     public static function trace ()
