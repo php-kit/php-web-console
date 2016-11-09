@@ -11,8 +11,8 @@ use Psr\Http\Message\ResponseInterface;
  */
 class ErrorConsole
 {
-  const TRIM_WIDTH = 50;
-
+  const TOOLTIP_MAX_LEN = self::TRIM_WIDTH * 10;
+  const TRIM_WIDTH      = 50;
   /**
    * @var bool To be read by ErrorHandler::globalExceptionHandler()
    */
@@ -80,7 +80,8 @@ class ErrorConsole
     return null;
   }
 
-  public static function errorLink ($file, $line = 1, $col = 1, $label = '', $class = 'hint--rounded hint--top', $tooltipAttr = 'data-hint')
+  public static function errorLink ($file, $line = 1, $col = 1, $label = '', $class = 'hint--rounded hint--top',
+                                    $tooltipAttr = 'data-hint')
   {
     if (empty($file))
       return '';
@@ -150,7 +151,7 @@ class ErrorConsole
         $arg = $arg ? 'true' : 'false';
         break;
       case 'string':
-        $arg = "'" . mb_strimwidth (htmlspecialchars ($arg), 0, self::TRIM_WIDTH, "...") . "'";
+        $arg = "'" . htmlspecialchars (mb_strimwidth ($arg, 0, self::TRIM_WIDTH, "...")) . "'";
         break;
       case 'integer':
       case 'double':
@@ -218,24 +219,32 @@ class ErrorConsole
                 $arg = $arg ? 'true' : 'false';
                 break;
               case 'string':
-                $arg = "'<span class='string'>" . mb_strimwidth (htmlspecialchars ($arg), 0, self::TRIM_WIDTH, "...") .
-                       "</span>'";
+                $arg = mb_strlen ($arg) > self::TRIM_WIDTH
+                  ? sprintf ("'<span class='string hint--rounded hint--top' data-hint='%s'>%s</span>'",
+                    htmlspecialchars (mb_strimwidth (
+                      chunk_split ($arg, self::TRIM_WIDTH, "\n"),
+                      0, self::TOOLTIP_MAX_LEN, "..."
+                    )),
+                    htmlspecialchars (mb_strimwidth ($arg, 0, self::TRIM_WIDTH, "...")))
+                  : sprintf ("'<span class='string'>%s</span>'", htmlspecialchars ($arg));
                 break;
               case 'integer':
               case 'double':
                 break;
               case 'array':
-                $arg = '<span class="info __type hint--rounded hint--top" data-hint="' . (($arg) ? "[\n  " . htmlspecialchars (implode (",\n  ",
-                      array_map (function ($k, $v) use ($arg) { return "$k => " . self::debugVal ($v); },
-                        array_keys ($arg),
-                        $arg))) . "\n]" : 'Empty array') . '">array</span>';
+                $arg = '<span class="info __type hint--rounded hint--top" data-hint="' .
+                       (($arg) ? "[\n  " . htmlspecialchars (implode (",\n  ",
+                           array_map (function ($k, $v) use ($arg) { return "$k => " . self::debugVal ($v); },
+                             array_keys ($arg),
+                             $arg))) . "\n]" : 'Empty array') . '">array</span>';
                 break;
               default:
                 if (is_object ($arg))
                   switch (get_class ($arg)) {
                     case \ReflectionMethod::class:
                       /** @var \ReflectionMethod $arg */
-                      $arg = sprintf ('<span class=type>ReflectionMethod</span>&lt;%s::%s>', $arg->getDeclaringClass ()->getName (), $arg->getName ());
+                      $arg = sprintf ('<span class=type>ReflectionMethod</span>&lt;%s::%s>',
+                        $arg->getDeclaringClass ()->getName (), $arg->getName ());
                       break;
                     case \ReflectionFunction::class:
                       /** @var \ReflectionFunction $arg */
@@ -247,12 +256,12 @@ class ErrorConsole
                       break;
                     case \ReflectionParameter::class:
                       /** @var \ReflectionParameter $arg */
-                      $arg = sprintf('<span class=type>ReflectionParameter</span>&lt;$%s>', $arg->getName ());
+                      $arg = sprintf ('<span class=type>ReflectionParameter</span>&lt;$%s>', $arg->getName ());
                       break;
                     default:
                       $arg = Debug::typeInfoOf ($arg);
                   }
-                  else $arg = Debug::typeInfoOf ($arg);
+                else $arg = Debug::typeInfoOf ($arg);
             }
             $args[] = $arg;
           }

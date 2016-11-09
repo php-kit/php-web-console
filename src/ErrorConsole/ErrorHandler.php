@@ -42,9 +42,9 @@ class ErrorHandler
 
   public static function init ()
   {
-    self::$nextErrorHandler     = set_error_handler ([get_class (), 'globalErrorHandler']);
-    self::$nextExceptionHandler = set_exception_handler ([get_class (), 'globalExceptionHandler']);
-    register_shutdown_function ([get_class (), 'onShutDown']);
+    self::$nextErrorHandler     = set_error_handler ([static::class, 'globalErrorHandler'], E_ALL | E_STRICT);
+    self::$nextExceptionHandler = set_exception_handler ([static::class, 'globalExceptionHandler']);
+    register_shutdown_function ([static::class, 'onShutDown']);
 
     if (extension_loaded('xdebug')) {
       ini_set('xdebug.collect_params', 1);            //[0..4] collect the parameters passed to functions when a function call is recorded
@@ -61,13 +61,9 @@ class ErrorHandler
   {
     //Catch fatal errors, which do not trigger globalErrorHandler()
     $error = error_get_last ();
-    if (isset($error) && ($error['type'] == E_ERROR || $error['type'] == E_PARSE)) {
-      //remove error output
-      /*
-      $buffer = @ob_get_clean ();
-      $buffer = preg_replace ('#<table class=\'xdebug-error\'[\s\S]*?</table>#i', '', $buffer);
-      echo $buffer;
-      */
+    if (isset($error)) {
+      //remove error output emitted by the PHP engine
+      @ob_get_clean ();
       self::globalExceptionHandler (new PHPError($error['message'], 0, $error['type'], $error['file'], $error['line']));
     }
   }
