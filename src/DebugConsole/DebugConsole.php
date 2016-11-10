@@ -182,28 +182,25 @@ namespace PhpKit\WebConsole\DebugConsole {
         $myContent = ob_get_clean ();
 
         if ($response) {
-          if ($request->getMethod () == 'GET') {
-            $contentType = $request->getHeaderLine ('Accept');
-            if (strpos ($contentType, 'text/html') !== false) {
-              $body    = $response->getBody ();
-              $content = $body->__toString ();
-              if (preg_match ('#</body>\s*</html>\s*$#i', $content, $m, PREG_OFFSET_CAPTURE)) {
-                list ($end, $ofs) = $m[0];
-                $content = substr($content, 0, $ofs) . $myContent . $end;
-              }
-              else if ($force)
-                $content .= $myContent;
-              try {
-                $body->rewind ();
-              }
-              catch (Exception $e) {
-                // suppress exceptions
-              }
-              $body->write ($content);
-              return $response->withHeader ('Content-Length', strval (strlen ($content)));
+          $contentType = $request->getHeaderLine ('Accept');
+          if (strpos ($contentType, 'text/html') !== false) {
+            $body    = $response->getBody ();
+            $content = $body->__toString ();
+            if (preg_match ('#</body>\s*</html>\s*$#i', $content, $m, PREG_OFFSET_CAPTURE)) {
+              list ($end, $ofs) = $m[0];
+              $content = substr ($content, 0, $ofs) . $myContent . $end;
             }
+            else if ($force)
+              $content .= $myContent;
+            try {
+              $body->rewind ();
+            }
+            catch (Exception $e) {
+              // suppress exceptions
+            }
+            $body->write ($content);
+            return $response->withHeader ('Content-Length', strval (strlen ($content)));
           }
-          return $response;
         }
 
         else self::outputContent ($force);
@@ -269,21 +266,21 @@ namespace PhpKit\WebConsole\DebugConsole {
         ['@</table>.*@s', "/align='center'/", '@(trace\(  \)</td>.*?</tr>)(.*)</table>@s'],
         ['</table>', 'align=right', '$1</table>'],
         $trace);
-      $prev = 0;
+      $prev  = 0;
       $trace = preg_replace_callback (
         '#<tr><td (.*?)>(.*?)</td><td (.*?)>(.*?)</td><td (.*?)>(.*?)</td><td (.*?)>(.*?)</td><td title=\'(.*?)\'(.*?)>(.*?)</td></tr>#',
         function ($m) use (&$prev) {
-          $t = $m[4] * 1000;
-          $s = $t - $prev;
-          $d = number_format ($s, 1);
-          $dd = $s >= self::PROFILER_WARNING_TRESHOLD ? ' class=__alert' : '';
+          $t    = $m[4] * 1000;
+          $s    = $t - $prev;
+          $d    = number_format ($s, 1);
+          $dd   = $s >= self::PROFILER_WARNING_TRESHOLD ? ' class=__alert' : '';
           $prev = $t;
-          $t = number_format ($t, 1);
-          $r = number_format ($m[6] / 1048576, 3);
-          $p = ErrorConsole::shortFileName ($m[9]);
-          $f = substr ($m[11], 3);
-          list ($fn, $args) = explode('(', $m[8], 2);
-          $info = preg_replace('/[\w{}]+$/', '<b>$0</b>', $fn) . '(' . $args;
+          $t    = number_format ($t, 1);
+          $r    = number_format ($m[6] / 1048576, 3);
+          $p    = ErrorConsole::shortFileName ($m[9]);
+          $f    = substr ($m[11], 3);
+          list ($fn, $args) = explode ('(', $m[8], 2);
+          $info = preg_replace ('/[\w{}]+$/', '<b>$0</b>', $fn) . '(' . $args;
           return "<tr><th $m[1]>$m[2]<td $m[3]>$t<td align=right$dd>$d<td $m[5]>$r<td $m[7]>$info<td class='__type' title='$p'$m[10]>$f</tr>";
         }, $trace);
       ini_set ('xdebug.collect_params', $v);
