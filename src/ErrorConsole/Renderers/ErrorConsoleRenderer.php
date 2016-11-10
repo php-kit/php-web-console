@@ -183,8 +183,18 @@ class ErrorConsoleRenderer
         display: none;
         color: #666;
         background: #FFE;
-        padding: 10px 15px;
+        padding: 20px 15px 10px;
         border-bottom: 1px solid #e9e9d8;
+        margin-top: -20px;
+      }
+      #__feedback code {
+        border: 1px solid #CCC;
+        padding: 0 5px;
+        background: #FFF;
+        margin: 0 5px;
+      }
+      #__feedback h4 {
+        margin: 0 0 20px;
       }
 
       #__error img {
