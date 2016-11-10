@@ -1,11 +1,11 @@
 <?php
 namespace PhpKit\WebConsole\Loggers;
 
+use Electro\Interfaces\CustomInspectionInterface;
 use PhpKit\WebConsole\DebugConsole\DebugConsole;
 use PhpKit\WebConsole\ErrorConsole\ErrorConsole;
 use PhpKit\WebConsole\Lib\Debug;
 use Psr\Log\AbstractLogger;
-use Electro\Interfaces\CustomInspectionInterface;
 
 class ConsoleLogger extends AbstractLogger
 {
@@ -391,9 +391,13 @@ HTML;
         if (empty($data))
           return '<i>(empty)</i>';
       }
-      else $data = get_object_vars ($data);
-      if (empty($data))
-        return '<i>(not inspectable)</i>';
+      else if ($it = iteratorOf ($data, false))
+        $data = iterator_to_array ($it);
+      else {
+        $data = get_object_vars ($data);
+        if (empty($data))
+          return '<i>(not inspectable)</i>';
+      }
       if (!is_string ($data)) {
         $label = 'Property';
         uksort ($data, 'strnatcasecmp');

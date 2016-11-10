@@ -224,9 +224,9 @@ class ErrorConsole
                     htmlspecialchars (mb_strimwidth (
                       chunk_split ($arg, self::TRIM_WIDTH, "\n"),
                       0, self::TOOLTIP_MAX_LEN, "..."
-                    )),
+                    ), ENT_QUOTES),
                     htmlspecialchars (mb_strimwidth ($arg, 0, self::TRIM_WIDTH, "...")))
-                  : sprintf ("'<span class='string'>%s</span>'", htmlspecialchars ($arg));
+                  : sprintf ("'<span class='string'>%s</span>'", htmlspecialchars ($arg, ENT_QUOTES));
                 break;
               case 'integer':
               case 'double':

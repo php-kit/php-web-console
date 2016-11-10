@@ -153,6 +153,8 @@ class Debug
   }
 
   /**
+   * Returns an HTML-formatted textual representation of a given value.
+   *
    * @param mixed $v When it's a string, if it begins with {@see RAW_TEXT}, it is not escaped.
    * @param bool  $enhanced
    * @return string
