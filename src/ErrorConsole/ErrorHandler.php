@@ -26,7 +26,7 @@ class ErrorHandler
   public static function globalExceptionHandler ($exception)
   {
     $handled = false;
-    if (ErrorConsole::$debugMode) {
+    if (ErrorConsole::$devEnv) {
       ErrorConsole::display ($exception);
       $handled = true;
     }

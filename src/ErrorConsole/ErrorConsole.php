@@ -16,9 +16,9 @@ class ErrorConsole
   /**
    * @var bool To be read by ErrorHandler::globalExceptionHandler()
    */
-  public static $debugMode = true;
-
-  private static $appName = 'PHP Web Console';
+  public static  $devEnv     = true;
+  private static $EDITOR_URL = '';
+  private static $appName    = 'PHP Web Console';
   private static $baseDir;
   private static $baseUri;
   private static $pathsMap;
@@ -61,7 +61,7 @@ class ErrorConsole
 
       if ($response) {
         $response->getBody ()->write ($exception->getMessage ());
-        if (self::$debugMode)
+        if (self::$devEnv)
           $response->getBody ()->write ("\n\nStack trace:\n" . $exception->getTraceAsString ());
         return $response
           ->withoutHeader ('Content-Type')
@@ -74,7 +74,7 @@ class ErrorConsole
       header ("Content-Type: text/plain");
       http_response_code (500);
       echo $exception->getMessage ();
-      if (self::$debugMode)
+      if (self::$devEnv)
         echo "\n\nStack trace:\n" . $exception->getTraceAsString ();
     }
     return null;
@@ -89,15 +89,18 @@ class ErrorConsole
     $label   = $label ?: $path;
     $file    = urlencode (self::toProjectPath ($file));
     $baseUri = self::$baseUri;
-    return "<a class='$class' target='hidden' $tooltipAttr='$path' href='$baseUri/goto-source.php?file=$file&line=$line&col=$col'>$label</a>";
+    $url     = self::$EDITOR_URL
+      ? "$baseUri/" . self::$EDITOR_URL . "?file=$file&line=$line&col=$col"
+      : 'javascript:void(0)';
+    return "<a class='$class' target='hidden' $tooltipAttr='$path' href='$url'>$label</a>";
   }
 
-  public static function init ($debugMode = true, $baseDir = '', $pathsMap = [])
+  public static function init ($devEnv = true, $baseDir = '', $pathsMap = [])
   {
-    self::$baseDir   = $baseDir;
-    self::$baseUri   = dirnameEx (get ($_SERVER, 'SCRIPT_NAME'));
-    self::$pathsMap  = $pathsMap;
-    self::$debugMode = $debugMode;
+    self::$baseDir  = $baseDir;
+    self::$baseUri  = dirnameEx (get ($_SERVER, 'SCRIPT_NAME'));
+    self::$pathsMap = $pathsMap;
+    self::$devEnv   = $devEnv;
     ErrorHandler::init ();
   }
 
@@ -121,6 +124,18 @@ class ErrorConsole
   public static function setAppName ($appName)
   {
     self::$appName = $appName;
+  }
+
+  /**
+   * Sets the virtual URL for an HTTP request for opening a source file on an editor at the error location.
+   *
+   * <p>Example: `'edit-source'` for generating 'edit-source?file=filename.php&line=8&col=1
+   *
+   * @param string $expr
+   */
+  static function setEditorURL ($expr)
+  {
+    self::$EDITOR_URL = $expr;
   }
 
   public static function setPathsMap (array $map)

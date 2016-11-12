@@ -69,7 +69,7 @@ namespace PhpKit\WebConsole\DebugConsole {
      * @var DebugConsoleSettings
      */
     static         $settings;
-    private static $debugMode;
+    private static $devEnv;
     /**
      * Map of panel names (identifiers) to Console subclass instances.
      *
@@ -109,12 +109,12 @@ namespace PhpKit\WebConsole\DebugConsole {
              '</span>';
     }
 
-    static function init ($debugMode = true, DebugConsoleSettings $settings = null)
+    static function init ($devEnv = true, DebugConsoleSettings $settings = null)
     {
       $settings          = $settings ?: new DebugConsoleSettings;
       self::$settings    = $settings;
       self::$initialized = true;
-      self::$debugMode   = $debugMode;
+      self::$devEnv      = $devEnv;
       self::registerPanel (self::$settings->defaultLoggerId,
         new ConsoleLogger ($settings->defaultPanelTitle, $settings->defaultPanelIcon));
     }
@@ -146,7 +146,7 @@ namespace PhpKit\WebConsole\DebugConsole {
     public static function outputContent ($force = false)
     {
       if (!self::$initialized
-          || !self::$debugMode
+          || !self::$devEnv
           || get ($_SERVER, 'REQUEST_METHOD') != 'GET'
           || strpos (get ($_SERVER, 'HTTP_ACCEPT'), 'text/html') === false
       ) return;
@@ -176,7 +176,7 @@ namespace PhpKit\WebConsole\DebugConsole {
                                                      ResponseInterface $response = null,
                                                      $force = false)
     {
-      if (self::$debugMode) {
+      if (self::$devEnv) {
         ob_start ();
         self::render ();
         $myContent = ob_get_clean ();
@@ -297,7 +297,7 @@ namespace PhpKit\WebConsole\DebugConsole {
 
     private static function render ()
     {
-      if (self::$debugMode && strpos ($_SERVER['HTTP_ACCEPT'], 'text/html') !== false) {
+      if (self::$devEnv && strpos ($_SERVER['HTTP_ACCEPT'], 'text/html') !== false) {
         echo "\n<!-- PHP WEB CONSOLE -->\n";
         DebugConsoleRenderer::renderStyles ();
         DebugConsoleRenderer::renderScripts ();
