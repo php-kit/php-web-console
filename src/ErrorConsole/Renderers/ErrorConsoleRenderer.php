@@ -43,7 +43,7 @@ class ErrorConsoleRenderer
       <div id="__panel">
         <div class="__title-bar"><?= $popupTitle ?></div>
         <div class="__panel-body">
-          <div id="__feedback">Please switch to PHPStorm / IDEA to view the code at the error location.</div>
+          <div id="__feedback">Please switch to PHPStorm/IDEA to view the code at the error location.</div>
           <img src="<?= self::getIcon () ?>">
           <div class="__message">
             <?php
