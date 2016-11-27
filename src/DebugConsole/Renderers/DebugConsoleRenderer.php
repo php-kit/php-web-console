@@ -309,12 +309,12 @@ class DebugConsoleRenderer
 
       .__log-stripe {
         position: relative;
-        padding: 30px 0 0;
+        padding: 32px 0 0;
         border: 1px solid #DDD;
         margin-top: -1px;
       }
       .__log-stripe .__log-item {
-        margin-top: -45px;;
+        margin: -30px 0px 0;
       }
 
       .__log-data {
@@ -350,7 +350,7 @@ class DebugConsoleRenderer
       }
 
       #__console .__log-item {
-        /*background: #fff;*/
+        background: #fff;
         padding: 10px;
         border-top: 1px solid #e4e4e4;
       }
@@ -451,6 +451,7 @@ class DebugConsoleRenderer
         border-collapse: collapse;
         border: none;
         margin: -1px 0;
+        color: #333;
       }
 
       .__debug-location + .__console-table {
@@ -582,6 +583,10 @@ class DebugConsoleRenderer
 
       .__expand.show > a {
         display: none;
+      }
+
+      .__panel {
+        color: #333;
       }
 
       .__panel .icon {

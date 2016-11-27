@@ -271,18 +271,19 @@ class ErrorConsoleRenderer
       #__error .file {
         display: table-cell;
         background: #EEE;
-        padding: 5px 15px;
-        width: 136px;
-        text-align: right;
+        padding: 5px 0 0 15px;
+        width: 200px;
+        text-align: left;
         border-right: 1px solid #DDD;
+        overflow-x: hidden;
       }
 
       #__error .line {
         border-right: 1px solid #DDD;
         display: table-cell;
         background: #EEE;
-        padding: 5px 15px;
-        width: 36px;
+        padding: 5px 15px 0 0;
+        width: 50px;
         text-align: right;
       }
 
@@ -437,7 +438,7 @@ class ErrorConsoleRenderer
       }
 
       .__message table.grid {
-        margin: 30px 0;
+        /*margin: 30px 0;*/
       }
 
       .__message table.grid i {
