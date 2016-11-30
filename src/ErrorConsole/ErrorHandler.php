@@ -15,7 +15,10 @@ class ErrorHandler
 
   public static function globalErrorHandler ($errno, $errstr, $errfile, $errline, $errcontext)
   {
-    if (!error_reporting ()) return false;
+    if (!error_reporting ()) {
+      error_clear_last ();
+      return false;
+    }
 
 //    self::globalExceptionHandler (new PHPError($errno, $errstr, $errfile, $errline, $errcontext));
     if (self::$nextErrorHandler)

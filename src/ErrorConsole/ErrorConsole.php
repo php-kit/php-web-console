@@ -16,11 +16,10 @@ class ErrorConsole
   /**
    * @var bool To be read by ErrorHandler::globalExceptionHandler()
    */
-  public static  $devEnv     = true;
-  private static $EDITOR_URL = '';
-  private static $appName    = 'PHP Web Console';
+  public static  $devEnv    = true;
+  private static $appName   = 'PHP Web Console';
   private static $baseDir;
-  private static $baseUri;
+  private static $editorUrl = '';
   private static $pathsMap;
 
   /**
@@ -88,9 +87,8 @@ class ErrorConsole
     $path    = self::shortFileName ($file);
     $label   = $label ?: $path;
     $file    = urlencode (self::toProjectPath ($file));
-    $baseUri = self::$baseUri;
-    $url     = self::$EDITOR_URL
-      ? "$baseUri/" . self::$EDITOR_URL . "?file=$file&line=$line&col=$col"
+    $url     = self::$editorUrl
+      ? self::$editorUrl . "?file=$file&line=$line&col=$col"
       : 'javascript:void(0)';
     return "<a class='$class' target='hidden' $tooltipAttr='$path' href='$url'>$label</a>";
   }
@@ -98,7 +96,6 @@ class ErrorConsole
   public static function init ($devEnv = true, $baseDir = '', $pathsMap = [])
   {
     self::$baseDir  = $baseDir;
-    self::$baseUri  = dirnameEx (get ($_SERVER, 'SCRIPT_NAME'));
     self::$pathsMap = $pathsMap;
     self::$devEnv   = $devEnv;
     ErrorHandler::init ();
@@ -133,9 +130,9 @@ class ErrorConsole
    *
    * @param string $expr
    */
-  static function setEditorURL ($expr)
+  static function setEditorUrl ($expr)
   {
-    self::$EDITOR_URL = $expr;
+    self::$editorUrl = $expr;
   }
 
   public static function setPathsMap (array $map)
