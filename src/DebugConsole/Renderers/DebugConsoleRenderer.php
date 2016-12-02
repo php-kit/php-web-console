@@ -542,7 +542,8 @@ class DebugConsoleRenderer
         table-layout: auto;
       }
       .__component .__console-table td,
-      .__component .__console-table th
+      .__component .__console-table th,
+      .__component .__console-table span
       {
         line-height: 15px;
       }
