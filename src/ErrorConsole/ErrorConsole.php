@@ -110,7 +110,7 @@ class ErrorConsole
   public static function processMessage ($msg)
   {
     $msg = preg_replace_callback ('#<path>([^<]*)</path>#', function ($m) {
-      return ErrorConsole::errorLink ($m[1], 1, 1, basename ($m[1]));
+      return ErrorConsole::errorLink ($m[1], 1, 1, self::shortFileName ($m[1]));
     }, $msg);
     return $msg;
   }

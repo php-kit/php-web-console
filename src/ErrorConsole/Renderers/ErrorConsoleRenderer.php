@@ -114,6 +114,7 @@ class ErrorConsoleRenderer
     <style>
       #__error {
         margin: 0;
+        background: #f8f8f8;
       }
 
       #__error a {
@@ -121,7 +122,7 @@ class ErrorConsoleRenderer
       }
 
       #__error a:link {
-        color: #99C
+        color: #6a86b4
       }
 
       #__error a:visited {
@@ -167,16 +168,20 @@ class ErrorConsoleRenderer
       }
 
       #__error .__panel-body {
-        padding-top: 20px;
+        /*padding-top: 20px;*/
       }
 
       #__error .__title-bar {
-        background: #ddd;
-        text-align: left;
+        /*background: #b24734;*/
+        /*border: 1px solid #94301e;*/
+        /*color: #f7e6e4;*/
+        /*text-align: left;*/
+        /*padding: 5px 30px;*/
         font-size: 18px;
-        padding: 1px 20px;
-        border: 1px solid #CCC;
-        color: #555;
+        padding: 5px 15px;
+        float: right;
+        z-index: 2;
+        position: relative;
       }
 
       #__feedback {
@@ -200,11 +205,16 @@ class ErrorConsoleRenderer
       #__error img {
         position: absolute;
         margin: 8px 20px;
+        z-index: 2;
       }
 
       #__error .__message {
-        padding: 26px 20px 20px 88px;
+        padding: 26px 20px 25px 88px;
+        border-bottom: 1px solid #ddd;
         color: #555;
+        z-index: 1;
+        position: relative;
+        background: #FFF;
       }
 
       #__error .__more {
@@ -229,12 +239,9 @@ class ErrorConsoleRenderer
 
       #__error .stack-frame {
         line-height: 18px;
-        padding-right: 2px;
         box-sizing: border-box;
-      }
-
-      #__error .stack-frame:first-child {
-        border-top: 1px solid;
+        border: 1px solid #DDD;
+        margin-top: -1px;
       }
 
       #__error .code {
@@ -382,10 +389,10 @@ class ErrorConsoleRenderer
 
       #__error-location {
         padding: 20px;
-        border-top: 1px solid #BF3D27;
+        /*border-top: 1px solid #BF3D27;*/
+        /*background: #FFF;*/
         font-family: menlo, monospace;
         font-size: 12px;
-        background: #FFF;
       }
 
       #__error .__location {
