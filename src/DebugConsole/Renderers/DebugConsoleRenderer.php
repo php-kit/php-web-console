@@ -314,7 +314,7 @@ class DebugConsoleRenderer
         margin-top: -1px;
       }
       .__log-stripe .__log-item {
-        margin: -30px 0px 0;
+        margin: -33px 0 0;
       }
 
       .__log-data {
@@ -384,8 +384,12 @@ class DebugConsoleRenderer
       #__console .__alert {
         color: #C00;
         background: #FFA;
-        padding: 12px;
-        border-bottom: 1px solid #DDD;
+        padding: 10px 15px;
+        border: 1px solid #DDD;
+        position: relative;
+        left: -11px;
+        top: -11px;
+        float: left;
       }
 
       #__console .__alert + div {

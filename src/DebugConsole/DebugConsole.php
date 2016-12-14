@@ -69,7 +69,10 @@ namespace PhpKit\WebConsole\DebugConsole {
      * @var DebugConsoleSettings
      */
     static         $settings;
-    private static $devEnv;
+    /**
+     * @var bool
+     */
+    private static $devEnv = false;
     /**
      * Map of panel names (identifiers) to Console subclass instances.
      *
@@ -109,14 +112,15 @@ namespace PhpKit\WebConsole\DebugConsole {
              '</span>';
     }
 
-    static function init ($devEnv = true, DebugConsoleSettings $settings = null)
+    static function init ($devEnv = true, DebugConsoleSettings $settings = null, $registerDefaultLogger = false)
     {
       $settings          = $settings ?: new DebugConsoleSettings;
       self::$settings    = $settings;
       self::$initialized = true;
       self::$devEnv      = $devEnv;
-      self::registerPanel (self::$settings->defaultLoggerId,
-        new ConsoleLogger ($settings->defaultPanelTitle, $settings->defaultPanelIcon));
+      if ($registerDefaultLogger)
+        self::registerPanel (self::$settings->defaultLoggerId,
+          new ConsoleLogger ($settings->defaultPanelTitle, $settings->defaultPanelIcon));
     }
 
     /**

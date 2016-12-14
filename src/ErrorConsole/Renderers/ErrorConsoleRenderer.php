@@ -115,6 +115,7 @@ class ErrorConsoleRenderer
       #__error {
         margin: 0;
         background: #f8f8f8;
+        overflow-x: hidden;
       }
 
       #__error a {
