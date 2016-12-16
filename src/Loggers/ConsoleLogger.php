@@ -242,6 +242,14 @@ HTML;
     return $this;
   }
 
+  /**
+   * Writes text to the logger.
+   *
+   * ><p>This is the only output function that should be overriden when creating a specialized logger.
+   *
+   * @param string $msg
+   * @return $this
+   */
   public function write ($msg)
   {
     $this->content .= $msg;
@@ -251,9 +259,7 @@ HTML;
 
   public function writef ()
   {
-    $this->content .= call_user_func_array ('sprintf', func_get_args ());
-
-    return $this;
+    return $this->write (call_user_func_array ('sprintf', func_get_args ()));
   }
 
   /**

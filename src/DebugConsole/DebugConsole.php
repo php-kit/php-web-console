@@ -3,6 +3,7 @@ namespace {
 
   use PhpKit\WebConsole\DebugConsole\DebugConsole;
   use PhpKit\WebConsole\Loggers\ConsoleLogger;
+  use PhpKit\WebConsole\Loggers\Specialized\NullLogger;
 
   /**
    * Displays a formatted representation of the given arguments to the default panel on the Debug Console.
@@ -45,6 +46,7 @@ namespace PhpKit\WebConsole\DebugConsole {
   use PhpKit\WebConsole\DebugConsole\Renderers\DebugConsoleRenderer;
   use PhpKit\WebConsole\ErrorConsole\ErrorConsole;
   use PhpKit\WebConsole\Loggers\ConsoleLogger;
+  use PhpKit\WebConsole\Loggers\Specialized\NullLogger;
   use Psr\Http\Message\ResponseInterface;
   use Psr\Http\Message\ServerRequestInterface;
 
@@ -79,6 +81,10 @@ namespace PhpKit\WebConsole\DebugConsole {
      * @var ConsoleLogger[]
      */
     private static $loggers = [];
+    /**
+     * @var NullLogger
+     */
+    private static $nullLogger;
 
     /**
      * Gets the default logger instance.
@@ -121,20 +127,25 @@ namespace PhpKit\WebConsole\DebugConsole {
       if ($registerDefaultLogger)
         self::registerPanel (self::$settings->defaultLoggerId,
           new ConsoleLogger ($settings->defaultPanelTitle, $settings->defaultPanelIcon));
+      self::$nullLogger = new NullLogger();
     }
 
     /**
-     * Returns a ConsolePanel instance by name.
+     * Returns a ConsoleLogger instance by name.
      *
      * @param string $loggerId
+     * @param bool   $required If TRUE, an exception is thrown if the logger doesn't exist, otherwhise a
+     *                         {@see NullLogger} instance is returned.
      * @return ConsoleLogger
      * @throws Exception When the id is invalid.
      */
-    public static function logger ($loggerId)
+    public static function logger ($loggerId, $required = false)
     {
       if (isset(self::$loggers[$loggerId]))
         return self::$loggers[$loggerId];
-      throw new Exception ("Invalid panel id: <b>" . htmlentities ($loggerId) . '</b>');
+      if ($required)
+        throw new Exception ("Invalid panel id: <b>" . htmlentities ($loggerId) . '</b>');
+      return self::$nullLogger;
     }
 
 
