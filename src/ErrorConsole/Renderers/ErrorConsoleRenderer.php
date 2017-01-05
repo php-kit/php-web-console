@@ -191,7 +191,6 @@ class ErrorConsoleRenderer
         background: #FFE;
         padding: 20px 15px 10px;
         border-bottom: 1px solid #e9e9d8;
-        margin-top: -20px;
       }
       #__feedback code {
         border: 1px solid #CCC;
