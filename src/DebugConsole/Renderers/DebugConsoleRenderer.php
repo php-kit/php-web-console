@@ -318,7 +318,7 @@ class DebugConsoleRenderer
 
       .__log-data {
         white-space: pre;
-        /*padding: 0 5px 0;*/
+        padding: 0 5px 0;
         display: inline-block;
       }
 
@@ -359,9 +359,11 @@ class DebugConsoleRenderer
       }
 
       #__console .__header {
-        color: #666;
+        font-family: sans-serif;
+        color: #888;
         font-weight: bold;
-        padding: 10px;
+        padding: 5px 10px;
+        background: #F8F8F8;
       }
 
       #__console .__header small {
@@ -454,10 +456,9 @@ class DebugConsoleRenderer
         border-spacing: 0;
         border-collapse: collapse;
         border: none;
-        margin: -1px 0;
+        border-bottom: 1px solid #DDD;
         color: #333;
       }
-
       .__debug-location + .__console-table {
         margin-top: -10px;
       }
@@ -519,6 +520,20 @@ class DebugConsoleRenderer
         white-space: pre-line;
         border: 1px solid #EEE;
         border-top: none;
+      }
+
+      .__console-table > tbody > tr:last-child > th,
+      .__console-table > tbody > tr:last-child > td
+      {
+        border-bottom: none;
+      }
+
+      .__console-table:last-of-type {
+        margin-bottom: -1px;
+      }
+
+      .__header + .__console-table {
+        border-top: 1px solid #DDD;
       }
 
       .__console-table .n {

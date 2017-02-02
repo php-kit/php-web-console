@@ -72,7 +72,7 @@ class ConsoleLogger extends AbstractLogger
 
   function getRenderedInspection ($val, $alt = null)
   {
-    // Note: Selenia's CustomInspectionInterface implements the inspect() method, but this library is not dependent on
+    // Note: Electro's CustomInspectionInterface implements the inspect() method, but this library is not dependent on
     // any external interface.
     return isset ($alt) && $alt instanceof CustomInspectionInterface ? $val->inspect ()
       : $this->format ($this->getInspection1 ($val, $alt));
@@ -125,8 +125,8 @@ class ConsoleLogger extends AbstractLogger
   /**
    * Displays detailed information about the specified value.
    *
-   * @param mixed $val
-   * @param mixed $alt
+   * @param mixed $val The value to be inspected.
+   * @param mixed $alt If specified, this will be the value that is displayed in tabular format.
    * @return $this
    */
   function inspectValue ($val, $alt = null)
@@ -388,7 +388,7 @@ HTML;
       if ($depth == DebugConsole::$settings->tableMaxDepth || $depth == $maxDepth)
         return '<i>(...)</i>';
       ++$depth;
-      // Note: Selenia's CustomInspectionInterface implements the inspect() method, but this library is not dependent on
+      // Note: Electro's CustomInspectionInterface implements the inspect() method, but this library is not dependent on
       // any external interface.
       if ($data instanceof CustomInspectionInterface)
         return $data->inspect ();
@@ -511,6 +511,20 @@ HTML;
     if ($val instanceof \PowerString)
       return Debug::toString ($val);
     return $this->formatType ($val, $arg);
+  }
+
+  /**
+   * @param mixed $val The value to be inspected.
+   * @param callable|null $fn A filter callback.
+   * @return string
+   */
+  function inspectWithNoTypeInfo ($val, callable $fn = null)
+  {
+    if ($fn)
+      $this->filter = $fn;
+    $this->write ($this->table ($val));
+    $this->filter = null;
+    return $this;
   }
 
 }

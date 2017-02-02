@@ -83,6 +83,25 @@ class Debug
   }
 
   /**
+   * Generates a table with a header column and a raw HTML text column from the given array.
+   *
+   * @param array $value
+   * @param string $title        [optional]
+   * @return string
+   */
+  public static function rawGrid (array $value, $title = '')
+  {
+    if ($title) $title = "<caption>$title</caption>";
+
+    return "<table class=__console-table>$title<colgroup><col width=160><col width=100%></colgroup>
+" . implode ('',
+        map ($value, function ($v, $k) {
+          return "<tr><th>$k<td>$v";
+        })) . "
+</table>";
+  }
+
+  /**
    * Interpolates context values into message placeholders, for use on PSR-3-compatible logging.
    *
    * @param string $message Message with optional placeholder with syntax {key}.
