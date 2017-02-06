@@ -7,21 +7,11 @@ use PhpKit\WebConsole\DebugConsole\DebugConsole;
 
 class WebConsoleMonologHandler extends AbstractProcessingHandler
 {
-  /**
-   * @param bool|int $level  The minimum logging level at which this handler will be triggered
-   * @param Boolean  $bubble Whether the messages that are handled can bubble up the stack or not
-   */
   public function __construct ($level = Logger::DEBUG, $bubble = true)
   {
     parent::__construct ($level, $bubble);
   }
 
-  /**
-   * Writes the record down to the log of the implementing handler
-   *
-   * @param  array $record
-   * @return void
-   */
   protected function write (array $record)
   {
     if (DebugConsole::$initialized) {
@@ -31,4 +21,5 @@ class WebConsoleMonologHandler extends AbstractProcessingHandler
       $logger->log ($record['level'], $record['message'], $record['context']);
     }
   }
+
 }
