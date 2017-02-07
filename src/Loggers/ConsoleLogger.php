@@ -1,4 +1,5 @@
 <?php
+
 namespace PhpKit\WebConsole\Loggers;
 
 use Electro\Interfaces\CustomInspectionInterface;
@@ -132,6 +133,20 @@ class ConsoleLogger extends AbstractLogger
   function inspectValue ($val, $alt = null)
   {
     return $this->write ($this->getRenderedInspection ($val, $alt))->write (' ');
+  }
+
+  /**
+   * @param mixed         $val The value to be inspected.
+   * @param callable|null $fn  A filter callback.
+   * @return string
+   */
+  function inspectWithNoTypeInfo ($val, callable $fn = null)
+  {
+    if ($fn)
+      $this->filter = $fn;
+    $this->write ($this->table ($val));
+    $this->filter = null;
+    return $this;
   }
 
   /**
@@ -406,7 +421,8 @@ HTML;
       }
       if (!is_string ($data)) {
         $label = 'Property';
-        uksort ($data, 'strnatcasecmp');
+        //TODO: allow sorting keys only if the caller wants so.
+        //uksort ($data, 'strnatcasecmp');
       }
     }
 
@@ -456,14 +472,17 @@ HTML;
         }
         $x = $filter($k, $v, $originalData);
         if (!$x) continue;
+        $isRaw = is_string ($v) && substr ($v, 0, 5) == '<raw>'
         ?>
         <tr>
           <th<?= $c1 ?>><?= strlen ($k) ? $k : "<i>''</i>" ?></th>
           <?php if ($typeColumn): ?>
-            <td><?= Debug::getType ($v) ?></td>
+            <td><?= $isRaw ? '' : Debug::getType ($v) ?></td>
           <?php endif ?>
-          <td class="v"><?= $x === '...' ? '<i>ommited</i>'
-              : $this->table ($v, '', $depth, $typeColumn, $columnHeaders, $maxDepth) ?></td>
+          <td class="v"><?php
+            if ($x === '...') echo '<i>ommited</i>';
+            else if ($isRaw) echo $v;
+            else echo $this->table ($v, '', $depth, $typeColumn, $columnHeaders, $maxDepth) ?></td>
           <?php endforeach; ?>
         </tbody>
       <?php } ?>
@@ -511,20 +530,6 @@ HTML;
     if ($val instanceof \PowerString)
       return Debug::toString ($val);
     return $this->formatType ($val, $arg);
-  }
-
-  /**
-   * @param mixed $val The value to be inspected.
-   * @param callable|null $fn A filter callback.
-   * @return string
-   */
-  function inspectWithNoTypeInfo ($val, callable $fn = null)
-  {
-    if ($fn)
-      $this->filter = $fn;
-    $this->write ($this->table ($val));
-    $this->filter = null;
-    return $this;
   }
 
 }
