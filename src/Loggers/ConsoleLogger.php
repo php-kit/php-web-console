@@ -412,7 +412,8 @@ HTML;
         if (empty($data))
           return '<i>(empty)</i>';
       }
-      else if ($it = iteratorOf ($data, false))
+      // Exclude generators because they can only be iterated once and we do not want to consume them.
+      else if ((!$data instanceof \Generator) && $it = iteratorOf ($data, false))
         $data = iterator_to_array ($it);
       else {
         $data = get_object_vars ($data);
