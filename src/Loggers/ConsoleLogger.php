@@ -343,7 +343,7 @@ HTML;
             case 'header':
               return "<div class='__header'>$str</div>";
             case 'footer':
-              return "<div class='__footer'>$str</div><div></div>";
+              return "<div class='__footer'>$str</div>";
             case 'alert':
               return "<div class='__alert'>$str</div>";
             case 'type':

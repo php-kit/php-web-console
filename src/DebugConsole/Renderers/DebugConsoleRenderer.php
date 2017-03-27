@@ -297,6 +297,13 @@ class DebugConsoleRenderer
         position: relative;
       }
 
+      /* clearfix */
+      .__log-section:after {
+        content: "";
+        display: table;
+        clear: both;
+      }
+
       .__log-title {
         font-weight: bold;
         text-align: left;
@@ -381,6 +388,10 @@ class DebugConsoleRenderer
 
       #__console .__footer + div {
         clear: right;
+      }
+
+      #__console .__footer + .__footer {
+        padding-top: 0;
       }
 
       #__console .__alert {

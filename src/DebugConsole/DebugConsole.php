@@ -114,7 +114,7 @@ namespace PhpKit\WebConsole\DebugConsole {
     public static function highlight ($msg, array $keywords, $baseStyle)
     {
       $k = implode ('|', $keywords);
-      return "<span class=$baseStyle>" . preg_replace ("#\\b($k)\\b#", '<span class=keyword>$1</span>', $msg) .
+      return "<span class=$baseStyle>" . preg_replace ("#\\b($k)\\b#i", '<span class=keyword>$1</span>', $msg) .
              '</span>';
     }
 
