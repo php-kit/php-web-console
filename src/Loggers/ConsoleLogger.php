@@ -118,6 +118,8 @@ class ConsoleLogger extends AbstractLogger
    */
   public function inspect ()
   {
+    if (!DebugConsole::$settings)
+      throw new \RuntimeException ("Web console not initialized");
     foreach (func_get_args () as $arg)
       $this->inspectValue ($arg);
     return $this;

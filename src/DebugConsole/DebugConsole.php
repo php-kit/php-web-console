@@ -127,7 +127,6 @@ namespace PhpKit\WebConsole\DebugConsole {
       if ($registerDefaultLogger)
         self::registerPanel (self::$settings->defaultLoggerId,
           new ConsoleLogger ($settings->defaultPanelTitle, $settings->defaultPanelIcon));
-      self::$nullLogger = new NullLogger();
     }
 
     /**
@@ -145,7 +144,8 @@ namespace PhpKit\WebConsole\DebugConsole {
         return self::$loggers[$loggerId];
       if ($required)
         throw new Exception ("Invalid panel id: <b>" . htmlentities ($loggerId) . '</b>');
-      return self::$nullLogger;
+      $logger = self::$nullLogger;
+      return $logger ?: self::$nullLogger = new NullLogger;
     }
 
 
