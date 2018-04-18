@@ -399,10 +399,6 @@ class DebugConsoleRenderer
         background: #FFA;
         padding: 10px 15px;
         border: 1px solid #DDD;
-        position: relative;
-        left: -11px;
-        top: -11px;
-        float: left;
       }
 
       #__console .__alert + div {
