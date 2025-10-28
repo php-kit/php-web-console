@@ -50,7 +50,7 @@ class ErrorHandler
 
   public static function init()
   {
-    self::$nextErrorHandler     = set_error_handler([static::class, 'globalErrorHandler'], E_ALL | E_STRICT);
+    self::$nextErrorHandler     = set_error_handler([static::class, 'globalErrorHandler'], E_ALL);
     self::$nextExceptionHandler = set_exception_handler([static::class, 'globalExceptionHandler']);
     register_shutdown_function([static::class, 'onShutDown']);
 
