@@ -15,7 +15,8 @@ class ErrorHandler
 
   public static function globalErrorHandler($errno, $errstr, $errfile, $errline, $errcontext = null)
   {
-    if (!error_reporting ()) {
+    // PHP 8+ keeps a non-zero error_reporting() value under @: check the errno bit instead.
+    if (!(error_reporting () & $errno)) {
       if (PHP_MAJOR_VERSION >= 7)
         error_clear_last();
       return false;
@@ -37,7 +38,7 @@ class ErrorHandler
     if (self::$nextExceptionHandler)
       call_user_func(self::$nextExceptionHandler, $e);
     if (!$handled) {
-      @ob_end_clean();
+      self::clearOutputBuffer();
       echo "<style>body,table{font-family:Menlo,sans-serif;font-size:12px}</style>";
       if ($e instanceof ExceptionWithTitle)
         echo "<h3>{$e->getTitle()}</h3>";
@@ -50,7 +51,7 @@ class ErrorHandler
 
   public static function init()
   {
-    self::$nextErrorHandler     = set_error_handler([static::class, 'globalErrorHandler'], E_ALL);
+    self::$nextErrorHandler     = set_error_handler([static::class, 'globalErrorHandler'], error_reporting());
     self::$nextExceptionHandler = set_exception_handler([static::class, 'globalExceptionHandler']);
     register_shutdown_function([static::class, 'onShutDown']);
 
@@ -76,11 +77,19 @@ class ErrorHandler
     //Catch fatal errors, which do not trigger globalErrorHandler()
     $error = error_get_last();
     if (isset($error)) {
-      if ($error['type'] === E_DEPRECATED)
+      if ($error['type'] === E_DEPRECATED || $error['type'] === E_USER_DEPRECATED)
         return;
       //remove error output emitted by the PHP engine
-      @ob_get_clean();
+      self::clearOutputBuffer();
       self::globalExceptionHandler(new PHPError($error['message'], 0, $error['type'], $error['file'], $error['line']));
+    }
+  }
+
+  private static function clearOutputBuffer()
+  {
+    while (ob_get_level () > 0) {
+      if (!@ob_end_clean ())
+        break;
     }
   }
 
